@@ -1,0 +1,72 @@
+[
+  {
+    "id": "1",
+    "name": "Grand Palace Hotel",
+    "code": "GPH001",
+    "location": "Downtown",
+    "rating": 5,
+    "description": "Luxury hotel in the heart of the city",
+    "amenities": ["WiFi", "Pool", "Spa", "Restaurant", "Gym"],
+    "contact": {
+      "phone": "+1-555-0101",
+      "email": "info@grandpalace.com",
+      "address": "123 Main Street, Downtown"
+    }
+  },
+  {
+    "id": "2",
+    "name": "Ocean View Resort",
+    "code": "OVR002",
+    "location": "Beachfront",
+    "rating": 4,
+    "description": "Beautiful resort with stunning ocean views",
+    "amenities": ["WiFi", "Beach Access", "Pool", "Restaurant", "Water Sports"],
+    "contact": {
+      "phone": "+1-555-0202",
+      "email": "reservations@oceanview.com",
+      "address": "456 Ocean Drive, Beachfront"
+    }
+  },
+  {
+    "id": "3",
+    "name": "Mountain Lodge",
+    "code": "ML003",
+    "location": "Mountain View",
+    "rating": 4,
+    "description": "Cozy lodge with mountain scenery",
+    "amenities": ["WiFi", "Fireplace", "Hiking Trails", "Restaurant", "Spa"],
+    "contact": {
+      "phone": "+1-555-0303",
+      "email": "stay@mountainlodge.com",
+      "address": "789 Mountain Road, Mountain View"
+    }
+  },
+  {
+    "id": "4",
+    "name": "City Center Hotel",
+    "code": "CCH004",
+    "location": "Business District",
+    "rating": 3,
+    "description": "Modern hotel perfect for business travelers",
+    "amenities": ["WiFi", "Business Center", "Gym", "Restaurant", "Conference Rooms"],
+    "contact": {
+      "phone": "+1-555-0404",
+      "email": "bookings@citycenter.com",
+      "address": "321 Business Ave, Business District"
+    }
+  },
+  {
+    "id": "5",
+    "name": "Boutique Inn",
+    "code": "BI005",
+    "location": "Historic Quarter",
+    "rating": 4,
+    "description": "Charming boutique hotel with historic charm",
+    "amenities": ["WiFi", "Historic Architecture", "Garden", "Restaurant", "Library"],
+    "contact": {
+      "phone": "+1-555-0505",
+      "email": "hello@boutiqueinn.com",
+      "address": "654 Heritage Street, Historic Quarter"
+    }
+  }
+]
