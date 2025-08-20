@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 interface Hotel {
   id: string;
@@ -153,7 +154,8 @@ export default function AddHotel() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6 relative overflow-hidden">
+    <ProtectedRoute requiredRole="OWNER">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6 relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-apple-blue/20 to-apple-purple/20 rounded-full blur-3xl"></div>
@@ -516,6 +518,7 @@ export default function AddHotel() {
         <div className="absolute -top-6 -left-6 w-12 h-12 bg-gradient-to-br from-apple-pink/30 to-apple-orange/30 rounded-full blur-sm animate-pulse"></div>
         <div className="absolute -bottom-6 -right-6 w-8 h-8 bg-gradient-to-br from-apple-green/30 to-apple-teal/30 rounded-full blur-sm animate-pulse delay-1000"></div>
       </div>
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 }
