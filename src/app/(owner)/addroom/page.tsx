@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 interface Room {
   id: string;
@@ -200,7 +201,8 @@ export default function AddRoom() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4 relative overflow-hidden">
+    <ProtectedRoute requiredRole="OWNER">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-apple-blue/20 to-apple-purple/20 rounded-full blur-3xl"></div>
@@ -690,6 +692,7 @@ export default function AddRoom() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 }

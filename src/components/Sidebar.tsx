@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -11,19 +12,23 @@ interface SidebarProps {
 
 const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
   const pathname = usePathname();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { user, logout } = useAuth();
 
-  const menuItems = [
+  const allMenuItems = [
     {
       title: 'Hotels Management',
       href: '/addhotel',
       icon: '🏨',
-      isActive: pathname.startsWith('/addhotel')
+      isActive: pathname.startsWith('/addhotel'),
+      requiredRole: 'OWNER'
     },
     {
       title: 'Rooms Management', 
       href: '/addroom',
       icon: '🏠',
-      isActive: pathname.startsWith('/addroom')
+      isActive: pathname.startsWith('/addroom'),
+      requiredRole: 'OWNER'
     },
     {
       title: 'Create a Reservations',
@@ -44,6 +49,14 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
       isActive: pathname === '/guests'
     }
   ];
+
+  // Filter menu items based on user role
+  const menuItems = allMenuItems.filter(item => {
+    if (item.requiredRole && user?.role !== item.requiredRole) {
+      return false;
+    }
+    return true;
+  });
 
   return (
     <>
@@ -103,11 +116,24 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
 
         {/* Logout Button */}
         <div className="p-4 border-t border-gray-200">
-          <button className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200">
+          <button 
+            onClick={async () => {
+              setIsLoggingOut(true);
+              try {
+                await logout();
+              } catch (error) {
+                console.error('Logout error:', error);
+              } finally {
+                setIsLoggingOut(false);
+              }
+            }}
+            disabled={isLoggingOut}
+            className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            <span className="font-medium">Logout</span>
+            <span className="font-medium">{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
           </button>
         </div>
       </div>
