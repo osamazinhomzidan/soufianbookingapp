@@ -1,0 +1,165 @@
+# 🏨 Hotel Management System – Backend Project Plan
+
+## 1. Overview
+
+This project is a **multi-hotel booking management platform** for **internal use only**.
+Staff create and manage reservations on behalf of guests, while Owners have full control over hotels, rooms, pricing, availability, and staff accounts.
+
+* **Frontend**: Already designed (UI/UX PDF).
+* **Specification**: Defined in MVP doc (Docx).
+* **Backend**: To be built with:
+
+  * **Next.js (API routes)**
+  * **Prisma ORM**
+  * **Supabase (Postgres database + Auth + Storage)**
+
+---
+
+## 2. System Roles
+
+* **Owner**
+
+  * Has **all Staff permissions**
+  * Plus: Manage hotels, room types, amenities, views, pricing, availability, and staff accounts
+
+* **Staff**
+
+  * Browse and filter rooms
+  * Create, edit, and cancel reservations
+  * Enter guest details
+  * View bookings
+
+👉 **Rule:** Owners can do everything Staff can.
+
+---
+
+## 3. Core Features
+
+### Owner (Admin Dashboard)
+
+* Manage hotels (CRUD: name, address, phone, email)
+* Define room types, amenities, and views
+* Set pricing for room types
+* Define availability ranges
+* Create and manage staff accounts
+
+### Staff (Booking Dashboard)
+
+* Browse rooms and availability
+* Book rooms with validation (capacity, availability)
+* Edit or cancel bookings
+* View/search existing reservations
+
+---
+
+## 4. Backend Architecture
+
+### 4.1 Layers
+
+* **Frontend (Next.js pages/UI)** → Calls backend APIs
+* **Next.js API Routes** → Authentication, validation, business logic
+* **Prisma ORM** → Database models & queries
+* **Supabase PostgreSQL** → Central data store
+* **Supabase Auth** → Authentication (JWT managed by Supabase)
+
+### 4.2 Database Entities (Prisma Models – draft)
+
+* **User**: login credentials, role (`OWNER`, `STAFF`)
+* **Hotel**: name, address, contact info, linked to owner
+* **RoomType**: type of room, capacity, features, belongs to a hotel
+* **Amenity**: linked to room types (Wi-Fi, AC, etc.)
+* **Pricing**: base rates by room type/view
+* **Availability**: date ranges for availability per room type
+* **Reservation**: guest details, linked to hotel, room type, and creator (staff/owner)
+
+---
+
+## 5. Environment Setup
+
+Create a `.env` file at the project root.
+
+### 🔑 Supabase Configuration
+
+```env
+# PostgreSQL (Supabase)
+POSTGRES_URL="postgres://postgres.evoqiykwbqgrxzeiyrbo:DFZDID3GaSELk4TV@aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&supa=base-pooler.x"
+POSTGRES_USER="postgres"
+POSTGRES_PASSWORD="DFZDID3GaSELk4TV"
+POSTGRES_HOST="db.evoqiykwbqgrxzeiyrbo.supabase.co"
+POSTGRES_DATABASE="postgres"
+
+# Prisma (connection via Supabase PgBouncer)
+POSTGRES_PRISMA_URL="postgres://postgres.evoqiykwbqgrxzeiyrbo:DFZDID3GaSELk4TV@aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true"
+POSTGRES_URL_NON_POOLING="postgres://postgres.evoqiykwbqgrxzeiyrbo:DFZDID3GaSELk4TV@aws-1-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require"
+
+# Supabase Project
+SUPABASE_URL="https://evoqiykwbqgrxzeiyrbo.supabase.co"
+NEXT_PUBLIC_SUPABASE_URL="https://evoqiykwbqgrxzeiyrbo.supabase.co"
+
+# Supabase Auth Keys
+SUPABASE_JWT_SECRET="1JkRVkiAMJUA05WaaDhojekUSys4GacZN7kPsA4u4SAOwuIHGOksZDm3sYK9ot7ViRD/ri6cw+udOrrCuafsGg=="
+NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2b3FpeWt3YnFncnh6ZWl5cmJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NDU4MjgsImV4cCI6MjA3MTIyMTgyOH0.5r65e8bqq7hmtaX5xqFT7TH2gtx-gyWL_jYXGmLHAm4"
+SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2b3FpeWt3YnFncnh6ZWl5cmJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NDU4MjgsImV4cCI6MjA3MTIyMTgyOH0.5r65e8bqq7hmtaX5xqFT7TH2gtx-gyWL_jYXGmLHAm4"
+SUPABASE_SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2b3FpeWt3YnFncnh6ZWl5cmJvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTY0NTgyOCwiZXhwIjoyMDcxMjIxODI4fQ.rPcqqf8fQJE78V6yDkZyongUu3WIddQTfdBkC-PCJGE"
+```
+
+---
+
+## 6. Backend Development Roadmap
+
+### Step 1 – Project Setup
+
+* Initialize Next.js with TypeScript
+* Add Prisma + Supabase PostgreSQL connection
+* Run `prisma init`
+
+### Step 2 – Authentication & Roles (**First Priority**)
+
+* Use **Supabase Auth** for user management (preferred since keys are ready)
+* Prisma `User` model will extend Supabase auth users with metadata (role, linked hotel, etc.)
+* Middleware to restrict APIs:
+
+  * Staff → booking/reservations only
+  * Owner → all endpoints
+
+### Step 3 – Hotel Management (Owner only)
+
+* CRUD APIs for hotel creation & management
+
+### Step 4 – Room Types & Amenities
+
+* APIs for defining rooms, amenities, and views
+
+### Step 5 – Pricing & Availability
+
+* APIs for rates and availability validation
+
+### Step 6 – Reservations
+
+* Staff & Owner can: create, edit, cancel bookings
+* Validate real-time room capacity & availability
+
+### Step 7 – Dashboard APIs
+
+* Reservation list, hotel overview, calendar data
+
+### Step 8 – Localization
+
+* Ensure API supports bilingual responses (English/Arabic keys)
+
+---
+
+## 7. Deployment & Environment
+
+* **Dev** → Supabase local or cloud, Next.js local dev server
+* **Prod** → Next.js + Supabase (on-prem or cloud)
+* **CI/CD** → GitHub Actions, Prisma migrations run on deploy
+
+---
+
+## 8. Next Actions
+
+1. Define **Prisma schema** for core entities (`User`, `Hotel`, `RoomType`, `Reservation`, etc.)
+2. Implement **Supabase Auth integration** with Prisma metadata (role-based).
+3. Build **role middleware** → Owner inherits Staff permissions.
+
