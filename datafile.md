@@ -63,6 +63,7 @@ This is a **multi-hotel booking management platform** for **internal use only**.
 - `hotelName`: String - Primary hotel name (required)
 - `hotelCode`: String - Unique hotel identifier (required)
 - `altHotelName`: String - Alternative/Arabic hotel name (required)
+- `hotelAddress`: String - Hotel address (required)
 
 ##### Hotel Search & Filter:
 - `nameFilter`: String - Filter hotels by name (supports both primary and alternative names)
@@ -79,6 +80,7 @@ interface Hotel {
   name: string;         // Primary hotel name
   code: string;         // Hotel code (e.g., 'GPH001')
   altName: string;      // Alternative/Arabic name
+  address: string;      // Hotel address
   createdAt: string;    // Creation timestamp
 }
 ```

@@ -7,6 +7,7 @@ interface Hotel {
   name: string;
   code: string;
   altName: string;
+  address: string;
   createdAt: string;
 }
 
@@ -15,6 +16,7 @@ export default function AddHotel() {
   const [hotelName, setHotelName] = useState('');
   const [hotelCode, setHotelCode] = useState('');
   const [altHotelName, setAltHotelName] = useState('');
+  const [hotelAddress, setHotelAddress] = useState('');
   const [nameFilter, setNameFilter] = useState('');
   const [codeFilter, setCodeFilter] = useState('');
   const [selectedHotels, setSelectedHotels] = useState<string[]>([]);
@@ -25,6 +27,7 @@ export default function AddHotel() {
       name: 'Grand Palace Hotel',
       code: 'GPH001',
       altName: 'فندق القصر الكبير',
+      address: '123 King Fahd Road, Riyadh, Saudi Arabia',
       createdAt: '2024-01-15'
     },
     {
@@ -32,6 +35,7 @@ export default function AddHotel() {
       name: 'Ocean View Resort',
       code: 'OVR002',
       altName: 'منتجع إطلالة المحيط',
+      address: '456 Corniche Road, Jeddah, Saudi Arabia',
       createdAt: '2024-01-20'
     },
     {
@@ -39,6 +43,7 @@ export default function AddHotel() {
       name: 'Mountain Lodge',
       code: 'ML003',
       altName: 'نزل الجبل',
+      address: '789 Mountain View Street, Abha, Saudi Arabia',
       createdAt: '2024-01-25'
     },
     {
@@ -46,6 +51,7 @@ export default function AddHotel() {
       name: 'City Center Hotel',
       code: 'CCH004',
       altName: 'فندق وسط المدينة',
+      address: '321 Business District, Dammam, Saudi Arabia',
       createdAt: '2024-01-30'
     }
   ]);
@@ -62,18 +68,20 @@ export default function AddHotel() {
 
   const handleAddHotel = (e: React.FormEvent) => {
     e.preventDefault();
-    if (hotelName && hotelCode && altHotelName) {
+    if (hotelName && hotelCode && altHotelName && hotelAddress) {
       const newHotel: Hotel = {
         id: Date.now().toString(),
         name: hotelName,
         code: hotelCode,
         altName: altHotelName,
+        address: hotelAddress,
         createdAt: new Date().toISOString().split('T')[0]
       };
       setHotels([...hotels, newHotel]);
       setHotelName('');
       setHotelCode('');
       setAltHotelName('');
+      setHotelAddress('');
       console.log('Hotel added:', newHotel);
     }
   };
@@ -213,6 +221,21 @@ export default function AddHotel() {
                   required
                 />
               </div>
+            </div>
+
+            {/* Hotel Address */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                {language === 'ar' ? 'عنوان الفندق' : 'Hotel Address'}
+              </label>
+              <input
+                type="text"
+                value={hotelAddress}
+                onChange={(e) => setHotelAddress(e.target.value)}
+                className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
+                placeholder={language === 'ar' ? 'أدخل عنوان الفندق' : 'Enter hotel address'}
+                required
+              />
             </div>
 
             {/* Action Buttons */}
