@@ -1,0 +1,411 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL_NON_POOLING")
+}
+
+// ================================
+// USER MANAGEMENT
+// ================================
+
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  email     String   @unique
+  password  String   // hashed password
+  role      UserRole @default(STAFF)
+  firstName String?
+  lastName  String?
+  phone     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  createdBookings Booking[] @relation("BookingCreatedBy")
+  updatedBookings Booking[] @relation("BookingUpdatedBy")
+  createdHotels   Hotel[]   @relation("HotelCreatedBy")
+  createdRooms    Room[]    @relation("RoomCreatedBy")
+
+  @@map("users")
+}
+
+enum UserRole {
+  OWNER
+  STAFF
+}
+
+// ================================
+// HOTEL MANAGEMENT
+// ================================
+
+model Hotel {
+  id          String   @id @default(cuid())
+  name        String   // Primary hotel name
+  code        String   @unique // Hotel code (e.g., 'GPH001')
+  altName     String?  // Alternative/Arabic name
+  description String?
+  address     String?
+  city        String?
+  country     String?
+  phone       String?
+  email       String?
+  rating      Int?     @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdById String
+
+  // Relations
+  createdBy User   @relation("HotelCreatedBy", fields: [createdById], references: [id])
+  rooms     Room[]
+  bookings  Booking[]
+  amenities HotelAmenity[]
+
+  @@map("hotels")
+}
+
+model HotelAmenity {
+  id      String @id @default(cuid())
+  hotelId String
+  name    String // e.g., "WiFi", "Pool", "Spa", "Restaurant", "Gym"
+  icon    String?
+
+  // Relations
+  hotel Hotel @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+
+  @@unique([hotelId, name])
+  @@map("hotel_amenities")
+}
+
+// ================================
+// ROOM MANAGEMENT
+// ================================
+
+model Room {
+  id                  String    @id @default(cuid())
+  hotelId             String
+  roomType            String    // e.g., 'Deluxe Suite', 'Family Room'
+  roomTypeDescription String    // English description
+  altDescription      String?   // Arabic description
+  basePrice           Decimal   @db.Decimal(10, 2)
+  quantity            Int       @default(1) // Number of rooms of this type
+  boardType           BoardType @default(ROOM_ONLY)
+  size                String?   // e.g., "45 sqm"
+  capacity            Int       @default(2) // Maximum occupancy
+  floor               Int?
+  isActive            Boolean   @default(true)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  createdById         String
+
+  // Relations
+  hotel             Hotel              @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  createdBy         User               @relation("RoomCreatedBy", fields: [createdById], references: [id])
+  bookings          Booking[]
+  seasonalPrices    SeasonalPrice[]
+  roomAmenities     RoomAmenity[]
+  availabilitySlots AvailabilitySlot[]
+
+  @@map("rooms")
+}
+
+enum BoardType {
+  ROOM_ONLY
+  BED_BREAKFAST
+  HALF_BOARD
+  FULL_BOARD
+}
+
+model RoomAmenity {
+  id     String @id @default(cuid())
+  roomId String
+  name   String // e.g., "King Bed", "Ocean View", "Balcony", "Mini Bar"
+  icon   String?
+
+  // Relations
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, name])
+  @@map("room_amenities")
+}
+
+model SeasonalPrice {
+  id        String   @id @default(cuid())
+  roomId    String
+  startDate DateTime
+  endDate   DateTime
+  price     Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+
+  // Relations
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@map("seasonal_prices")
+}
+
+model AvailabilitySlot {
+  id               String   @id @default(cuid())
+  roomId           String
+  date             DateTime @db.Date
+  availableCount   Int      // How many rooms of this type are available on this date
+  blockedCount     Int      @default(0) // Rooms blocked for maintenance, etc.
+  maintenanceNotes String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, date])
+  @@map("availability_slots")
+}
+
+// ================================
+// GUEST MANAGEMENT
+// ================================
+
+model Guest {
+  id                   String    @id @default(cuid())
+  profileId            String    @unique // External profile ID
+  firstName            String
+  lastName             String
+  fullName             String    // Computed or stored full name
+  email                String?
+  phone                String?
+  nationality          String?
+  passportNumber       String?
+  dateOfBirth          DateTime? @db.Date
+  gender               Gender?
+  address              String?
+  city                 String?
+  country              String?
+  company              String?
+  guestClassification  String?   // e.g., 'Saudi Citizen', 'Visitor'
+  travelAgent          String?
+  source               String?   // Booking source
+  group                String?   // Group classification
+  isVip                Boolean   @default(false)
+  notes                String?
+  totalStays           Int       @default(0)
+  totalSpent           Decimal   @default(0) @db.Decimal(12, 2)
+  lastStayDate         DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  // Relations
+  bookings         Booking[]
+  preferences      GuestPreference?
+  loyaltyProgram   LoyaltyProgram?
+  emergencyContact EmergencyContact?
+
+  @@map("guests")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+model GuestPreference {
+  id                 String           @id @default(cuid())
+  guestId            String           @unique
+  roomType           String?
+  bedType            String?
+  smokingPreference  SmokingPreference @default(NON_SMOKING)
+  floorPreference    String?
+  specialRequests    String[]         // Array of special requests
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  // Relations
+  guest Guest @relation(fields: [guestId], references: [id], onDelete: Cascade)
+
+  @@map("guest_preferences")
+}
+
+enum SmokingPreference {
+  SMOKING
+  NON_SMOKING
+}
+
+model LoyaltyProgram {
+  id        String       @id @default(cuid())
+  guestId   String       @unique
+  isMember  Boolean      @default(false)
+  level     LoyaltyLevel @default(BRONZE)
+  points    Int          @default(0)
+  joinDate  DateTime?    @db.Date
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  // Relations
+  guest Guest @relation(fields: [guestId], references: [id], onDelete: Cascade)
+
+  @@map("loyalty_programs")
+}
+
+enum LoyaltyLevel {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+model EmergencyContact {
+  id           String   @id @default(cuid())
+  guestId      String   @unique
+  name         String
+  relationship String
+  phone        String
+  email        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  guest Guest @relation(fields: [guestId], references: [id], onDelete: Cascade)
+
+  @@map("emergency_contacts")
+}
+
+// ================================
+// BOOKING MANAGEMENT
+// ================================
+
+model Booking {
+  id              String        @id @default(cuid())
+  resId           String        @unique // Reservation ID (e.g., 'RES-2024-001')
+  hotelId         String
+  roomId          String
+  guestId         String
+  numberOfRooms   Int           @default(1)
+  checkInDate     DateTime      @db.Date
+  checkOutDate    DateTime      @db.Date
+  numberOfNights  Int           // Calculated field
+  roomRate        Decimal       @db.Decimal(10, 2) // Rate applied at booking time
+  totalAmount     Decimal       @db.Decimal(12, 2) // Total booking amount
+  rateCode        String?       // Rate classification code (e.g., 'CORP')
+  status          BookingStatus @default(PENDING)
+  checkInTime     DateTime?
+  checkOutTime    DateTime?
+  assignedRoomNo  String?       // Actual room number assigned
+  specialRequests String[]      // Array of special requests
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  createdById     String
+  updatedById     String?
+
+  // Relations
+  hotel     Hotel    @relation(fields: [hotelId], references: [id])
+  room      Room     @relation(fields: [roomId], references: [id])
+  guest     Guest    @relation(fields: [guestId], references: [id])
+  createdBy User     @relation("BookingCreatedBy", fields: [createdById], references: [id])
+  updatedBy User?    @relation("BookingUpdatedBy", fields: [updatedById], references: [id])
+  payments  Payment[]
+
+  @@map("bookings")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CHECKED_IN
+  CHECKED_OUT
+  CANCELLED
+  NO_SHOW
+}
+
+// ================================
+// PAYMENT MANAGEMENT
+// ================================
+
+model Payment {
+  id                String        @id @default(cuid())
+  bookingId         String
+  method            PaymentMethod
+  amount            Decimal       @db.Decimal(12, 2)
+  paymentDate       DateTime      @default(now())
+  startDate         DateTime?     @db.Date // Payment period start
+  completionDate    DateTime?     @db.Date // Expected completion date
+  amountPaidToday   Decimal?      @db.Decimal(12, 2)
+  remainingBalance  Decimal?      @db.Decimal(12, 2)
+  status            PaymentStatus @default(PENDING)
+  transactionId     String?       // External transaction reference
+  notes             String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  // Relations
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  DEBIT_CARD
+  BANK_TRANSFER
+  VISA
+  MASTERCARD
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+  PARTIALLY_PAID
+}
+
+// ================================
+// AUDIT AND LOGGING
+// ================================
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String   // e.g., 'CREATE_BOOKING', 'UPDATE_GUEST', 'DELETE_ROOM'
+  tableName String   // Table affected
+  recordId  String   // ID of the affected record
+  oldValues Json?    // Previous values (for updates)
+  newValues Json?    // New values
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+// ================================
+// SYSTEM CONFIGURATION
+// ================================
+
+model SystemSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique // e.g., 'default_currency', 'tax_rate', 'cancellation_policy'
+  value     String   // JSON string for complex values
+  category  String?  // e.g., 'payment', 'booking', 'system'
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("system_settings")
+}
+
+// ================================
+// INDEXES FOR PERFORMANCE
+// ================================
+
+// Additional indexes can be added here for better query performance
+// Examples:
+// @@index([checkInDate, checkOutDate]) on Booking
+// @@index([email]) on Guest
+// @@index([hotelId, date]) on AvailabilitySlot
