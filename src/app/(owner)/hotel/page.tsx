@@ -12,7 +12,7 @@ interface Hotel {
   createdAt: string;
 }
 
-export default function AddHotel() {
+export default function Hotel() {
   const [language, setLanguage] = useState('en');
   const [hotelName, setHotelName] = useState('');
   const [hotelCode, setHotelCode] = useState('');

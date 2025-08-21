@@ -18,16 +18,16 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
   const allMenuItems = [
     {
       title: 'Hotels Management',
-      href: '/addhotel',
+      href: '/hotel',
       icon: '🏨',
-      isActive: pathname.startsWith('/addhotel'),
+      isActive: pathname.startsWith('/hotel'),
       requiredRole: 'OWNER'
     },
     {
       title: 'Rooms Management', 
-      href: '/addroom',
+      href: '/room',
       icon: '🏠',
-      isActive: pathname.startsWith('/addroom'),
+      isActive: pathname.startsWith('/room'),
       requiredRole: 'OWNER'
     },
     {

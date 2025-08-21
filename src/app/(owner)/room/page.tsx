@@ -27,7 +27,7 @@ interface Hotel {
   code: string;
 }
 
-export default function AddRoom() {
+export default function Room() {
   const [language, setLanguage] = useState('en');
   const [hotelId, setHotelId] = useState('');
   const [roomType, setRoomType] = useState('');

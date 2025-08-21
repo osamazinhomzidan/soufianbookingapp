@@ -178,32 +178,6 @@ export default function LoginPage() {
               </div>
             </div>
           </div>
-
-            {/* Remember Me and Forgot Password */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 text-apple-blue focus:ring-apple-blue border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                  {language === 'ar' ? 'تذكرني' : 'remember me'}
-                </label>
-              </div>
-              <button
-                type="button"
-                onClick={handleForgotPassword}
-                className="text-sm text-apple-blue hover:text-apple-blue-dark transition-colors font-medium"
-              >
-                {language === 'ar' ? 'نسيت كلمة المرور؟' : 'forgot password ?'}
-              </button>
-            </div>
-
-            
-
             {/* Login and Exit Buttons */}
             <div className="flex space-x-4">
               <button
