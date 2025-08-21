@@ -1,9 +1,23 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from '@/hooks/useTranslation';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import {
+  HomeIcon,
+  BuildingOfficeIcon,
+  KeyIcon,
+  CalendarDaysIcon,
+  ClipboardDocumentListIcon,
+  UsersIcon,
+  ArrowRightOnRectangleIcon,
+  Bars3Icon,
+  XMarkIcon,
+  LanguageIcon,
+} from '@heroicons/react/24/outline';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -11,41 +25,43 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
+  const { user, logout } = useAuth();
+  const { language, toggleLanguage } = useLanguage();
+  const { t, isRTL, textAlignClass, marginLeftClass, marginRightClass } = useTranslation();
   const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const { user, logout } = useAuth();
 
   const allMenuItems = [
     {
-      title: 'Hotels Management',
+      title: t('sidebar.hotelsManagement'),
       href: '/hotel',
-      icon: '🏨',
+      icon: BuildingOfficeIcon,
       isActive: pathname.startsWith('/hotel'),
       requiredRole: 'OWNER'
     },
     {
-      title: 'Rooms Management', 
+      title: t('sidebar.roomsManagement'), 
       href: '/room',
-      icon: '🏠',
+      icon: KeyIcon,
       isActive: pathname.startsWith('/room'),
       requiredRole: 'OWNER'
     },
     {
-      title: 'Create a Reservations',
+      title: t('sidebar.createReservation'),
       href: '/booking',
-      icon: '📝',
+      icon: CalendarDaysIcon,
       isActive: pathname.startsWith('/booking')
     },
     {
-      title: 'All Reservations',
+      title: t('sidebar.allReservations'),
       href: '/reservations',
-      icon: '📋',
+      icon: ClipboardDocumentListIcon,
       isActive: pathname === '/reservations'
     },
     {
-      title: 'All Guests',
+      title: t('sidebar.allGuests'),
       href: '/guests',
-      icon: '👥',
+      icon: UsersIcon,
       isActive: pathname === '/guests'
     }
   ];
@@ -70,17 +86,17 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
       
       {/* Sidebar */}
       <div className={`
-        fixed top-0 left-0 h-full w-72 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        fixed top-0 ${isRTL ? 'right-0' : 'left-0'} h-full w-72 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : (isRTL ? 'translate-x-full' : '-translate-x-full')}
         lg:translate-x-0 lg:static lg:z-auto
       `}>
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <div className="flex items-center space-x-3">
+          <div className={`flex items-center ${isRTL ? 'space-x-reverse' : ''} space-x-3`}>
             <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">H</span>
             </div>
-            <span className="text-xl font-semibold text-gray-800">Logo</span>
+            <span className={`text-xl font-semibold text-gray-800 ${textAlignClass}`}>Logo</span>
           </div>
           
           {/* Toggle button for mobile */}
@@ -101,21 +117,29 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
               key={index}
               href={item.href}
               className={`
-                flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200
+                flex items-center ${isRTL ? 'space-x-reverse' : ''} space-x-3 px-4 py-3 rounded-lg transition-all duration-200
                 ${item.isActive 
                   ? 'bg-green-500 text-white shadow-md' 
                   : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'
                 }
               `}
             >
-              <span className="text-lg">{item.icon}</span>
-              <span className="font-medium">{item.title}</span>
+              <item.icon className="w-5 h-5" />
+              <span className={`font-medium ${textAlignClass}`}>{item.title}</span>
             </Link>
           ))}
         </nav>
 
-        {/* Logout Button */}
-        <div className="p-4 border-t border-gray-200">
+        {/* Language Toggle and Logout Button */}
+        <div className="p-4 border-t border-gray-200 space-y-2">
+          <button 
+            onClick={toggleLanguage}
+            className={`w-full flex items-center justify-center ${isRTL ? 'space-x-reverse' : ''} space-x-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200`}
+          >
+            <LanguageIcon className="w-5 h-5" />
+            <span className="font-medium">{language === 'en' ? t('sidebar.arabic') : t('sidebar.english')}</span>
+          </button>
+          
           <button 
             onClick={async () => {
               setIsLoggingOut(true);
@@ -128,12 +152,10 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
               }
             }}
             disabled={isLoggingOut}
-            className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`w-full flex items-center justify-center ${isRTL ? 'space-x-reverse' : ''} space-x-2 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            <span className="font-medium">{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
+            <ArrowRightOnRectangleIcon className="w-5 h-5" />
+            <span className="font-medium">{isLoggingOut ? t('sidebar.loggingOut') : t('sidebar.logout')}</span>
           </button>
         </div>
       </div>

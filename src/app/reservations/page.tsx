@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Hotel {
   id: string;
@@ -62,7 +64,8 @@ interface Booking {
 }
 
 export default function Reservations() {
-  const [language, setLanguage] = useState('en');
+  const { language } = useLanguage();
+  const { t, isRTL, textAlignClass } = useTranslation();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);

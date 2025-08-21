@@ -2,7 +2,10 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from '@/hooks/useTranslation';
 import Sidebar from './Sidebar';
+import { Bars3Icon } from '@heroicons/react/24/outline';
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
@@ -11,6 +14,7 @@ interface LayoutWrapperProps {
 const LayoutWrapper = ({ children }: LayoutWrapperProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { isAuthenticated, isLoading } = useAuth();
+  const { isRTL } = useTranslation();
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -32,7 +36,7 @@ const LayoutWrapper = ({ children }: LayoutWrapperProps) => {
 
   // If authenticated, show the full layout with sidebar
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className={`flex h-screen bg-gray-50 ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
       
@@ -46,9 +50,7 @@ const LayoutWrapper = ({ children }: LayoutWrapperProps) => {
                 onClick={toggleSidebar}
                 className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
+                <Bars3Icon className="w-6 h-6" />
               </button>
               <h1 className="text-lg font-semibold text-gray-800">Hotel Management</h1>
             </div>

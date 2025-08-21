@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Hotel {
   id: string;
@@ -64,7 +66,8 @@ interface Booking {
 }
 
 export default function Booking() {
-  const [language, setLanguage] = useState('en');
+  const { language } = useLanguage();
+  const { t, isRTL, textAlignClass } = useTranslation();
   
   // Step 1: Room Selection
   const [selectedHotelId, setSelectedHotelId] = useState('hotel-1');
@@ -228,7 +231,7 @@ export default function Booking() {
           <div className="flex items-center space-x-4">
             <div className="w-8 h-8 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
             <span className="text-lg font-medium text-gray-700">
-              {language === 'ar' ? 'جاري تحميل البيانات...' : 'Loading data...'}
+              {t('booking.loadingData')}
             </span>
           </div>
         </div>
@@ -238,7 +241,7 @@ export default function Booking() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4 relative overflow-hidden">
+      <div className={`min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4 relative overflow-hidden ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
@@ -258,23 +261,23 @@ export default function Booking() {
             <div className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-2xl p-6 shadow-lg">
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
-                <h2 className="text-xl font-semibold text-gray-800">
-                  {language === 'ar' ? 'اختيار الغرفة' : 'Room Selection'}
+                <h2 className={`text-xl font-semibold text-gray-800 ${textAlignClass}`}>
+                  {t('booking.roomSelection')}
                 </h2>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Hotel Selection */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'الفندق' : 'Hotel'}
+                  <label className={`block text-sm font-medium text-gray-700 ${textAlignClass}`}>
+                    {t('booking.hotel')}
                   </label>
                   <select
                     value={selectedHotelId}
                     onChange={(e) => setSelectedHotelId(e.target.value)}
                     className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
                   >
-                    <option value="">{language === 'ar' ? 'اختر الفندق' : 'Select Hotel'}</option>
+                    <option value="">{t('booking.selectHotel')}</option>
                     {hotels.map((hotel) => (
                       <option key={hotel.id} value={hotel.id}>
                         {hotel.name} ({hotel.code})
@@ -285,13 +288,13 @@ export default function Booking() {
                 
                 {/* Room Type Selection with Availability Colors */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'نوع الغرفة' : 'Room Type'}
+                  <label className={`block text-sm font-medium text-gray-700 ${textAlignClass}`}>
+                    {t('booking.roomType')}
                   </label>
                   <div className="space-y-2">
                     {!selectedHotelId ? (
-                      <div className="w-full px-4 py-3 bg-gray-100/50 border border-gray-200/50 rounded-xl text-gray-500">
-                        {language === 'ar' ? 'اختر الفندق أولاً' : 'Select hotel first'}
+                      <div className={`w-full px-4 py-3 bg-gray-100/50 border border-gray-200/50 rounded-xl text-gray-500 ${textAlignClass}`}>
+                        {t('booking.selectHotelFirst')}
                       </div>
                     ) : (
                       <div className="space-y-2">
@@ -317,17 +320,17 @@ export default function Booking() {
                                   <div className="text-xs mt-1">
                                     {room.status === 'available' ? (
                                       <span className="text-green-600 font-medium">
-                                        {language === 'ar' ? `${room.availableCount || 0} غرفة متاحة` : `${room.availableCount || 0} rooms available`}
+                                        {t('booking.roomsAvailable', { count: room.availableCount || 0 })}
                                       </span>
                                     ) : (
                                       <span className="text-red-600 font-medium">
-                                        {language === 'ar' ? 'غير متاح' : 'Not available'}
+                                        {t('booking.notAvailable')}
                                       </span>
                                     )}
                                   </div>
                                 </div>
                                 <div className="text-right">
-                                  <div className="font-bold">{room.rate} {language === 'ar' ? 'ريال' : 'SAR'}/night</div>
+                                  <div className="font-bold">{room.rate} {t('common.currency')}/{t('booking.night')}</div>
                                   <div className="text-xs capitalize">{room.status}</div>
                                 </div>
                               </div>
@@ -341,8 +344,8 @@ export default function Booking() {
                 
                 {/* Number of Rooms */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'عدد الغرف' : 'Number of Rooms'}
+                  <label className={`block text-sm font-medium text-gray-700 ${textAlignClass}`}>
+                    {t('booking.numberOfRooms')}
                   </label>
                   <select
                     value={numberOfRooms}
@@ -351,29 +354,26 @@ export default function Booking() {
                     className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {!selectedRoomId ? (
-                      <option value={1}>{language === 'ar' ? 'اختر نوع الغرفة أولاً' : 'Select room type first'}</option>
+                      <option value={1}>{t('booking.selectRoomTypeFirst')}</option>
                     ) : (
                       Array.from({ length: Math.min(10, (getSelectedRoom()?.availableCount || 0)) }, (_, i) => i + 1).map(num => (
                         <option key={num} value={num}>
-                          {num} {language === 'ar' ? (num === 1 ? 'غرفة' : 'غرف') : (num === 1 ? 'room' : 'rooms')}
+                          {num} {t(num === 1 ? 'booking.room' : 'booking.rooms')}
                         </option>
                       ))
                     )}
                   </select>
                   {selectedRoomId && (
                     <div className="text-xs text-gray-600 mt-1">
-                      {language === 'ar' 
-                        ? `الحد الأقصى: ${getSelectedRoom()?.availableCount || 0} غرف متاحة`
-                        : `Maximum: ${getSelectedRoom()?.availableCount || 0} rooms available`
-                      }
+                      {t('booking.maximumRooms', { count: getSelectedRoom()?.availableCount || 0 })}
                     </div>
                   )}
                 </div>
                 
                 {/* Arrival Date */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'تاريخ الوصول' : 'Arrival Date'}
+                  <label className={`block text-sm font-medium text-gray-700 ${textAlignClass}`}>
+                    {t('booking.arrivalDate')}
                   </label>
                   <input
                     type="date"
@@ -388,8 +388,8 @@ export default function Booking() {
                 
                 {/* Departure Date */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'تاريخ المغادرة' : 'Departure Date'}
+                  <label className={`block text-sm font-medium text-gray-700 ${textAlignClass}`}>
+                    {t('booking.departureDate')}
                   </label>
                   <input
                     type="date"
@@ -404,18 +404,18 @@ export default function Booking() {
                 
                 {/* Number of Nights */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'عدد الليالي' : 'Number of Nights'}
+                  <label className={`block text-sm font-medium text-gray-700 ${textAlignClass}`}>
+                    {t('booking.numberOfNights')}
                   </label>
                   <div className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl backdrop-blur-sm text-gray-700">
-                    {numberOfNights} {language === 'ar' ? 'ليلة' : 'nights'}
+                    {numberOfNights} {t(numberOfNights === 1 ? 'booking.night' : 'booking.nights')}
                   </div>
                 </div>
                 
                 {/* Alternative Price Input */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'السعر البديل' : 'Alternative Price'}
+                  <label className={`block text-sm font-medium text-gray-700 ${textAlignClass}`}>
+                    {t('booking.alternativePrice')}
                   </label>
                   <div className="relative">
                     <input
@@ -423,13 +423,13 @@ export default function Booking() {
                       value={guestData.roomRate || 0}
                       onChange={(e) => setGuestData({...guestData, roomRate: parseFloat(e.target.value) || 0})}
                       className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
-                      placeholder={language === 'ar' ? 'أدخل السعر البديل' : 'Enter alternative price'}
+                      placeholder={t('booking.enterAlternativePrice')}
                       min="0"
                       step="0.01"
                     />
                     <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
                       <span className="text-gray-500 font-medium text-sm">
-                        {language === 'ar' ? 'ريال' : 'SAR'}
+                        {t('common.currency')}
                       </span>
                     </div>
                   </div>
@@ -445,8 +445,8 @@ export default function Booking() {
                           <div>
                             <h3 className="font-semibold text-gray-800 mb-2">{room?.type}</h3>
                             <div className="mb-3">
-                              <h4 className="text-sm font-medium text-gray-700 mb-1">
-                                {language === 'ar' ? 'الوصف والخدمات:' : 'Description & Amenities:'}
+                              <h4 className={`text-sm font-medium text-gray-700 mb-1 ${textAlignClass}`}>
+                                {t('booking.descriptionAmenities')}
                               </h4>
                               <p className="text-sm text-gray-600">{room?.description}</p>
                             </div>
@@ -456,17 +456,14 @@ export default function Booking() {
                                   {room?.status ? room.status.charAt(0).toUpperCase() + room.status.slice(1) : ''}
                                 </span>
                                 <span className="text-sm font-medium text-gray-700">
-                                  {language === 'ar' ? 'سعر الليلة:' : 'Room Rate:'} {room?.rate} {language === 'ar' ? 'ريال' : 'SAR'}/night
+                                  {t('booking.roomRate')}: {room?.rate} {t('common.currency')}/{t('booking.night')}
                                 </span>
                               </div>
                               <div className="text-lg font-bold text-blue-600">
-                                {language === 'ar' ? 'الإجمالي:' : 'Total:'} {(room?.rate || 0) * numberOfNights * numberOfRooms} {language === 'ar' ? 'ريال' : 'SAR'}
+                                {t('booking.total')}: {(room?.rate || 0) * numberOfNights * numberOfRooms} {t('common.currency')}
                                 {numberOfRooms > 1 && (
                                   <div className="text-sm text-gray-600 font-normal">
-                                    {language === 'ar' 
-                                      ? `(${numberOfRooms} غرف × ${numberOfNights} ليالي × ${room?.rate || 0} ريال)`
-                                      : `(${numberOfRooms} rooms × ${numberOfNights} nights × ${room?.rate || 0} SAR)`
-                                    }
+                                    ({numberOfRooms} {t('booking.rooms')} × {numberOfNights} {t('booking.nights')} × {room?.rate || 0} {t('common.currency')})
                                   </div>
                                 )}
                               </div>
@@ -484,44 +481,44 @@ export default function Booking() {
             <div className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-2xl p-6 shadow-lg">
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-2 h-2 bg-gradient-to-r from-green-500 to-blue-500 rounded-full animate-pulse"></div>
-                <h2 className="text-xl font-semibold text-gray-800">
-                  {language === 'ar' ? 'بيانات النزيل' : 'Guest Data Entry'}
+                <h2 className={`text-xl font-semibold text-gray-800 ${textAlignClass}`}>
+                  {t('booking.guestDataEntry')}
                 </h2>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Full Name */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'الاسم الكامل' : 'Full Name'} *
+                  <label className={`block text-sm font-medium text-gray-700 ${textAlignClass}`}>
+                    {t('booking.fullName')} *
                   </label>
                   <input
                     type="text"
                     value={guestData.fullName}
                     onChange={(e) => setGuestData({...guestData, fullName: e.target.value})}
                     className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
-                    placeholder={language === 'ar' ? 'أدخل الاسم الكامل' : 'Enter full name'}
+                    placeholder={t('booking.enterFullName')}
                   />
                 </div>
                 
                 {/* Email */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'البريد الإلكتروني' : 'Email'} *
+                  <label className={`block text-sm font-medium text-gray-700 ${textAlignClass}`}>
+                    {t('booking.email')} *
                   </label>
                   <input
                     type="email"
                     value={guestData.email}
                     onChange={(e) => setGuestData({...guestData, email: e.target.value})}
                     className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
-                    placeholder={language === 'ar' ? 'أدخل البريد الإلكتروني' : 'Enter email address'}
+                    placeholder={t('booking.enterEmail')}
                   />
                 </div>
                 
                 {/* Guest Classification */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'تصنيف النزيل' : 'Guest Classification'} *
+                  <label className={`block text-sm font-medium text-gray-700 ${textAlignClass}`}>
+                    {t('booking.guestClassification')} *
                   </label>
                   <select
                     value={guestData.guestClassification}
@@ -882,7 +879,7 @@ export default function Booking() {
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-pulse"></div>
                 <h2 className="text-xl font-semibold text-gray-800">
-                  {language === 'ar' ? 'مراجعة وتأكيد' : 'Review & Confirmation'}
+                  {t('common.reviewAndConfirm')}
                 </h2>
               </div>
               
@@ -890,22 +887,22 @@ export default function Booking() {
                 {/* Room Summary */}
                 <div className="p-4 bg-gradient-to-r from-blue-50/80 to-purple-50/80 rounded-xl border border-blue-200/50">
                   <h3 className="font-semibold text-gray-800 mb-3">
-                    {language === 'ar' ? 'تفاصيل الغرفة' : 'Room Details'}
+                    {t('booking.roomDetails')}
                   </h3>
                   {(() => {
                     const hotel = getSelectedHotel();
                     const room = getSelectedRoom();
                     return (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <div><span className="font-medium">Hotel:</span> {hotel?.name} ({hotel?.code})</div>
-                        <div><span className="font-medium">Room Type:</span> {room?.type}</div>
-                        <div><span className="font-medium">Board Type:</span> {room?.boardType}</div>
-                        <div><span className="font-medium">Rate:</span> {room?.rate} SAR/night</div>
-                        <div><span className="font-medium">Arrival:</span> {arrivalDate}</div>
-                        <div><span className="font-medium">Departure:</span> {departureDate}</div>
-                        <div><span className="font-medium">Nights:</span> {numberOfNights}</div>
-                        <div><span className="font-medium">Number of Rooms:</span> {numberOfRooms}</div>
-                        <div><span className="font-medium">Total:</span> {(room?.rate || 0) * numberOfNights * numberOfRooms} SAR</div>
+                        <div><span className="font-medium">{t('booking.hotelLabel')}</span> {hotel?.name} ({hotel?.code})</div>
+                        <div><span className="font-medium">{t('booking.roomTypeLabel')}</span> {room?.type}</div>
+                        <div><span className="font-medium">{t('booking.boardTypeLabel')}</span> {room?.boardType}</div>
+                        <div><span className="font-medium">{t('booking.rateLabel')}</span> {room?.rate} {t('common.currency')}{t('booking.perNight')}</div>
+                        <div><span className="font-medium">{t('booking.arrivalLabel')}</span> {arrivalDate}</div>
+                        <div><span className="font-medium">{t('booking.departureLabel')}</span> {departureDate}</div>
+                        <div><span className="font-medium">{t('booking.nightsLabel')}</span> {numberOfNights}</div>
+                        <div><span className="font-medium">{t('booking.numberOfRoomsLabel')}</span> {numberOfRooms}</div>
+                        <div><span className="font-medium">{t('booking.totalLabel')}</span> {(room?.rate || 0) * numberOfNights * numberOfRooms} {t('common.currency')}</div>
                       </div>
                     );
                   })()} 
@@ -914,34 +911,34 @@ export default function Booking() {
                 {/* Guest Summary */}
                 <div className="p-4 bg-gradient-to-r from-green-50/80 to-blue-50/80 rounded-xl border border-green-200/50">
                   <h3 className="font-semibold text-gray-800 mb-3">
-                    {language === 'ar' ? 'بيانات النزيل' : 'Guest Details'}
+                    {t('booking.guestDetails')}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div><span className="font-medium">Name:</span> {guestData.fullName}</div>
-                    <div><span className="font-medium">Email:</span> {guestData.email}</div>
-                    <div><span className="font-medium">Classification:</span> {guestData.guestClassification}</div>
-                    <div><span className="font-medium">Nationality:</span> {guestData.nationality}</div>
-                    <div><span className="font-medium">Telephone:</span> {guestData.telephone}</div>
-                    <div><span className="font-medium">Company:</span> {guestData.company}</div>
-                    <div><span className="font-medium">Travel Agent:</span> {guestData.travelAgent}</div>
-                    <div><span className="font-medium">VIP:</span> {guestData.vip ? 'Yes' : 'No'}</div>
-                    <div><span className="font-medium">Room No:</span> {guestData.roomNo}</div>
+                    <div><span className="font-medium">{t('booking.nameLabel')}</span> {guestData.fullName}</div>
+                    <div><span className="font-medium">{t('booking.emailLabel')}</span> {guestData.email}</div>
+                    <div><span className="font-medium">{t('booking.classificationLabel')}</span> {guestData.guestClassification}</div>
+                    <div><span className="font-medium">{t('booking.nationalityLabel')}</span> {guestData.nationality}</div>
+                    <div><span className="font-medium">{t('booking.telephoneLabel')}</span> {guestData.telephone}</div>
+                    <div><span className="font-medium">{t('booking.companyLabel')}</span> {guestData.company}</div>
+                    <div><span className="font-medium">{t('booking.travelAgentLabel')}</span> {guestData.travelAgent}</div>
+                    <div><span className="font-medium">{t('booking.vipLabel')}</span> {guestData.vip ? 'Yes' : 'No'}</div>
+                    <div><span className="font-medium">{t('booking.roomNoLabel')}</span> {guestData.roomNo}</div>
                   </div>
                 </div>
                 
                 {/* Payment Summary */}
                 <div className="p-4 bg-gradient-to-r from-yellow-50/80 to-orange-50/80 rounded-xl border border-yellow-200/50">
                   <h3 className="font-semibold text-gray-800 mb-3">
-                    {language === 'ar' ? 'تفاصيل الدفع' : 'Payment Breakdown'}
+                    {t('booking.paymentBreakdown')}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div><span className="font-medium">Method:</span> {paymentData.method.charAt(0).toUpperCase() + paymentData.method.slice(1)}</div>
-                    <div><span className="font-medium">Amount Paid:</span> {paymentData.amount} SAR</div>
-                    <div><span className="font-medium">Payment Date:</span> {paymentData.date}</div>
+                    <div><span className="font-medium">{t('booking.methodLabel')}</span> {paymentData.method.charAt(0).toUpperCase() + paymentData.method.slice(1)}</div>
+                    <div><span className="font-medium">{t('booking.amountPaidLabel')}</span> {paymentData.amount} {t('common.currency')}</div>
+                    <div><span className="font-medium">{t('booking.paymentDateLabel')}</span> {paymentData.date}</div>
                     {paymentData.method === 'credit' && (
                       <>
-                        <div><span className="font-medium">Paid Today:</span> {paymentData.amountPaidToday || 0} SAR</div>
-                        <div><span className="font-medium">Remaining:</span> {paymentData.remainingBalance || 0} SAR</div>
+                        <div><span className="font-medium">{t('booking.paidTodayLabel')}</span> {paymentData.amountPaidToday || 0} {t('common.currency')}</div>
+                        <div><span className="font-medium">{t('booking.remainingLabel')}</span> {paymentData.remainingBalance || 0} {t('common.currency')}</div>
                       </>
                     )}
                   </div>

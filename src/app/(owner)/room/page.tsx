@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Room {
   id: string;
@@ -28,7 +30,8 @@ interface Hotel {
 }
 
 export default function Room() {
-  const [language, setLanguage] = useState('en');
+  const { language } = useLanguage();
+  const { t } = useTranslation();
   const [hotelId, setHotelId] = useState('');
   const [roomType, setRoomType] = useState('');
   const [roomTypeDescription, setRoomTypeDescription] = useState('');
@@ -221,7 +224,7 @@ export default function Room() {
             <div className="flex items-center space-x-3 mb-6">
               <div className="w-2 h-2 bg-gradient-to-r from-apple-green to-apple-blue rounded-full animate-pulse"></div>
               <h2 className="text-xl font-semibold text-gray-800">
-                {language === 'ar' ? 'إضافة غرفة جديدة' : 'Add New Room'}
+                {t('rooms.addNewRoom')}
               </h2>
             </div>
 
@@ -230,7 +233,7 @@ export default function Room() {
                 {/* Hotel Selection */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'الفندق' : 'Hotel'}
+                    {t('rooms.hotel')}
                   </label>
                   <select
                     value={hotelId}
@@ -238,7 +241,7 @@ export default function Room() {
                     className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm"
                     required
                   >
-                    <option value="">{language === 'ar' ? 'اختر فندق' : 'Select Hotel'}</option>
+                    <option value="">{t('rooms.selectHotel')}</option>
                     {hotels.map(hotel => (
                       <option key={hotel.id} value={hotel.id}>{hotel.name}</option>
                     ))}
@@ -248,14 +251,14 @@ export default function Room() {
                 {/* Room Type */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'نوع الغرفة' : 'Room Type'}
+                    {t('rooms.roomType')}
                   </label>
                   <input
                     type="text"
                     value={roomType}
                     onChange={(e) => setRoomType(e.target.value)}
                     className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                    placeholder={language === 'ar' ? 'مثل: جناح فاخر' : 'e.g., Deluxe Suite'}
+                    placeholder={t('rooms.enterRoomType')}
                     required
                   />
                 </div>
@@ -263,31 +266,31 @@ export default function Room() {
                 {/* Board Type */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'نوع الإقامة' : 'Board Type'}
+                    {t('rooms.boardType')}
                   </label>
                   <select
                     value={boardType}
                     onChange={(e) => setBoardType(e.target.value as any)}
                     className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm"
                   >
-                    <option value="Room only">{language === 'ar' ? 'غرفة فقط' : 'Room only'}</option>
-                    <option value="Bed & breakfast">{language === 'ar' ? 'إفطار' : 'Bed & breakfast'}</option>
-                    <option value="Half board">{language === 'ar' ? 'نصف إقامة' : 'Half board'}</option>
-                    <option value="Full board">{language === 'ar' ? 'إقامة كاملة' : 'Full board'}</option>
+                    <option value="Room only">{t('rooms.roomOnly')}</option>
+                    <option value="Bed & breakfast">{t('rooms.bedBreakfast')}</option>
+                    <option value="Half board">{t('rooms.halfBoard')}</option>
+                    <option value="Full board">{t('rooms.fullBoard')}</option>
                   </select>
                 </div>
 
                 {/* Room Description */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'وصف الغرفة' : 'Room Description'}
+                    {t('rooms.roomDescription')}
                   </label>
                   <input
                     type="text"
                     value={roomTypeDescription}
                     onChange={(e) => setRoomTypeDescription(e.target.value)}
                     className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                    placeholder={language === 'ar' ? 'وصف تفصيلي للغرفة' : 'Detailed room description'}
+                    placeholder={t('rooms.enterRoomDescription')}
                     required
                   />
                 </div>
@@ -295,28 +298,28 @@ export default function Room() {
                 {/* Alt Description */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'الوصف البديل' : 'Alt Description'}
+                    {t('rooms.altDescription')}
                   </label>
                   <input
                     type="text"
                     value={altDescription}
                     onChange={(e) => setAltDescription(e.target.value)}
                     className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                    placeholder={language === 'ar' ? 'الوصف باللغة الأخرى' : 'Description in other language'}
+                    placeholder={t('rooms.enterAltDescription')}
                     required
                   />
                 </div>
                 {/* Quantity */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'عدد الغرف' : 'Number of Rooms'}
+                    {t('rooms.numberOfRooms')}
                   </label>
                   <input
                     type="number"
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
                     className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                    placeholder={language === 'ar' ? 'عدد الغرف' : 'Room quantity'}
+                    placeholder={t('rooms.roomQuantityPlaceholder')}
                     min="1"
                     required
                   />
@@ -330,7 +333,7 @@ export default function Room() {
                   <div className="space-y-3 w-full">
                     <label className="flex items-center gap-2 text-sm font-semibold text-gray-800">
                       <div className="w-2 h-2 bg-apple-blue rounded-full"></div>
-                      {language === 'ar' ? 'السعر الأساسي (لكل ليلة)' : 'Base Price (per night)'}
+                      {t('rooms.basePrice')}
                     </label>
                     <div className="relative">
                       <input
@@ -338,14 +341,14 @@ export default function Room() {
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}
                         className="w-full px-4 py-4 bg-white/70 border border-gray-200/60 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-300 backdrop-blur-sm placeholder-gray-400 text-lg font-medium shadow-sm hover:shadow-md"
-                        placeholder={language === 'ar' ? 'أدخل السعر بالريال' : 'Enter price in SAR '}
+                        placeholder={t('rooms.enterBasePrice')}
                         min="0"
                         step="0.01"
                         required
                       />
                       <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
                         <span className="text-gray-500 font-medium text-sm">
-                          {language === 'ar' ? 'ريال' : 'SAR '}
+                          {t('common.currency')}
                         </span>
                       </div>
                     </div>
@@ -363,11 +366,11 @@ export default function Room() {
                           className="w-5 h-5 text-apple-blue bg-white/80 border-gray-300 rounded-md focus:ring-apple-blue focus:ring-2 transition-all duration-200"
                         />
                         <label htmlFor="hasAlternativePrice" className="text-sm font-semibold text-gray-700 cursor-pointer">
-                          {language === 'ar' ? 'تفعيل السعر البديل' : 'Enable Alternative Price'}
+                          {t('rooms.enableAlternativePrice')}
                         </label>
                       </div>
                       <div className="text-xs text-gray-500 bg-gray-100/60 px-2 py-1 rounded-full">
-                        {language === 'ar' ? 'اختياري' : 'Optional'}
+                        {t('common.optional')}
                       </div>
                     </div>
                     
@@ -378,7 +381,7 @@ export default function Room() {
                       <div className="space-y-3 w-full">
                         <label className="flex items-center gap-2 text-sm font-semibold text-gray-800">
                           <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                          {language === 'ar' ? 'السعر البديل (لكل ليلة)' : 'Alternative Price (per night)'}
+                          {t('rooms.alternativePrice')}
                         </label>
                         <div className="relative w-full">
                           <input
@@ -386,22 +389,19 @@ export default function Room() {
                             value={alternativePrice}
                             onChange={(e) => setAlternativePrice(e.target.value)}
                             className="w-full px-4 py-4 bg-orange-50/70 border border-orange-200/60 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all duration-300 backdrop-blur-sm placeholder-orange-400 text-lg font-medium shadow-sm hover:shadow-md"
-                            placeholder={language === 'ar' ? 'أدخل السعر البديل بالريال' : 'Enter alternative price in SAR '}
+                            placeholder={t('rooms.enterAlternativePrice')}
                             min="0"
                             step="0.01"
                           />
                           <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
                             <span className="text-orange-500 font-medium text-sm">
-                              {language === 'ar' ? 'ريال' : 'SAR '}
+                              {t('common.currency')}
                             </span>
                           </div>
                         </div>
                         <div className="w-full bg-gradient-to-r from-blue-50/80 to-indigo-50/80 p-4 rounded-xl border border-blue-200/50 shadow-sm">
                           <p className="text-sm font-medium text-blue-800 leading-relaxed">
-                            {language === 'ar' 
-                              ? '💡 يمكنك تحديد أسعار موسمية بناءً على تواريخ محددة بعد إضافة الغرفة'
-                              : '💡 You can set seasonal prices based on specific dates after adding the room'
-                            }
+                            {t('rooms.alternativePriceDescription')}
                           </p>
                         </div>
                       </div>
@@ -418,7 +418,7 @@ export default function Room() {
                   type="submit"
                   className="w-full px-6 py-3 bg-gradient-to-r from-apple-green to-apple-green-light text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 focus:ring-2 focus:ring-apple-green focus:ring-offset-2"
                 >
-                  {language === 'ar' ? 'إضافة غرفة' : 'Add Room'}
+                  {t('rooms.addRoom')}
                 </button>
               </div>
             </form>
@@ -429,7 +429,7 @@ export default function Room() {
             <div className="flex items-center space-x-3 mb-6">
               <div className="w-2 h-2 bg-gradient-to-r from-apple-purple to-apple-pink rounded-full animate-pulse"></div>
               <h2 className="text-xl font-semibold text-gray-800">
-                {language === 'ar' ? 'عرض الغرف المضافة' : 'View Added Rooms'}
+                {t('rooms.viewAddedRooms')}
               </h2>
             </div>
 
@@ -439,7 +439,7 @@ export default function Room() {
                 {/* Name Filter */}
                 <div className="flex-1 max-w-sm">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {language === 'ar' ? 'البحث بالاسم' : 'Filter by Name'}
+                    {t('rooms.filterByName')}
                   </label>
                   <div className="relative">
                     <input
@@ -447,7 +447,7 @@ export default function Room() {
                       value={nameFilter}
                       onChange={(e) => setNameFilter(e.target.value)}
                       className="w-full px-4 py-3 pl-10 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                      placeholder={language === 'ar' ? 'ابحث بالاسم...' : 'Search by name...'}
+                      placeholder={t('rooms.searchRoomOrHotel')}
                     />
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -460,7 +460,7 @@ export default function Room() {
                 {/* Type Filter */}
                 <div className="flex-1 max-w-sm">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {language === 'ar' ? 'البحث بالنوع' : 'Filter by Type'}
+                    {t('rooms.filterByType')}
                   </label>
                   <div className="relative">
                     <input
@@ -468,7 +468,7 @@ export default function Room() {
                       value={typeFilter}
                       onChange={(e) => setTypeFilter(e.target.value)}
                       className="w-full px-4 py-3 pl-10 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                      placeholder={language === 'ar' ? 'ابحث بالنوع...' : 'Search by type...'}
+                      placeholder={t('rooms.searchRoomType')}
                     />
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -484,13 +484,13 @@ export default function Room() {
                     onClick={handleDeleteAll}
                     className="px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white text-sm rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
                   >
-                    {language === 'ar' ? 'حذف الكل' : 'Delete All'}
+                    {t('rooms.deleteAll')}
                   </button>
                   <button
                     onClick={handlePrintAll}
                     className="px-4 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-sm rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 focus:ring-2 focus:ring-gray-600 focus:ring-offset-2"
                   >
-                    {language === 'ar' ? 'طباعة الكل' : 'Print All'}
+                    {t('rooms.printAll')}
                   </button>
                 </div>
               </div>
@@ -502,13 +502,13 @@ export default function Room() {
                     onClick={handleDeleteSelected}
                     className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm rounded-lg hover:shadow-md transition-all duration-200"
                   >
-                    {language === 'ar' ? `حذف المحدد (SAR {selectedRooms.length})` : `Delete Selected (SAR {selectedRooms.length})`}
+                    {t('rooms.deleteSelected')} ({selectedRooms.length})
                   </button>
                   <button
                     onClick={handlePrintSelected}
                     className="px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-sm rounded-lg hover:shadow-md transition-all duration-200"
                   >
-                    {language === 'ar' ? `طباعة المحدد (SAR {selectedRooms.length})` : `Print Selected (SAR {selectedRooms.length})`}
+                    {t('rooms.printSelected')} ({selectedRooms.length})
                   </button>
                 </div>
               )}
@@ -529,22 +529,22 @@ export default function Room() {
                         />
                       </th>
                       <th className="text-left py-3 px-4 font-semibold text-gray-700">
-                        {language === 'ar' ? 'الفندق' : 'Hotel'}
+                        {t('rooms.hotel')}
                       </th>
                       <th className="text-left py-3 px-4 font-semibold text-gray-700">
-                        {language === 'ar' ? 'نوع الغرفة' : 'Room Type'}
+                        {t('rooms.roomType')}
                       </th>
                       <th className="text-left py-3 px-4 font-semibold text-gray-700">
-                        {language === 'ar' ? 'نوع الإقامة' : 'Board Type'}
+                        {t('rooms.boardType')}
                       </th>
                       <th className="text-left py-3 px-4 font-semibold text-gray-700">
-                        {language === 'ar' ? 'السعر' : 'Price'}
+                        {t('common.price')}
                       </th>
                       <th className="text-left py-3 px-4 font-semibold text-gray-700">
-                        {language === 'ar' ? 'العدد' : 'Quantity'}
+                        {t('rooms.quantity')}
                       </th>
                       <th className="text-left py-3 px-4 font-semibold text-gray-700">
-                        {language === 'ar' ? 'الإجراءات' : 'Actions'}
+                        {t('common.actions')}
                       </th>
                     </tr>
                   </thead>
@@ -574,25 +574,25 @@ export default function Room() {
                               onClick={() => handleViewRoom(room.id)}
                               className="px-3 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs rounded-lg hover:shadow-md transition-all duration-200"
                             >
-                              {language === 'ar' ? 'عرض' : 'View'}
+                              {t('common.view')}
                             </button>
                             <button
                               onClick={() => handleEditRoom(room.id)}
                               className="px-3 py-1 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-xs rounded-lg hover:shadow-md transition-all duration-200"
                             >
-                              {language === 'ar' ? 'تعديل' : 'Edit'}
+                              {t('common.edit')}
                             </button>
                             <button
                               onClick={() => handleDeleteRoom(room.id)}
                               className="px-3 py-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs rounded-lg hover:shadow-md transition-all duration-200"
                             >
-                              {language === 'ar' ? 'حذف' : 'Delete'}
+                              {t('common.delete')}
                             </button>
                             <button
                               onClick={() => handlePrintRoom(room.id)}
                               className="px-3 py-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white text-xs rounded-lg hover:shadow-md transition-all duration-200"
                             >
-                              {language === 'ar' ? 'طباعة' : 'Print'}
+                              {t('common.print')}
                             </button>
                           </div>
                         </td>
@@ -609,8 +609,8 @@ export default function Room() {
                   </div>
                   <p className="text-gray-500">
                     {(nameFilter || typeFilter) ? 
-                      (language === 'ar' ? 'لا توجد غرف تطابق البحث' : 'No rooms match your search') :
-                      (language === 'ar' ? 'لا توجد غرف مضافة بعد' : 'No rooms added yet')
+                      t('rooms.noMatchingRooms') :
+                      t('rooms.noRoomsAdded')
                     }
                   </p>
                 </div>
@@ -626,7 +626,7 @@ export default function Room() {
           <div className="bg-white/90 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-6 w-full max-w-md">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">
-                {language === 'ar' ? 'تفاصيل الغرفة' : 'Room Details'}
+                {t('rooms.roomInformation')}
               </h3>
               <button
                 onClick={() => setSelectedRoomDetails(null)}
@@ -640,51 +640,51 @@ export default function Room() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  {language === 'ar' ? 'الفندق' : 'Hotel'}
+                  {t('rooms.hotel')}
                 </label>
                 <p className="text-gray-900">{selectedRoomDetails.hotelName}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  {language === 'ar' ? 'نوع الغرفة' : 'Room Type'}
+                  {t('rooms.roomType')}
                 </label>
                 <p className="text-gray-900">{selectedRoomDetails.roomType}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  {language === 'ar' ? 'الوصف' : 'Description'}
+                  {t('rooms.description')}
                 </label>
                 <p className="text-gray-900">{selectedRoomDetails.roomTypeDescription}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  {language === 'ar' ? 'الوصف البديل' : 'Alt Description'}
+                  {t('rooms.altDescription')}
                 </label>
                 <p className="text-gray-900">{selectedRoomDetails.altDescription}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  {language === 'ar' ? 'نوع الإقامة' : 'Board Type'}
+                  {t('rooms.boardType')}
                 </label>
                 <p className="text-gray-900">{selectedRoomDetails.boardType}</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'السعر' : 'Price'}
+                    {t('rooms.price')}
                   </label>
                   <p className="text-gray-900">SAR {selectedRoomDetails.price}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'العدد' : 'Quantity'}
+                    {t('rooms.quantity')}
                   </label>
                   <p className="text-gray-900">{selectedRoomDetails.quantity}</p>
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  {language === 'ar' ? 'تاريخ الإضافة' : 'Created Date'}
+                  {t('common.createdDate')}
                 </label>
                 <p className="text-gray-900">{selectedRoomDetails.createdAt}</p>
               </div>

@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Hotel {
   id: string;
@@ -13,7 +15,8 @@ interface Hotel {
 }
 
 export default function Hotel() {
-  const [language, setLanguage] = useState('en');
+  const { language } = useLanguage();
+  const { t } = useTranslation();
   const [hotelName, setHotelName] = useState('');
   const [hotelCode, setHotelCode] = useState('');
   const [altHotelName, setAltHotelName] = useState('');
@@ -170,10 +173,10 @@ export default function Hotel() {
         <div className="backdrop-blur-xl bg-white/70 border border-white/20 rounded-3xl shadow-2xl p-8">
           <div className="mb-6">
             <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-              {language === 'ar' ? 'إضافة فندق جديد' : 'Add New Hotel'}
+              {t('hotels.addNewHotel')}
             </h2>
             <p className="text-gray-600">
-              {language === 'ar' ? 'أدخل تفاصيل الفندق الجديد' : 'Enter the details of the new hotel'}
+              {t('hotels.enterHotelDetails')}
             </p>
           </div>
 
@@ -182,14 +185,14 @@ export default function Hotel() {
               {/* Hotel Name */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  {language === 'ar' ? 'اسم الفندق' : 'Hotel Name'}
+                  {t('hotels.hotelName')}
                 </label>
                 <input
                   type="text"
                   value={hotelName}
                   onChange={(e) => setHotelName(e.target.value)}
                   className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                  placeholder={language === 'ar' ? 'أدخل اسم الفندق' : 'Enter hotel name'}
+                  placeholder={t('hotels.enterHotelName')}
                   required
                 />
               </div>
@@ -197,14 +200,14 @@ export default function Hotel() {
               {/* Hotel Code */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  {language === 'ar' ? 'رمز الفندق' : 'Hotel Code'}
+                  {t('hotels.hotelCode')}
                 </label>
                 <input
                   type="text"
                   value={hotelCode}
                   onChange={(e) => setHotelCode(e.target.value)}
                   className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                  placeholder={language === 'ar' ? 'أدخل رمز الفندق' : 'Enter hotel code'}
+                  placeholder={t('hotels.enterHotelCode')}
                   required
                 />
               </div>
@@ -212,14 +215,14 @@ export default function Hotel() {
               {/* Alt Hotel Name */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  {language === 'ar' ? 'الاسم البديل للفندق' : 'Alt Hotel Name'}
+                  {t('hotels.altHotelName')}
                 </label>
                 <input
                   type="text"
                   value={altHotelName}
                   onChange={(e) => setAltHotelName(e.target.value)}
                   className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                  placeholder={language === 'ar' ? 'أدخل الاسم البديل' : 'Enter alternative name'}
+                  placeholder={t('hotels.enterAltName')}
                   required
                 />
               </div>
@@ -228,14 +231,14 @@ export default function Hotel() {
             {/* Hotel Address */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
-                {language === 'ar' ? 'عنوان الفندق' : 'Hotel Address'}
+                {t('hotels.hotelAddress')}
               </label>
               <input
                 type="text"
                 value={hotelAddress}
                 onChange={(e) => setHotelAddress(e.target.value)}
                 className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                placeholder={language === 'ar' ? 'أدخل عنوان الفندق' : 'Enter hotel address'}
+                placeholder={t('hotels.enterHotelAddress')}
                 required
               />
             </div>
@@ -246,7 +249,7 @@ export default function Hotel() {
                 type="submit"
                 className="px-6 py-3 bg-gradient-to-r w-full from-green-600 to-green-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 focus:ring-2 focus:ring-green-600 focus:ring-offset-2"
               >
-                {language === 'ar' ? 'إضافة' : 'Add'}
+                {t('common.add')}
               </button>
               
             </div>
@@ -257,10 +260,10 @@ export default function Hotel() {
          <div className="backdrop-blur-xl bg-white/70 border border-white/20 rounded-3xl shadow-2xl p-8">
            <div className="mb-6">
              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-               {language === 'ar' ? 'قائمة الفنادق' : 'Hotels List'}
+               {t('hotels.hotelsList')}
              </h2>
              <p className="text-gray-600">
-               {language === 'ar' ? 'عرض وإدارة الفنادق المضافة' : 'View and manage added hotels'}
+               {t('hotels.viewManageHotels')}
              </p>
            </div>
 
@@ -270,7 +273,7 @@ export default function Hotel() {
                 {/* Name Filter */}
                 <div className="flex-1 max-w-sm">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {language === 'ar' ? 'البحث بالاسم' : 'Filter by Name'}
+                    {t('hotels.filterByName')}
                   </label>
                   <div className="relative">
                     <input
@@ -278,7 +281,7 @@ export default function Hotel() {
                       value={nameFilter}
                       onChange={(e) => setNameFilter(e.target.value)}
                       className="w-full px-4 py-3 pl-10 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                      placeholder={language === 'ar' ? 'ابحث بالاسم...' : 'Search by name...'}
+                      placeholder={t('hotels.searchByName')}
                     />
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -291,7 +294,7 @@ export default function Hotel() {
                 {/* Code Filter */}
                 <div className="flex-1 max-w-sm">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {language === 'ar' ? 'البحث بالرمز' : 'Filter by Code'}
+                    {t('hotels.filterByCode')}
                   </label>
                   <div className="relative">
                     <input
@@ -299,7 +302,7 @@ export default function Hotel() {
                       value={codeFilter}
                       onChange={(e) => setCodeFilter(e.target.value)}
                       className="w-full px-4 py-3 pl-10 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                      placeholder={language === 'ar' ? 'ابحث بالرمز...' : 'Search by code...'}
+                      placeholder={t('hotels.searchByCode')}
                     />
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -319,13 +322,13 @@ export default function Hotel() {
                     onClick={handleDeleteSelected}
                     className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm rounded-lg hover:shadow-md transition-all duration-200"
                   >
-                    {language === 'ar' ? `حذف المحدد (${selectedHotels.length})` : `Delete Selected (${selectedHotels.length})`}
+                    {`${t('hotels.deleteSelected')} (${selectedHotels.length})`}
                   </button>
                   <button
                     onClick={handlePrintSelected}
                     className="px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-sm rounded-lg hover:shadow-md transition-all duration-200"
                   >
-                    {language === 'ar' ? `طباعة المحدد (${selectedHotels.length})` : `Print Selected (${selectedHotels.length})`}
+                    {`${t('hotels.printSelected')} (${selectedHotels.length})`}
                   </button>
                 </div>
               )}
@@ -345,19 +348,19 @@ export default function Hotel() {
                      />
                    </th>
                    <th className="text-left py-4 px-4 font-semibold text-gray-700">
-                     {language === 'ar' ? 'اسم الفندق' : 'Hotel Name'}
+                     {t('hotels.hotelName')}
                    </th>
                    <th className="text-left py-4 px-4 font-semibold text-gray-700">
-                     {language === 'ar' ? 'رمز الفندق' : 'Hotel Code'}
+                     {t('hotels.hotelCode')}
                    </th>
                    <th className="text-left py-4 px-4 font-semibold text-gray-700">
-                     {language === 'ar' ? 'الاسم البديل' : 'Alt Name'}
+                     {t('hotels.altHotelName')}
                    </th>
                    <th className="text-left py-4 px-4 font-semibold text-gray-700">
-                     {language === 'ar' ? 'تاريخ الإضافة' : 'Created Date'}
+                     {t('hotels.createdDate')}
                    </th>
                    <th className="text-left py-4 px-4 font-semibold text-gray-700">
-                     {language === 'ar' ? 'الإجراءات' : 'Actions'}
+                     {t('common.actions')}
                    </th>
                  </tr>
                </thead>
@@ -384,25 +387,25 @@ export default function Hotel() {
                            onClick={() => handleViewHotel(hotel.id)}
                            className="px-3 py-1 bg-gradient-to-r from-apple-blue to-apple-purple text-white text-sm rounded-lg hover:shadow-md transition-all duration-200"
                          >
-                           {language === 'ar' ? 'عرض' : 'View'}
+                           {t('common.view')}
                          </button>
                          <button
                            onClick={() => handleEditHotel(hotel.id)}
                            className="px-3 py-1 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-sm rounded-lg hover:shadow-md transition-all duration-200"
                          >
-                           {language === 'ar' ? 'تعديل' : 'Edit'}
+                           {t('common.edit')}
                          </button>
                          <button
                            onClick={() => handleDeleteHotel(hotel.id)}
                            className="px-3 py-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm rounded-lg hover:shadow-md transition-all duration-200"
                          >
-                           {language === 'ar' ? 'حذف' : 'Delete'}
+                           {t('common.delete')}
                          </button>
                          <button
                            onClick={handlePrint}
                            className="px-3 py-1 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-sm rounded-lg hover:shadow-md transition-all duration-200"
                          >
-                           {language === 'ar' ? 'طباعة' : 'Print'}
+                           {t('hotels.print')}
                          </button>
                        </div>
                      </td>
@@ -421,8 +424,8 @@ export default function Hotel() {
                </div>
                <p className="text-gray-500">
                   {(nameFilter || codeFilter) ? 
-                    (language === 'ar' ? 'لا توجد فنادق تطابق البحث' : 'No hotels match your search') :
-                    (language === 'ar' ? 'لا توجد فنادق مضافة بعد' : 'No hotels added yet')
+                    t('hotels.noHotelsMatch') :
+                    t('hotels.noHotelsAdded')
                   }
                 </p>
              </div>
@@ -435,7 +438,7 @@ export default function Hotel() {
              <div className="backdrop-blur-xl bg-white/90 border border-white/20 rounded-3xl shadow-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                <div className="flex items-center justify-between mb-6">
                  <h3 className="text-2xl font-semibold text-gray-900">
-                   {language === 'ar' ? 'تفاصيل الفندق' : 'Hotel Details'}
+                   {t('hotels.hotelDetails')}
                  </h3>
                  <button
                    onClick={() => setSelectedHotelDetails(null)}
@@ -451,7 +454,7 @@ export default function Hotel() {
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                    <div className="space-y-2">
                      <label className="block text-sm font-medium text-gray-700">
-                       {language === 'ar' ? 'اسم الفندق' : 'Hotel Name'}
+                       {t('hotels.hotelName')}
                      </label>
                      <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800">
                        {selectedHotelDetails.name}
@@ -460,7 +463,7 @@ export default function Hotel() {
                    
                    <div className="space-y-2">
                      <label className="block text-sm font-medium text-gray-700">
-                       {language === 'ar' ? 'رمز الفندق' : 'Hotel Code'}
+                       {t('hotels.hotelCode')}
                      </label>
                      <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800">
                        {selectedHotelDetails.code}
@@ -469,7 +472,7 @@ export default function Hotel() {
                    
                    <div className="space-y-2">
                      <label className="block text-sm font-medium text-gray-700">
-                       {language === 'ar' ? 'الاسم البديل' : 'Alternative Name'}
+                       {t('hotels.altHotelName')}
                      </label>
                      <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800">
                        {selectedHotelDetails.altName}
@@ -478,7 +481,7 @@ export default function Hotel() {
                    
                    <div className="space-y-2">
                      <label className="block text-sm font-medium text-gray-700">
-                       {language === 'ar' ? 'تاريخ الإضافة' : 'Created Date'}
+                       {t('hotels.createdDate')}
                      </label>
                      <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800">
                        {selectedHotelDetails.createdAt}
@@ -491,7 +494,7 @@ export default function Hotel() {
                      onClick={() => handleEditHotel(selectedHotelDetails.id)}
                      className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
                    >
-                     {language === 'ar' ? 'تعديل' : 'Edit'}
+                     {t('common.edit')}
                    </button>
                    <button
                      onClick={() => {
@@ -500,13 +503,13 @@ export default function Hotel() {
                      }}
                      className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
                    >
-                     {language === 'ar' ? 'حذف' : 'Delete'}
+                     {t('common.delete')}
                    </button>
                    <button
                      onClick={handlePrint}
                      className="px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
                    >
-                     {language === 'ar' ? 'طباعة' : 'Print'}
+                     {t('hotels.print')}
                    </button>
                  </div>
                </div>

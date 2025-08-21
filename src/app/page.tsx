@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from '@/hooks/useTranslation';
 import { useRouter } from 'next/navigation';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 export default function LoginPage() {
-  const [language, setLanguage] = useState('en');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -14,6 +16,8 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { login, isAuthenticated, isLoading } = useAuth();
+  const { language, setLanguage } = useLanguage();
+  const { t, isRTL, textAlignClass } = useTranslation();
   const router = useRouter();
 
   // Redirect if already authenticated
@@ -67,7 +71,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className={`min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4 relative overflow-hidden ${isRTL ? 'rtl' : 'ltr'}`}>
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-apple-blue/20 to-apple-purple/20 rounded-full blur-3xl"></div>
@@ -86,8 +90,8 @@ export default function LoginPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
-            <h1 className="text-2xl font-semibold text-gray-900">
-              {language === 'ar' ? 'تسجيل الدخول' : 'Login'}
+            <h1 className={`text-2xl font-semibold text-gray-900 ${textAlignClass}`}>
+              {t('login.title')}
             </h1>
           </div>
 
@@ -95,7 +99,7 @@ export default function LoginPage() {
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+            <div className={`bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm ${textAlignClass}`}>
               {error}
             </div>
           )}
@@ -104,8 +108,8 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="space-y-4">
             {/* Login Name Field */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                {language === 'ar' ? 'اسم تسجيل الدخول' : 'UserName'}
+              <label className={`block text-sm font-medium text-gray-700 ${textAlignClass}`}>
+                {t('login.username')}
               </label>
               <div className="relative">
                 <input
@@ -113,7 +117,7 @@ export default function LoginPage() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                  placeholder={language === 'ar' ? 'أدخل اسم تسجيل الدخول' : 'Enter your username'}
+                  placeholder={t('login.usernamePlaceholder')}
                   required
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -126,8 +130,8 @@ export default function LoginPage() {
 
             {/* Password Field */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                {language === 'ar' ? 'كلمة المرور' : 'Password'}
+              <label className={`block text-sm font-medium text-gray-700 ${textAlignClass}`}>
+                {t('login.password')}
               </label>
               <div className="relative">
                 <input
@@ -135,7 +139,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400 pr-12"
-                  placeholder={language === 'ar' ? 'أدخل كلمة المرور' : 'Enter your password'}
+                  placeholder={t('login.passwordPlaceholder')}
                   required
                 />
                 <button
@@ -159,17 +163,17 @@ export default function LoginPage() {
 
              {/* Language Selector */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              {language === 'ar' ? 'اللغة' : 'Language'}
+            <label className={`block text-sm font-medium text-gray-700 ${textAlignClass}`}>
+              {t('login.language')}
             </label>
             <div className="relative">
               <select
                 value={language}
-                onChange={(e) => setLanguage(e.target.value)}
+                onChange={(e) => setLanguage(e.target.value as 'en' | 'ar')}
                 className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm appearance-none cursor-pointer"
               >
-                <option value="en">English</option>
-                <option value="ar">العربية</option>
+                <option value="en">{t('sidebar.english')}</option>
+                <option value="ar">{t('sidebar.arabic')}</option>
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                 <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,10 +195,10 @@ export default function LoginPage() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    {language === 'ar' ? 'جاري تسجيل الدخول...' : 'Logging in...'}
+                    {t('login.loggingIn')}
                   </>
                 ) : (
-                  language === 'ar' ? 'تسجيل الدخول' : 'login'
+                  t('login.loginButton')
                 )}
               </button>
               <button
@@ -203,7 +207,7 @@ export default function LoginPage() {
                 disabled={isSubmitting}
                 className="flex-1 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-3 px-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                {language === 'ar' ? 'خروج' : 'Exit'}
+                {t('login.exitButton')}
               </button>
             </div>
           </form>
