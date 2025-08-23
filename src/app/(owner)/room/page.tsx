@@ -66,6 +66,34 @@ export default function Room() {
   const { language } = useLanguage();
   const { t } = useTranslation();
   
+  // Board type mappings - centralized to avoid duplication
+  const BOARD_TYPE_MAPPINGS = {
+    // API format to display format
+    apiToDisplay: {
+      'ROOM_ONLY': 'Room only',
+      'BED_BREAKFAST': 'Bed & breakfast',
+      'HALF_BOARD': 'Half board',
+      'FULL_BOARD': 'Full board'
+    } as const,
+    // Display format to API format
+    displayToApi: {
+      'Room only': 'ROOM_ONLY',
+      'Bed & breakfast': 'BED_BREAKFAST',
+      'Half board': 'HALF_BOARD',
+      'Full board': 'FULL_BOARD'
+    } as const,
+    // API format to translated text
+    apiToTranslated: (apiFormat: string) => {
+      const map: { [key: string]: string } = {
+        'ROOM_ONLY': t('rooms.roomOnly'),
+        'BED_BREAKFAST': t('rooms.bedBreakfast'),
+        'HALF_BOARD': t('rooms.halfBoard'),
+        'FULL_BOARD': t('rooms.fullBoard')
+      };
+      return map[apiFormat] || apiFormat;
+    }
+  };
+  
   // State management
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -147,7 +175,6 @@ export default function Room() {
       room.hotel?.name?.toLowerCase().includes(nameFilter.toLowerCase());
     
     const typeMatch = typeFilter === '' || 
-      room.boardType?.toLowerCase().includes(typeFilter.toLowerCase()) ||
       room.roomType?.toLowerCase().includes(typeFilter.toLowerCase());
     
     const hotelMatch = hotelFilter === '' || 
@@ -155,8 +182,13 @@ export default function Room() {
       room.hotel?.name?.toLowerCase().includes(hotelFilter.toLowerCase()) ||
       room.hotelName?.toLowerCase().includes(hotelFilter.toLowerCase());
     
-    const boardMatch = boardTypeFilter === '' || 
-      room.boardType === boardTypeFilter;
+    // Fix board type filtering - handle both API format and display format
+    const boardMatch = boardTypeFilter === '' || (() => {
+      // Check if room.boardType matches either the filter value directly or the API equivalent
+      return room.boardType === boardTypeFilter || 
+             room.boardType === BOARD_TYPE_MAPPINGS.displayToApi[boardTypeFilter] ||
+             BOARD_TYPE_MAPPINGS.displayToApi[room.boardType] === BOARD_TYPE_MAPPINGS.displayToApi[boardTypeFilter];
+    })();
     
     const priceMatch = (
       (minPrice === '' || (room.basePrice && room.basePrice >= parseFloat(minPrice))) &&
@@ -188,14 +220,6 @@ export default function Room() {
     try {
       setLoading(true);
       
-      // Convert board type to API format
-      const boardTypeMap: { [key: string]: string } = {
-        [t('rooms.roomOnly')]: 'ROOM_ONLY',
-        [t('rooms.bedBreakfast')]: 'BED_BREAKFAST',
-        [t('rooms.halfBoard')]: 'HALF_BOARD',
-        [t('rooms.fullBoard')]: 'FULL_BOARD'
-      };
-
       const roomData = {
         hotelId,
         roomType,
@@ -204,7 +228,7 @@ export default function Room() {
         basePrice: parseFloat(price),
         alternativePrice: hasAlternativePrice && alternativePrice ? parseFloat(alternativePrice) : null,
         quantity: parseInt(quantity),
-        boardType: boardTypeMap[boardType] || 'ROOM_ONLY',
+        boardType: BOARD_TYPE_MAPPINGS.displayToApi[boardType] || 'ROOM_ONLY',
       };
 
       let response;
@@ -287,14 +311,6 @@ export default function Room() {
       if (result.success && result.data) {
         const room = result.data;
         
-        // Convert board type from API format to component format
-        const boardTypeMap: { [key: string]: 'Room only' | 'Bed & breakfast' | 'Half board' | 'Full board' } = {
-          'ROOM_ONLY': 'Room only',
-          'BED_BREAKFAST': 'Bed & breakfast',
-          'HALF_BOARD': 'Half board',
-          'FULL_BOARD': 'Full board'
-        };
-        
         setEditingRoomId(id);
         setHotelId(room.hotelId);
         setRoomType(room.roomType);
@@ -302,7 +318,7 @@ export default function Room() {
         setAltDescription(room.altDescription || '');
         setPrice(room.basePrice.toString());
         setQuantity(room.quantity.toString());
-        setBoardType(boardTypeMap[room.boardType] || 'Room only');
+        setBoardType(BOARD_TYPE_MAPPINGS.apiToDisplay[room.boardType] || 'Room only');
         setHasAlternativePrice(!!room.alternativePrice);
         setAlternativePrice(room.alternativePrice?.toString() || '');
         
@@ -1066,15 +1082,7 @@ export default function Room() {
                         </td>
                         <td className="py-2 px-2 text-gray-600 text-sm">
                           <span className="px-2 py-1 bg-blue-100/50 text-blue-800 text-xs rounded-full whitespace-nowrap">
-                            {(() => {
-                              const boardTypeMap: { [key: string]: string } = {
-                                'ROOM_ONLY': t('rooms.roomOnly'),
-                                'BED_BREAKFAST': t('rooms.bedBreakfast'),
-                                'HALF_BOARD': t('rooms.halfBoard'),
-                                'FULL_BOARD': t('rooms.fullBoard')
-                              };
-                              return boardTypeMap[room.boardType] || room.boardType;
-                            })()} 
+                            {BOARD_TYPE_MAPPINGS.apiToTranslated(room.boardType)}
                           </span>
                         </td>
                         <td className="py-2 px-2 text-gray-600 text-sm font-medium">
@@ -1184,15 +1192,7 @@ export default function Room() {
                   </label>
                   <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800">
                     <span className="px-3 py-1 bg-blue-100/50 text-blue-800 text-sm rounded-full">
-                      {(() => {
-                        const boardTypeMap: { [key: string]: string } = {
-                          'ROOM_ONLY': t('rooms.roomOnly'),
-                          'BED_BREAKFAST': t('rooms.bedBreakfast'),
-                          'HALF_BOARD': t('rooms.halfBoard'),
-                          'FULL_BOARD': t('rooms.fullBoard')
-                        };
-                        return boardTypeMap[selectedRoomDetails.boardType] || selectedRoomDetails.boardType;
-                      })()} 
+                      {BOARD_TYPE_MAPPINGS.apiToTranslated(selectedRoomDetails.boardType)}
                     </span>
                   </div>
                 </div>
