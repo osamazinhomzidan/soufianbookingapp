@@ -225,6 +225,17 @@ export interface Translations {
     hotelStats: string;
     manageRooms: string;
     viewBookings: string;
+    hotelDescription: string;
+    altHotelDescription: string;
+    enterHotelDescription: string;
+    enterAltHotelDescription: string;
+    updateHotelDetails: string;
+    updateHotel: string;
+    adding: string;
+    updating: string;
+    clear: string;
+    confirmDeleteHotel: string;
+    confirmDeleteSelectedHotels: string;
   };
   
   // Rooms page translations (Owner only)
@@ -604,9 +615,20 @@ const en: Translations = {
     hotelDetails: 'Hotel Details',
     createdDate: 'Created Date',
     print: 'Print',
-    hotelStats: 'Hotel Stats',
+    hotelStats: 'Hotel Statistics',
     manageRooms: 'Manage Rooms',
     viewBookings: 'View Bookings',
+    hotelDescription: 'Hotel Description',
+    altHotelDescription: 'Alt Hotel Description',
+    enterHotelDescription: 'Enter hotel description',
+    enterAltHotelDescription: 'Enter alternative hotel description',
+    updateHotelDetails: 'Update hotel details',
+    updateHotel: 'Update Hotel',
+    adding: 'Adding...',
+    updating: 'Updating...',
+    clear: 'Clear',
+    confirmDeleteHotel: 'Are you sure you want to delete this hotel?',
+    confirmDeleteSelectedHotels: 'Are you sure you want to delete {{count}} selected hotel(s)?',
   },
   
   rooms: {
@@ -1007,6 +1029,17 @@ const ar: Translations = {
     hotelStats: 'إحصائيات الفندق',
     manageRooms: 'إدارة الغرف',
     viewBookings: 'عرض الحجوزات',
+    hotelDescription: 'وصف الفندق',
+    altHotelDescription: 'الوصف البديل للفندق',
+    enterHotelDescription: 'أدخل وصف الفندق',
+    enterAltHotelDescription: 'أدخل الوصف البديل للفندق',
+    updateHotelDetails: 'تحديث تفاصيل الفندق',
+    updateHotel: 'تحديث الفندق',
+    adding: 'جاري الإضافة...',
+    updating: 'جاري التحديث...',
+    clear: 'مسح',
+    confirmDeleteHotel: 'هل أنت متأكد من حذف هذا الفندق؟',
+    confirmDeleteSelectedHotels: 'هل أنت متأكد من حذف {{count}} فندق محدد؟',
   },
   
   rooms: {
