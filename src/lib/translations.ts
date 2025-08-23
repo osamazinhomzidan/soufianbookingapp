@@ -69,6 +69,9 @@ export interface Translations {
     inactive: string;
     currency: string;
     reviewAndConfirm: string;
+    optional: string;
+    clearFilters: string;
+    createdDate: string;
   };
   
   // Booking page translations
@@ -277,6 +280,7 @@ export interface Translations {
     numberOfRooms: string;
     basePricePerNight: string;
     enableAlternativePrice: string;
+    alternativePrice: string;
     alternativePricePerNight: string;
     seasonalPricingNote: string;
     viewAddedRooms: string;
@@ -293,6 +297,37 @@ export interface Translations {
     roomQuantity: string;
     enterPriceSAR: string;
     enterAlternativePriceSAR: string;
+    roomQuantityPlaceholder: string;
+    updateRoom: string;
+    fillAllFields: string;
+    selectValidHotel: string;
+    roomUpdatedSuccessfully: string;
+    roomAddedSuccessfully: string;
+    errorAddingRoom: string;
+    roomLoadedForEdit: string;
+    errorFetchingRoom: string;
+    roomDeletedSuccessfully: string;
+    errorDeletingRoom: string;
+    noRoomsSelected: string;
+    selectedRoomsDeleted: string;
+    partialDeleteSuccess: string;
+    errorDeletingSelectedRooms: string;
+    printingSelectedRooms: string;
+    noRoomsToDelete: string;
+    allRoomsDeleted: string;
+    errorDeletingAllRooms: string;
+    allHotels: string;
+    allBoardTypes: string;
+    priceRange: string;
+    minPrice: string;
+    maxPrice: string;
+    quantityRange: string;
+    minQty: string;
+    maxQty: string;
+    clearFilters: string;
+    createdBy: string;
+    filterByHotel: string;
+    filterByBoardType: string;
   };
   
   // Layout and navigation
@@ -417,6 +452,9 @@ const en: Translations = {
     inactive: 'Inactive',
     currency: 'SAR',
     reviewAndConfirm: 'Review and Confirm',
+    optional: 'Optional',
+    clearFilters: 'Clear Filters',
+    createdDate: 'Created Date',
   },
   
   booking: {
@@ -669,6 +707,7 @@ const en: Translations = {
     numberOfRooms: 'Number of Rooms',
     basePricePerNight: 'Base Price',
     enableAlternativePrice: 'Enable Alternative Price',
+    alternativePrice: 'Alternative Price',
     alternativePricePerNight: 'Alternative Price',
     seasonalPricingNote: 'Seasonal pricing can be configured later',
     viewAddedRooms: 'View Added Rooms',
@@ -685,6 +724,39 @@ const en: Translations = {
     roomQuantity: 'Room quantity',
     enterPriceSAR: 'Enter price in SAR',
     enterAlternativePriceSAR: 'Enter alternative price in SAR',
+    roomQuantityPlaceholder: 'Enter number of rooms',
+    updateRoom: 'Update Room',
+    fillAllFields: 'Please fill all required fields',
+    selectValidHotel: 'Please select a valid hotel',
+    roomUpdatedSuccessfully: 'Room updated successfully',
+    roomAddedSuccessfully: 'Room added successfully',
+    errorAddingRoom: 'Error adding room',
+    roomLoadedForEdit: 'Room loaded for editing',
+    errorFetchingRoom: 'Error fetching room data',
+    roomDeletedSuccessfully: 'Room deleted successfully',
+    errorDeletingRoom: 'Error deleting room',
+    noRoomsSelected: 'No rooms selected',
+    selectedRoomsDeleted: '{{count}} selected rooms deleted successfully',
+    partialDeleteSuccess: '{{success}} rooms deleted, {{failed}} failed to delete',
+    errorDeletingSelectedRooms: 'Error deleting selected rooms',
+    printingSelectedRooms: 'Printing {{count}} selected rooms',
+    noRoomsToDelete: 'No rooms to delete',
+    allRoomsDeleted: 'All rooms ({{count}}) deleted successfully',
+    errorDeletingAllRooms: 'Error deleting all rooms',
+    allHotels: 'All Hotels',
+    allBoardTypes: 'All Board Types',
+    priceRange: 'Price Range',
+    minPrice: 'Min Price',
+    maxPrice: 'Max Price',
+    quantityRange: 'Quantity Range',
+    minQty: 'Min Qty',
+    maxQty: 'Max Qty',
+    createdBy: 'Created By',
+     filterByHotel: 'Filter by Hotel',
+     filterByBoardType: 'Filter by Board Type',
+     unknownHotel: 'Unknown Hotel',
+    printSelectedRooms: 'Print selected rooms',
+    exitDashboard: 'Exit dashboard',
     roomTypePlaceholder: 'Enter room type',
     roomDescriptionPlaceholder: 'Detailed room description',
     altDescriptionPlaceholder: 'Description in other language',
@@ -826,8 +898,11 @@ const ar: Translations = {
     unavailable: 'غير متاح',
     active: 'نشط',
     inactive: 'غير نشط',
-    currency: 'ريال',
+    currency: 'ر.س',
     reviewAndConfirm: 'مراجعة وتأكيد',
+    optional: 'اختياري',
+    clearFilters: 'مسح المرشحات',
+    createdDate: 'تاريخ الإنشاء',
   },
   
   booking: {
@@ -1080,6 +1155,7 @@ const ar: Translations = {
     numberOfRooms: 'عدد الغرف',
     basePricePerNight: 'السعر الأساسي',
     enableAlternativePrice: 'تفعيل السعر البديل',
+    alternativePrice: 'السعر البديل',
     alternativePricePerNight: 'السعر البديل',
     seasonalPricingNote: 'يمكن تكوين التسعير الموسمي لاحقاً',
     viewAddedRooms: 'عرض الغرف المضافة',
@@ -1096,6 +1172,39 @@ const ar: Translations = {
     roomQuantity: 'كمية الغرف',
     enterPriceSAR: 'أدخل السعر بالريال السعودي',
     enterAlternativePriceSAR: 'أدخل السعر البديل بالريال السعودي',
+    roomQuantityPlaceholder: 'أدخل عدد الغرف',
+    updateRoom: 'تحديث الغرفة',
+    fillAllFields: 'يرجى ملء جميع الحقول المطلوبة',
+    selectValidHotel: 'يرجى اختيار فندق صحيح',
+    roomUpdatedSuccessfully: 'تم تحديث الغرفة بنجاح',
+    roomAddedSuccessfully: 'تم إضافة الغرفة بنجاح',
+    errorAddingRoom: 'خطأ في إضافة الغرفة',
+    roomLoadedForEdit: 'تم تحميل الغرفة للتعديل',
+    errorFetchingRoom: 'خطأ في جلب بيانات الغرفة',
+    roomDeletedSuccessfully: 'تم حذف الغرفة بنجاح',
+    errorDeletingRoom: 'خطأ في حذف الغرفة',
+    noRoomsSelected: 'لم يتم تحديد أي غرف',
+    selectedRoomsDeleted: 'تم حذف {{count}} غرفة محددة بنجاح',
+    partialDeleteSuccess: 'تم حذف {{success}} غرفة، فشل في حذف {{failed}} غرفة',
+    errorDeletingSelectedRooms: 'خطأ في حذف الغرف المحددة',
+    printingSelectedRooms: 'جاري طباعة {{count}} غرفة محددة',
+    noRoomsToDelete: 'لا توجد غرف للحذف',
+    allRoomsDeleted: 'تم حذف جميع الغرف ({{count}}) بنجاح',
+    errorDeletingAllRooms: 'خطأ في حذف جميع الغرف',
+    allHotels: 'جميع الفنادق',
+    allBoardTypes: 'جميع أنواع الإقامة',
+    priceRange: 'نطاق السعر',
+    minPrice: 'أقل سعر',
+    maxPrice: 'أعلى سعر',
+    quantityRange: 'نطاق الكمية',
+    minQty: 'أقل كمية',
+    maxQty: 'أعلى كمية',
+    createdBy: 'أنشئ بواسطة',
+    filterByHotel: 'تصفية بالفندق',
+    filterByBoardType: 'تصفية بنوع الإقامة',
+    unknownHotel: 'فندق غير معروف',
+    printSelectedRooms: 'طباعة الغرف المحددة',
+    exitDashboard: 'الخروج من لوحة التحكم',
     roomTypePlaceholder: 'أدخل نوع الغرفة',
     roomDescriptionPlaceholder: 'وصف مفصل للغرفة',
     altDescriptionPlaceholder: 'الوصف بلغة أخرى',
