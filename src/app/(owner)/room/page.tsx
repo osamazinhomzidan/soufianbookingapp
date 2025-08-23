@@ -287,12 +287,12 @@ export default function Room() {
       if (result.success && result.data) {
         const room = result.data;
         
-        // Convert board type from API format to display format
-        const boardTypeMap: { [key: string]: string } = {
-          'ROOM_ONLY': t('rooms.roomOnly'),
-          'BED_BREAKFAST': t('rooms.bedBreakfast'),
-          'HALF_BOARD': t('rooms.halfBoard'),
-          'FULL_BOARD': t('rooms.fullBoard')
+        // Convert board type from API format to component format
+        const boardTypeMap: { [key: string]: 'Room only' | 'Bed & breakfast' | 'Half board' | 'Full board' } = {
+          'ROOM_ONLY': 'Room only',
+          'BED_BREAKFAST': 'Bed & breakfast',
+          'HALF_BOARD': 'Half board',
+          'FULL_BOARD': 'Full board'
         };
         
         setEditingRoomId(id);
@@ -302,7 +302,7 @@ export default function Room() {
         setAltDescription(room.altDescription || '');
         setPrice(room.basePrice.toString());
         setQuantity(room.quantity.toString());
-        setBoardType(boardTypeMap[room.boardType] || t('rooms.roomOnly'));
+        setBoardType(boardTypeMap[room.boardType] || 'Room only');
         setHasAlternativePrice(!!room.alternativePrice);
         setAlternativePrice(room.alternativePrice?.toString() || '');
         
@@ -317,6 +317,10 @@ export default function Room() {
   };
 
   const handleDeleteRoom = async (id: string) => {
+    if (!confirm(t('rooms.confirmDeleteRoom'))) {
+      return;
+    }
+
     try {
       setLoading(true);
       const response = await fetch(`/api/rooms/${id}`, {
@@ -328,6 +332,9 @@ export default function Room() {
       if (result.success) {
         setRooms(rooms.filter(room => room.id !== id));
         setSelectedRooms(selectedRooms.filter(selectedId => selectedId !== id));
+        if (selectedRoomDetails?.id === id) {
+          setSelectedRoomDetails(null);
+        }
         setMessage({ type: 'success', text: t('rooms.roomDeletedSuccessfully') });
       } else {
         setMessage({ type: 'error', text: result.message || t('rooms.errorDeletingRoom') });
@@ -384,6 +391,10 @@ export default function Room() {
       return;
     }
 
+    if (!confirm(t('rooms.confirmDeleteSelected', { count: selectedRooms.length }))) {
+      return;
+    }
+
     try {
       setLoading(true);
       const deletePromises = selectedRooms.map(id => 
@@ -433,6 +444,10 @@ export default function Room() {
   const handleDeleteAll = async () => {
     if (rooms.length === 0) {
       setMessage({ type: 'error', text: t('rooms.noRoomsToDelete') });
+      return;
+    }
+
+    if (!confirm(t('rooms.confirmDeleteAll', { count: rooms.length }))) {
       return;
     }
 
@@ -1074,27 +1089,30 @@ export default function Room() {
                         </td>
                         <td className="py-2 px-2 text-gray-600 text-sm font-medium">{room.quantity}</td>
                         <td className="py-2 px-2">
-                          <div className="flex space-x-1">
+                          <div className="flex space-x-2">
                             <button
                               onClick={() => handleViewRoom(room.id)}
-                              className="px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs rounded-md hover:shadow-md transition-all duration-200"
-                              title={t('common.view')}
+                              className="px-3 py-1 bg-gradient-to-r from-apple-blue to-apple-purple text-white text-sm rounded-lg hover:shadow-md transition-all duration-200"
                             >
-                              👁️
+                              {t('common.view')}
                             </button>
                             <button
                               onClick={() => handleEditRoom(room.id)}
-                              className="px-2 py-1 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-xs rounded-md hover:shadow-md transition-all duration-200"
-                              title={t('common.edit')}
+                              className="px-3 py-1 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-sm rounded-lg hover:shadow-md transition-all duration-200"
                             >
-                              ✏️
+                              {t('common.edit')}
                             </button>
                             <button
                               onClick={() => handleDeleteRoom(room.id)}
-                              className="px-2 py-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs rounded-md hover:shadow-md transition-all duration-200"
-                              title={t('common.delete')}
+                              className="px-3 py-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm rounded-lg hover:shadow-md transition-all duration-200"
                             >
-                              🗑️
+                              {t('common.delete')}
+                            </button>
+                            <button
+                              onClick={() => handlePrintRoom(room.id)}
+                              className="px-3 py-1 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-sm rounded-lg hover:shadow-md transition-all duration-200"
+                            >
+                              {t('rooms.print')}
                             </button>
                           </div>
                         </td>
