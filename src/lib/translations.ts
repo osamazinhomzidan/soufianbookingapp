@@ -96,6 +96,9 @@ export interface Translations {
     specialRequests: string;
     totalAmount: string;
     paymentMethod: string;
+    cash: string;
+    credit: string;
+    visa: string;
     bookingConfirmed: string;
     bookingFailed: string;
     selectHotel: string;
@@ -478,6 +481,9 @@ const en: Translations = {
     specialRequests: 'Special Requests',
     totalAmount: 'Total Amount',
     paymentMethod: 'Payment Method',
+    cash: 'Cash',
+    credit: 'Credit',
+    visa: 'Visa',
     bookingConfirmed: 'Booking Confirmed',
     bookingFailed: 'Booking Failed',
     selectHotel: 'Select Hotel',
@@ -926,6 +932,9 @@ const ar: Translations = {
     specialRequests: 'طلبات خاصة',
     totalAmount: 'المبلغ الإجمالي',
     paymentMethod: 'طريقة الدفع',
+    cash: 'نقداً',
+    credit: 'ائتمان',
+    visa: 'فيزا',
     bookingConfirmed: 'تم تأكيد الحجز',
     bookingFailed: 'فشل في الحجز',
     selectHotel: 'اختر الفندق',

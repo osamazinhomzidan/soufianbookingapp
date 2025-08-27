@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.SUPABASE_JWT_SECRET || 'fallback-secret-key';
 const JWT_EXPIRES_IN = '7d'; // Token expires in 7 days

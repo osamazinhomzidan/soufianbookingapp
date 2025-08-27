@@ -595,7 +595,7 @@ async function main() {
   await prisma.payment.create({
     data: {
       bookingId: booking2.id,
-      method: 'VISA',
+      method: 'CREDIT',
       amount: 300.00,
       paymentDate: new Date('2024-01-18'),
       startDate: new Date('2024-01-20'),
@@ -604,14 +604,14 @@ async function main() {
       remainingBalance: 300.00,
       status: 'PARTIALLY_PAID',
       transactionId: 'TXN-002-2024',
-      notes: '50% deposit paid',
+      notes: '50% deposit paid on credit',
     },
   });
 
   await prisma.payment.create({
     data: {
       bookingId: booking3.id,
-      method: 'BANK_TRANSFER',
+      method: 'CASH',
       amount: 900.00,
       paymentDate: new Date('2024-01-22'),
       startDate: new Date('2024-01-25'),
@@ -620,7 +620,7 @@ async function main() {
       remainingBalance: 900.00,
       status: 'PARTIALLY_PAID',
       transactionId: 'TXN-003-2024',
-      notes: '50% deposit paid via bank transfer',
+      notes: '50% deposit paid in cash',
     },
   });
 

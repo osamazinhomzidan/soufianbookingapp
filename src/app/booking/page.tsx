@@ -119,6 +119,8 @@ export default function Booking() {
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
   
   // Fetch data on component mount
   useEffect(() => {
@@ -126,20 +128,50 @@ export default function Booking() {
       try {
         setLoading(true);
         
-        // Fetch hotels
-        const hotelsResponse = await fetch('/hotels.json');
-        const hotelsData = await hotelsResponse.json();
-        setHotels(hotelsData);
+        // Fetch hotels from API
+        const hotelsResponse = await fetch('/api/hotels');
+        if (hotelsResponse.ok) {
+          const hotelsResult = await hotelsResponse.json();
+          if (hotelsResult.success && hotelsResult.data) {
+            setHotels(hotelsResult.data);
+          }
+        } else {
+          console.error('Failed to fetch hotels:', hotelsResponse.statusText);
+        }
         
-        // Fetch rooms
-        const roomsResponse = await fetch('/rooms.json');
-        const roomsData = await roomsResponse.json();
-        setRooms(roomsData);
+        // Fetch rooms from API
+        const roomsResponse = await fetch('/api/rooms');
+        if (roomsResponse.ok) {
+          const roomsResult = await roomsResponse.json();
+          if (roomsResult.success && roomsResult.data) {
+            // Transform room data to match expected interface
+            const transformedRooms = roomsResult.data.map((room: any) => ({
+              id: room.id,
+              hotelId: room.hotelId,
+              type: room.roomType,
+              boardType: room.boardType,
+              description: room.roomTypeDescription || room.altDescription || '',
+              rate: room.basePrice || room.alternativePrice || 0,
+              available: room.isActive,
+              status: room.isActive ? 'available' : 'maintenance',
+              availableCount: room.quantity || 0
+            }));
+            setRooms(transformedRooms);
+          }
+        } else {
+          console.error('Failed to fetch rooms:', roomsResponse.statusText);
+        }
         
-        // Fetch bookings
-        const bookingsResponse = await fetch('/bookings.json');
-        const bookingsData = await bookingsResponse.json();
-        setBookings(bookingsData);
+        // Fetch bookings from API
+        const bookingsResponse = await fetch('/api/bookings');
+        if (bookingsResponse.ok) {
+          const bookingsResult = await bookingsResponse.json();
+          if (bookingsResult.success && bookingsResult.data) {
+            setBookings(bookingsResult.data);
+          }
+        } else {
+          console.error('Failed to fetch bookings:', bookingsResponse.statusText);
+        }
         
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -159,6 +191,68 @@ export default function Booking() {
       const timeDiff = departureDate.getTime() - arrivalDate.getTime();
       const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
       setNumberOfNights(nights > 0 ? nights : 0);
+      
+      // Check availability when dates change
+      if (nights > 0) {
+        checkRoomAvailability(arrival, departure);
+      }
+    } else {
+      setNumberOfNights(0);
+    }
+  };
+  
+  // Check room availability for selected dates
+  const checkRoomAvailability = async (checkIn: string, checkOut: string) => {
+    if (!checkIn || !checkOut || !selectedHotelId) return;
+    
+    try {
+      setCheckingAvailability(true);
+      const params = new URLSearchParams({
+        checkInDate: checkIn,
+        checkOutDate: checkOut,
+        hotelId: selectedHotelId,
+        numberOfRooms: numberOfRooms.toString(),
+        availableOnly: 'false'
+      });
+      
+      const response = await fetch(`/api/bookings/availability?${params}`);
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data && result.data.results) {
+          // Update rooms with real-time availability
+          const updatedRooms = rooms.map(room => {
+            const availabilityInfo = result.data.results.find((r: any) => r.room.id === room.id);
+            if (availabilityInfo) {
+              return {
+                ...room,
+                available: availabilityInfo.availability.isAvailable,
+                availableCount: availabilityInfo.availability.availableCount,
+                status: availabilityInfo.availability.isAvailable ? 'available' : 'occupied'
+              };
+            }
+            return room;
+          });
+          setRooms(updatedRooms);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking availability:', error);
+    } finally {
+      setCheckingAvailability(false);
+    }
+  };
+  
+  // Handle hotel selection change
+  const handleHotelChange = (hotelId: string) => {
+    setSelectedHotelId(hotelId);
+    setSelectedRoomId(''); // Reset room selection
+    
+    // Filter rooms for selected hotel
+    const hotelRooms = rooms.filter(room => room.hotelId === hotelId);
+    
+    // Check availability if dates are selected
+    if (arrivalDate && departureDate && numberOfNights > 0) {
+      checkRoomAvailability(arrivalDate, departureDate);
     }
   };
   
@@ -178,26 +272,226 @@ export default function Booking() {
   };
   
   // Handle booking confirmation
-  const handleConfirmBooking = () => {
+  // Guest data validation function
+  const validateGuestData = () => {
+    const errors: {[key: string]: string} = {};
+    const errorMessages = [];
+    
+    // Required fields validation
+    if (!guestData.fullName.trim()) {
+      errors.fullName = t('booking.validation.nameRequired');
+      errorMessages.push(errors.fullName);
+    }
+    
+    if (!guestData.email.trim()) {
+      errors.email = t('booking.validation.emailRequired');
+      errorMessages.push(errors.email);
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestData.email)) {
+      errors.email = t('booking.validation.emailInvalid');
+      errorMessages.push(errors.email);
+    }
+    
+    if (!guestData.guestClassification) {
+      errors.guestClassification = t('booking.validation.classificationRequired');
+      errorMessages.push(errors.guestClassification);
+    }
+    
+    if (!guestData.nationality.trim()) {
+      errors.nationality = t('booking.validation.nationalityRequired');
+      errorMessages.push(errors.nationality);
+    }
+    
+    if (!guestData.telephone.trim()) {
+      errors.telephone = t('booking.validation.phoneRequired');
+      errorMessages.push(errors.telephone);
+    } else if (!/^[+]?[0-9\s-()]{8,}$/.test(guestData.telephone)) {
+      errors.telephone = t('booking.validation.phoneInvalid');
+      errorMessages.push(errors.telephone);
+    }
+    
+    // Date validation
+    if (!arrivalDate) {
+      errors.arrivalDate = t('booking.validation.arrivalDateRequired');
+      errorMessages.push(errors.arrivalDate);
+    }
+    
+    if (!departureDate) {
+      errors.departureDate = t('booking.validation.departureDateRequired');
+      errorMessages.push(errors.departureDate);
+    }
+    
+    if (arrivalDate && departureDate && new Date(arrivalDate) >= new Date(departureDate)) {
+      errors.dateRange = t('booking.validation.invalidDateRange');
+      errorMessages.push(errors.dateRange);
+    }
+    
+    // Payment validation
+    if (!paymentData.method) {
+      errors.paymentMethod = t('booking.validation.paymentMethodRequired');
+      errorMessages.push(errors.paymentMethod);
+    }
+    
+    if (!paymentData.date) {
+      errors.paymentDate = t('booking.validation.paymentDateRequired');
+      errorMessages.push(errors.paymentDate);
+    }
+    
+    if (paymentData.amount <= 0) {
+      errors.paymentAmount = t('booking.validation.paymentAmountRequired');
+      errorMessages.push(errors.paymentAmount);
+    }
+    
+    // Set validation errors for UI feedback
+    setValidationErrors(errors);
+    
+    return errorMessages;
+  };
+  
+  // Sanitize guest data
+  const sanitizeGuestData = () => {
+    return {
+      ...guestData,
+      fullName: guestData.fullName.trim(),
+      email: guestData.email.trim().toLowerCase(),
+      telephone: guestData.telephone.trim(),
+      nationality: guestData.nationality.trim(),
+      travelAgent: guestData.travelAgent.trim(),
+      company: guestData.company.trim(),
+      source: guestData.source.trim(),
+      group: guestData.group.trim(),
+      roomNo: guestData.roomNo.trim(),
+      rateCode: guestData.rateCode.trim(),
+      resId: guestData.resId.trim(),
+      profileId: guestData.profileId.trim()
+    };
+  };
+  
+  // Reset booking form
+  const resetBookingForm = () => {
+    // Reset guest data
+    setGuestData({
+      fullName: '',
+      email: '',
+      guestClassification: '',
+      travelAgent: '',
+      company: '',
+      source: '',
+      group: '',
+      arrival: '',
+      departure: '',
+      vip: false,
+      nationality: '',
+      telephone: '',
+      roomNo: '',
+      rateCode: '',
+      roomRate: 0,
+      payment: '',
+      resId: '',
+      profileId: ''
+    });
+    
+    // Reset payment data
+    setPaymentData({
+      method: 'cash',
+      amount: 0,
+      date: new Date().toISOString().split('T')[0],
+      startDate: '',
+      completionDate: '',
+      amountPaidToday: 0,
+      remainingBalance: 0
+    });
+    
+    // Reset booking details
+    setSelectedHotelId('hotel-1');
+    setSelectedRoomId('');
+    setNumberOfRooms(1);
+    setArrivalDate('');
+    setDepartureDate('');
+    setNumberOfNights(0);
+    
+    // Clear validation errors
+    setValidationErrors({});
+  };
+
+  const handleConfirmBooking = async () => {
     const selectedRoom = getSelectedRoom();
-    if (selectedRoom) {
-      const newBooking: Booking = {
-        id: Date.now().toString(),
-        resId: guestData.resId || `RES${Date.now()}`,
-        guest: {
-          ...guestData,
-          arrival: arrivalDate,
-          departure: departureDate,
-          roomRate: selectedRoom.rate
-        },
-        room: selectedRoom,
-        numberOfRooms: numberOfRooms,
-        payment: paymentData,
-        status: 'confirmed',
-        createdAt: new Date().toISOString()
-      };
-      
-      setBookings([...bookings, newBooking]);
+    const selectedHotel = getSelectedHotel();
+    
+    // Validate guest data before proceeding
+    const validationErrors = validateGuestData();
+    if (validationErrors.length > 0) {
+      alert(t('booking.validation.errors') + '\n' + validationErrors.join('\n'));
+      return;
+    }
+    
+    if (selectedRoom && selectedHotel) {
+      try {
+        setLoading(true);
+        
+        // Sanitize guest data
+        const sanitizedGuestData = sanitizeGuestData();
+        
+        const bookingData = {
+          hotelId: selectedHotel.id,
+          roomId: selectedRoom.id,
+          guestName: sanitizedGuestData.fullName,
+          guestEmail: sanitizedGuestData.email,
+          guestPhone: sanitizedGuestData.telephone,
+          guestNationality: sanitizedGuestData.nationality,
+          guestClassification: sanitizedGuestData.guestClassification,
+          checkInDate: arrivalDate,
+          checkOutDate: departureDate,
+          numberOfRooms: numberOfRooms,
+          totalAmount: (selectedRoom.rate || 0) * numberOfNights * numberOfRooms,
+          paymentMethod: paymentData.method.toUpperCase(),
+          paymentStatus: paymentData.method === 'credit' ? 'PARTIAL' : 'PAID',
+          specialRequests: `Travel Agent: ${sanitizedGuestData.travelAgent}, Company: ${sanitizedGuestData.company}, Source: ${sanitizedGuestData.source}, Group: ${sanitizedGuestData.group}`,
+          vipGuest: sanitizedGuestData.vip,
+          // Additional guest data
+          roomNumber: sanitizedGuestData.roomNo,
+          rateCode: sanitizedGuestData.rateCode,
+          reservationId: sanitizedGuestData.resId,
+          profileId: sanitizedGuestData.profileId
+        };
+        
+        const response = await fetch('/api/bookings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(bookingData),
+        });
+        
+        if (response.ok) {
+          const newBooking = await response.json();
+          
+          // Refresh bookings list
+          const bookingsResponse = await fetch('/api/bookings');
+          if (bookingsResponse.ok) {
+            const updatedBookings = await bookingsResponse.json();
+            setBookings(updatedBookings);
+          }
+          
+          // Show success message
+          alert(`${t('booking.success.confirmed')} ${newBooking.id}`);
+          
+          // Reset form after successful booking
+          resetBookingForm();
+          
+        } else {
+          const errorData = await response.json();
+          console.error('Booking creation failed:', errorData);
+          alert(`Failed to create booking: ${errorData.error || 'Unknown error'}`);
+        }
+        
+      } catch (error) {
+        console.error('Error creating booking:', error);
+        alert('Failed to create booking. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      alert('Please select a hotel and room before confirming the booking.');
     }
   };
   
@@ -274,8 +568,9 @@ export default function Booking() {
                   </label>
                   <select
                     value={selectedHotelId}
-                    onChange={(e) => setSelectedHotelId(e.target.value)}
+                    onChange={(e) => handleHotelChange(e.target.value)}
                     className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
+                    disabled={checkingAvailability}
                   >
                     <option value="">{t('booking.selectHotel')}</option>
                     {hotels.map((hotel) => (
@@ -288,9 +583,17 @@ export default function Booking() {
                 
                 {/* Room Type Selection with Availability Colors */}
                 <div className="space-y-2">
-                  <label className={`block text-sm font-medium text-gray-700 ${textAlignClass}`}>
-                    {t('booking.roomType')}
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className={`block text-sm font-medium text-gray-700 ${textAlignClass}`}>
+                      {t('booking.roomType')}
+                    </label>
+                    {checkingAvailability && (
+                      <div className="flex items-center space-x-2 text-sm text-blue-600">
+                        <div className="w-4 h-4 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin"></div>
+                        <span>{t('booking.checkingAvailability')}</span>
+                      </div>
+                    )}
+                  </div>
                   <div className="space-y-2">
                     {!selectedHotelId ? (
                       <div className={`w-full px-4 py-3 bg-gray-100/50 border border-gray-200/50 rounded-xl text-gray-500 ${textAlignClass}`}>
@@ -817,18 +1120,6 @@ export default function Booking() {
                     <>
                       <div className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700">
-                          {language === 'ar' ? 'تاريخ بداية الدفع' : 'Payment Start Date'}
-                        </label>
-                        <input
-                          type="date"
-                          value={paymentData.startDate || ''}
-                          onChange={(e) => setPaymentData({...paymentData, startDate: e.target.value})}
-                          className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">
                           {language === 'ar' ? 'تاريخ إتمام الدفع' : 'Payment Completion Date'}
                         </label>
                         <input
@@ -932,7 +1223,7 @@ export default function Booking() {
                     {t('booking.paymentBreakdown')}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div><span className="font-medium">{t('booking.methodLabel')}</span> {paymentData.method.charAt(0).toUpperCase() + paymentData.method.slice(1)}</div>
+                    <div><span className="font-medium">{t('booking.methodLabel')}</span> {paymentData.method ? paymentData.method.charAt(0).toUpperCase() + paymentData.method.slice(1) : 'N/A'}</div>
                     <div><span className="font-medium">{t('booking.amountPaidLabel')}</span> {paymentData.amount} {t('common.currency')}</div>
                     <div><span className="font-medium">{t('booking.paymentDateLabel')}</span> {paymentData.date}</div>
                     {paymentData.method === 'credit' && (
@@ -1057,29 +1348,29 @@ export default function Booking() {
                             {booking.resId}
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-700">
-                            {booking.guest.fullName}
-                            {booking.guest.vip && (
+                            {booking.guest?.fullName || 'N/A'}
+                            {booking.guest?.vip && (
                               <span className="ml-2 inline-block w-2 h-2 bg-yellow-400 rounded-full" title="VIP"></span>
                             )}
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-700">
-                            {booking.guest.guestClassification}
+                            {booking.guest?.guestClassification || 'N/A'}
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-700">
-                            {booking.room.type}
+                            {booking.room?.type || 'N/A'}
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-700">
-                            {booking.guest.arrival} - {booking.guest.departure}
+                            {booking.guest?.arrival && booking.guest?.departure ? `${booking.guest.arrival} - ${booking.guest.departure}` : 'N/A'}
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-700">
-                            {booking.payment.method.charAt(0).toUpperCase() + booking.payment.method.slice(1)}
+                            {booking.payment?.method ? t(`booking.${booking.payment.method}` as any) || booking.payment.method.charAt(0).toUpperCase() + booking.payment.method.slice(1) : 'N/A'}
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-700">
-                            ${booking.payment.remainingBalance || 0}
+                            ${booking.payment?.remainingBalance || 0}
                           </td>
                           <td className="px-4 py-3">
-                            <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(booking.status)}`}>
-                              {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                            <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(booking.status || 'pending')}`}>
+                              {booking.status ? booking.status.charAt(0).toUpperCase() + booking.status.slice(1) : 'Pending'}
                             </span>
                           </td>
                           <td className="px-4 py-3">

@@ -346,6 +346,7 @@ model Payment {
 
 enum PaymentMethod {
   CASH
+  CREDIT
   CREDIT_CARD
   DEBIT_CARD
   BANK_TRANSFER
