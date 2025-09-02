@@ -18,6 +18,7 @@ interface Room {
   boardType: 'Room only' | 'Bed & breakfast' | 'Half board' | 'Full board';
   description: string;
   rate: number;
+  alternativePrice?: number;
   available: boolean;
   status: 'available' | 'occupied' | 'maintenance';
   availableCount?: number;
@@ -45,13 +46,11 @@ interface Guest {
 }
 
 interface Payment {
-  method: 'cash' | 'credit' | 'visa';
-  amount: number;
+  method: 'CASH' | 'CREDIT';
+  amount?: number; // For cash payments
+  paidAmount?: number; // For credit payments
   date: string;
-  startDate?: string;
-  completionDate?: string;
-  amountPaidToday?: number;
-  remainingBalance?: number;
+  remainingDueDate?: string; // For credit payments
 }
 
 interface Booking {
@@ -73,8 +72,8 @@ export default function Booking() {
   const [selectedHotelId, setSelectedHotelId] = useState('hotel-1');
   const [selectedRoomId, setSelectedRoomId] = useState('room-1');
   const [numberOfRooms, setNumberOfRooms] = useState(1);
-  const [arrivalDate, setArrivalDate] = useState('2024-01-15');
-  const [departureDate, setDepartureDate] = useState('2024-01-20');
+  const [arrivalDate, setArrivalDate] = useState('2025-09-05');
+  const [departureDate, setDepartureDate] = useState('2025-09-05');
   const [numberOfNights, setNumberOfNights] = useState(5);
   
   // Step 2: Guest Data
@@ -86,29 +85,31 @@ export default function Booking() {
     company: 'Al-Rashid Trading Co.',
     source: 'Online Booking',
     group: 'Business Group',
-    arrival: '2024-01-15',
-    departure: '2024-01-20',
+    arrival: '2025-09-02',
+    departure: '2025-09-05',
     vip: true,
     nationality: 'UAE',
     telephone: '+971-50-123-4567',
     roomNo: '205',
     rateCode: 'CORP',
     roomRate: 250,
-    payment: 'credit',
+    payment: 'CREDIT',
     resId: 'RES-2024-001',
-    profileId: 'PROF-12345'
+    profileId: ''
   });
   
   // Step 3: Payment
   const [paymentData, setPaymentData] = useState<Payment>({
-    method: 'credit',
+    method: 'CASH',
     amount: 1250,
-    date: '2024-01-15',
-    startDate: '2024-01-15',
-    completionDate: '2024-01-25',
-    amountPaidToday: 500,
-    remainingBalance: 750
+    paidAmount: 0,
+    date: new Date().toISOString().split('T')[0],
+    remainingDueDate: ''
   });
+  
+  // Alternative pricing
+  const [useAlternativeRate, setUseAlternativeRate] = useState(false);
+  const [alternativeRate, setAlternativeRate] = useState<number>(0);
   
   // Operations Management
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -167,7 +168,9 @@ export default function Booking() {
         if (bookingsResponse.ok) {
           const bookingsResult = await bookingsResponse.json();
           if (bookingsResult.success && bookingsResult.data) {
-            setBookings(bookingsResult.data);
+            // Ensure data is an array
+            const bookingsData = Array.isArray(bookingsResult.data) ? bookingsResult.data : [];
+            setBookings(bookingsData);
           }
         } else {
           console.error('Failed to fetch bookings:', bookingsResponse.statusText);
@@ -326,8 +329,13 @@ export default function Booking() {
     }
     
     // Payment validation
+    const validPaymentMethods = ['CASH', 'CREDIT'];
+    
     if (!paymentData.method) {
       errors.paymentMethod = t('booking.validation.paymentMethodRequired');
+      errorMessages.push(errors.paymentMethod);
+    } else if (!validPaymentMethods.includes(paymentData.method)) {
+      errors.paymentMethod = `Invalid payment method: ${paymentData.method}. Valid methods are: ${validPaymentMethods.join(', ')}`;
       errorMessages.push(errors.paymentMethod);
     }
     
@@ -392,14 +400,16 @@ export default function Booking() {
     
     // Reset payment data
     setPaymentData({
-      method: 'cash',
+      method: 'CASH',
       amount: 0,
+      paidAmount: 0,
       date: new Date().toISOString().split('T')[0],
-      startDate: '',
-      completionDate: '',
-      amountPaidToday: 0,
-      remainingBalance: 0
+      remainingDueDate: ''
     });
+    
+    // Reset alternative pricing
+    setUseAlternativeRate(false);
+    setAlternativeRate(0);
     
     // Reset booking details
     setSelectedHotelId('hotel-1');
@@ -431,27 +441,45 @@ export default function Booking() {
         // Sanitize guest data
         const sanitizedGuestData = sanitizeGuestData();
         
+        // Calculate rate to use
+        const rateToUse = useAlternativeRate ? alternativeRate : selectedRoom.rate;
+        const totalAmount = (rateToUse || 0) * numberOfNights * numberOfRooms;
+        
         const bookingData = {
           hotelId: selectedHotel.id,
           roomId: selectedRoom.id,
-          guestName: sanitizedGuestData.fullName,
-          guestEmail: sanitizedGuestData.email,
-          guestPhone: sanitizedGuestData.telephone,
-          guestNationality: sanitizedGuestData.nationality,
-          guestClassification: sanitizedGuestData.guestClassification,
+          guestData: {
+            fullName: sanitizedGuestData.fullName,
+            email: sanitizedGuestData.email,
+            telephone: sanitizedGuestData.telephone,
+            nationality: sanitizedGuestData.nationality,
+            guestClassification: sanitizedGuestData.guestClassification,
+            travelAgent: sanitizedGuestData.travelAgent,
+            company: sanitizedGuestData.company,
+            source: sanitizedGuestData.source,
+            group: sanitizedGuestData.group,
+            vip: sanitizedGuestData.vip,
+            roomNo: sanitizedGuestData.roomNo,
+            rateCode: sanitizedGuestData.rateCode,
+            resId: sanitizedGuestData.resId,
+            profileId: sanitizedGuestData.profileId
+          },
           checkInDate: arrivalDate,
           checkOutDate: departureDate,
           numberOfRooms: numberOfRooms,
-          totalAmount: (selectedRoom.rate || 0) * numberOfNights * numberOfRooms,
-          paymentMethod: paymentData.method.toUpperCase(),
-          paymentStatus: paymentData.method === 'credit' ? 'PARTIAL' : 'PAID',
-          specialRequests: `Travel Agent: ${sanitizedGuestData.travelAgent}, Company: ${sanitizedGuestData.company}, Source: ${sanitizedGuestData.source}, Group: ${sanitizedGuestData.group}`,
-          vipGuest: sanitizedGuestData.vip,
-          // Additional guest data
-          roomNumber: sanitizedGuestData.roomNo,
-          rateCode: sanitizedGuestData.rateCode,
-          reservationId: sanitizedGuestData.resId,
-          profileId: sanitizedGuestData.profileId
+          useAlternativeRate: useAlternativeRate,
+          alternativeRate: useAlternativeRate ? alternativeRate : undefined,
+          paymentData: {
+            method: paymentData.method,
+            ...(paymentData.method === 'CASH' ? {
+              amount: totalAmount,
+              paymentDate: paymentData.date
+            } : {
+              paidAmount: paymentData.paidAmount || 0,
+              paymentDate: paymentData.date,
+              remainingDueDate: paymentData.remainingDueDate
+            })
+          }
         };
         
         const response = await fetch('/api/bookings', {
@@ -468,8 +496,11 @@ export default function Booking() {
           // Refresh bookings list
           const bookingsResponse = await fetch('/api/bookings');
           if (bookingsResponse.ok) {
-            const updatedBookings = await bookingsResponse.json();
-            setBookings(updatedBookings);
+            const updatedBookingsResult = await bookingsResponse.json();
+            if (updatedBookingsResult.success && updatedBookingsResult.data) {
+              const bookingsData = Array.isArray(updatedBookingsResult.data) ? updatedBookingsResult.data : [];
+              setBookings(bookingsData);
+            }
           }
           
           // Show success message
@@ -510,7 +541,7 @@ export default function Booking() {
   };
   
   // Filter bookings
-  const filteredBookings = bookings.filter(booking => {
+  const filteredBookings = (Array.isArray(bookings) ? bookings : []).filter(booking => {
     const statusMatch = !statusFilter || booking.status === statusFilter;
     const dateMatch = (!dateRangeFilter.start || booking.guest.arrival >= dateRangeFilter.start) &&
                      (!dateRangeFilter.end || booking.guest.departure <= dateRangeFilter.end);
@@ -715,27 +746,39 @@ export default function Booking() {
                   </div>
                 </div>
                 
-                {/* Alternative Price Input */}
-                <div className="space-y-2">
-                  <label className={`block text-sm font-medium text-gray-700 ${textAlignClass}`}>
-                    {t('booking.alternativePrice')}
-                  </label>
-                  <div className="relative">
+                {/* Alternative Price Toggle and Input */}
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3">
                     <input
-                      type="number"
-                      value={guestData.roomRate || 0}
-                      onChange={(e) => setGuestData({...guestData, roomRate: parseFloat(e.target.value) || 0})}
-                      className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
-                      placeholder={t('booking.enterAlternativePrice')}
-                      min="0"
-                      step="0.01"
+                      type="checkbox"
+                      id="useAlternativeRate"
+                      checked={useAlternativeRate}
+                      onChange={(e) => setUseAlternativeRate(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                     />
-                    <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                      <span className="text-gray-500 font-medium text-sm">
-                        {t('common.currency')}
-                      </span>
-                    </div>
+                    <label htmlFor="useAlternativeRate" className={`text-sm font-medium text-gray-700 ${textAlignClass}`}>
+                      {language === 'ar' ? 'استخدام سعر بديل' : 'Use Alternative Price'}
+                    </label>
                   </div>
+                  
+                  {useAlternativeRate && (
+                    <div className="relative">
+                      <input
+                        type="number"
+                        value={alternativeRate}
+                        onChange={(e) => setAlternativeRate(parseFloat(e.target.value) || 0)}
+                        className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
+                        placeholder={language === 'ar' ? 'أدخل السعر البديل' : 'Enter alternative price'}
+                        min="0"
+                        step="0.01"
+                      />
+                      <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                        <span className="text-gray-500 font-medium text-sm">
+                          SAR
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Room Details */}
@@ -973,9 +1016,13 @@ export default function Booking() {
                     className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
                   >
                     <option value="">{language === 'ar' ? 'اختر طريقة الدفع' : 'Select payment method'}</option>
-                    <option value="cash">{language === 'ar' ? 'نقدي' : 'Cash'}</option>
-                    <option value="credit">{language === 'ar' ? 'آجل' : 'Credit'}</option>
-                    <option value="visa">{language === 'ar' ? 'فيزا' : 'Visa'}</option>
+                    <option value="CASH">{language === 'ar' ? 'نقدي' : 'Cash'}</option>
+                        <option value="CREDIT">{language === 'ar' ? 'آجل' : 'Credit'}</option>
+                        <option value="CREDIT_CARD">{language === 'ar' ? 'بطاقة ائتمان' : 'Credit Card'}</option>
+                        <option value="DEBIT_CARD">{language === 'ar' ? 'بطاقة خصم' : 'Debit Card'}</option>
+                        <option value="BANK_TRANSFER">{language === 'ar' ? 'تحويل بنكي' : 'Bank Transfer'}</option>
+                        <option value="VISA">{language === 'ar' ? 'فيزا' : 'Visa'}</option>
+                        <option value="MASTERCARD">{language === 'ar' ? 'ماستركارد' : 'Mastercard'}</option>
                   </select>
                 </div>
                 
@@ -1029,16 +1076,16 @@ export default function Booking() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Cash */}
                     <div
-                      onClick={() => setPaymentData({...paymentData, method: 'cash'})}
+                      onClick={() => setPaymentData({...paymentData, method: 'CASH'})}
                       className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
-                        paymentData.method === 'cash'
+                        paymentData.method === 'CASH'
                           ? 'border-green-500 bg-green-50/80 shadow-lg'
                           : 'border-gray-200 bg-white/50 hover:border-green-300'
                       }`}
                     >
                       <div className="flex items-center justify-center space-x-3">
                         <div className={`w-4 h-4 rounded-full border-2 ${
-                          paymentData.method === 'cash' ? 'border-green-500 bg-green-500' : 'border-gray-300'
+                          paymentData.method === 'CASH' ? 'border-green-500 bg-green-500' : 'border-gray-300'
                         }`}></div>
                         <span className="font-medium text-gray-800">
                           {language === 'ar' ? 'نقدي' : 'Cash'}
@@ -1048,16 +1095,16 @@ export default function Booking() {
                     
                     {/* Credit */}
                     <div
-                      onClick={() => setPaymentData({...paymentData, method: 'credit'})}
+                      onClick={() => setPaymentData({...paymentData, method: 'CREDIT'})}
                       className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
-                        paymentData.method === 'credit'
+                        paymentData.method === 'CREDIT'
                           ? 'border-orange-500 bg-orange-50/80 shadow-lg'
                           : 'border-gray-200 bg-white/50 hover:border-orange-300'
                       }`}
                     >
                       <div className="flex items-center justify-center space-x-3">
                         <div className={`w-4 h-4 rounded-full border-2 ${
-                          paymentData.method === 'credit' ? 'border-orange-500 bg-orange-500' : 'border-gray-300'
+                          paymentData.method === 'CREDIT' ? 'border-orange-500 bg-orange-500' : 'border-gray-300'
                         }`}></div>
                         <span className="font-medium text-gray-800">
                           {language === 'ar' ? 'آجل' : 'Credit'}
@@ -1065,24 +1112,7 @@ export default function Booking() {
                       </div>
                     </div>
                     
-                    {/* Visa */}
-                    <div
-                      onClick={() => setPaymentData({...paymentData, method: 'visa'})}
-                      className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
-                        paymentData.method === 'visa'
-                          ? 'border-blue-500 bg-blue-50/80 shadow-lg'
-                          : 'border-gray-200 bg-white/50 hover:border-blue-300'
-                      }`}
-                    >
-                      <div className="flex items-center justify-center space-x-3">
-                        <div className={`w-4 h-4 rounded-full border-2 ${
-                          paymentData.method === 'visa' ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
-                        }`}></div>
-                        <span className="font-medium text-gray-800">
-                          {language === 'ar' ? 'فيزا' : 'Visa'}
-                        </span>
-                      </div>
-                    </div>
+
                   </div>
                 </div>
                 
@@ -1101,65 +1131,46 @@ export default function Booking() {
                     />
                   </div>
                   
-                  {/* Amount Paid */}
+                  {/* Amount for Cash or Paid Amount for Credit */}
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">
-                      {language === 'ar' ? 'المبلغ المدفوع' : 'Amount Paid'}
+                      {paymentData.method === 'CASH' 
+                        ? (language === 'ar' ? 'المبلغ الكامل' : 'Full Amount')
+                        : (language === 'ar' ? 'المبلغ المدفوع' : 'Amount Paid Today')
+                      }
                     </label>
                     <input
                       type="number"
-                      value={paymentData.amount}
-                      onChange={(e) => setPaymentData({...paymentData, amount: parseFloat(e.target.value) || 0})}
+                      value={paymentData.method === 'CASH' ? (paymentData.amount || 0) : (paymentData.paidAmount || 0)}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value) || 0;
+                        if (paymentData.method === 'CASH') {
+                          setPaymentData({...paymentData, amount: value});
+                        } else {
+                          setPaymentData({...paymentData, paidAmount: value});
+                        }
+                      }}
                       className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
-                      placeholder={language === 'ar' ? 'أدخل المبلغ' : 'Enter amount'}
+                      placeholder={paymentData.method === 'CASH' 
+                        ? (language === 'ar' ? 'أدخل المبلغ الكامل' : 'Enter full amount')
+                        : (language === 'ar' ? 'أدخل المبلغ المدفوع اليوم' : 'Enter amount paid today')
+                      }
                     />
                   </div>
                   
-                  {/* Credit Payment Details */}
-                  {paymentData.method === 'credit' && (
-                    <>
-                      <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">
-                          {language === 'ar' ? 'تاريخ إتمام الدفع' : 'Payment Completion Date'}
-                        </label>
-                        <input
-                          type="date"
-                          value={paymentData.completionDate || ''}
-                          onChange={(e) => setPaymentData({...paymentData, completionDate: e.target.value})}
-                          className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">
-                          {language === 'ar' ? 'المبلغ المدفوع اليوم' : 'Amount Paid Today'}
-                        </label>
-                        <input
-                          type="number"
-                          value={paymentData.amountPaidToday || 0}
-                          onChange={(e) => {
-                            const paidToday = parseFloat(e.target.value) || 0;
-                            const remaining = paymentData.amount - paidToday;
-                            setPaymentData({
-                              ...paymentData,
-                              amountPaidToday: paidToday,
-                              remainingBalance: remaining > 0 ? remaining : 0
-                            });
-                          }}
-                          className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
-                          placeholder={language === 'ar' ? 'أدخل المبلغ المدفوع اليوم' : 'Enter amount paid today'}
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">
-                          {language === 'ar' ? 'الرصيد المتبقي' : 'Remaining Balance'}
-                        </label>
-                        <div className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl backdrop-blur-sm text-gray-700">
-                          {paymentData.remainingBalance || 0} SAR
-                        </div>
-                      </div>
-                    </>
+                  {/* Credit Payment Due Date */}
+                  {paymentData.method === 'CREDIT' && (
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        {language === 'ar' ? 'تاريخ استحقاق الباقي' : 'Remaining Due Date'}
+                      </label>
+                      <input
+                        type="date"
+                        value={paymentData.remainingDueDate || ''}
+                        onChange={(e) => setPaymentData({...paymentData, remainingDueDate: e.target.value})}
+                        className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
+                      />
+                    </div>
                   )}
                 </div>
               </div>
@@ -1226,7 +1237,7 @@ export default function Booking() {
                     <div><span className="font-medium">{t('booking.methodLabel')}</span> {paymentData.method ? paymentData.method.charAt(0).toUpperCase() + paymentData.method.slice(1) : 'N/A'}</div>
                     <div><span className="font-medium">{t('booking.amountPaidLabel')}</span> {paymentData.amount} {t('common.currency')}</div>
                     <div><span className="font-medium">{t('booking.paymentDateLabel')}</span> {paymentData.date}</div>
-                    {paymentData.method === 'credit' && (
+                    {paymentData.method === 'CREDIT' && (
                       <>
                         <div><span className="font-medium">{t('booking.paidTodayLabel')}</span> {paymentData.amountPaidToday || 0} {t('common.currency')}</div>
                         <div><span className="font-medium">{t('booking.remainingLabel')}</span> {paymentData.remainingBalance || 0} {t('common.currency')}</div>

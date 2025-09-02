@@ -521,6 +521,7 @@ async function main() {
       checkOutDate: new Date('2024-01-18'),
       numberOfNights: 3,
       roomRate: 250.00,
+      useAlternativeRate: false,
       totalAmount: 750.00,
       rateCode: 'CORP',
       status: 'CHECKED_IN',
@@ -543,6 +544,7 @@ async function main() {
       checkOutDate: new Date('2024-01-23'),
       numberOfNights: 3,
       roomRate: 200.00,
+      useAlternativeRate: false,
       totalAmount: 600.00,
       rateCode: 'RACK',
       status: 'CONFIRMED',
@@ -563,8 +565,10 @@ async function main() {
       checkInDate: new Date('2024-01-25'),
       checkOutDate: new Date('2024-01-30'),
       numberOfNights: 5,
-      roomRate: 180.00,
-      totalAmount: 1800.00, // 2 rooms * 5 nights * 180
+      roomRate: 220.00, // Using alternative rate
+      useAlternativeRate: true,
+      alternativeRate: 220.00,
+      totalAmount: 2200.00, // 2 rooms * 5 nights * 220
       rateCode: 'FAM',
       status: 'PENDING',
       specialRequests: ['Connecting rooms', 'Baby crib'],
@@ -579,16 +583,14 @@ async function main() {
   await prisma.payment.create({
     data: {
       bookingId: booking1.id,
-      method: 'CREDIT_CARD',
-      amount: 750.00,
+      method: 'CASH',
+      totalAmount: 750.00,
+      paidAmount: 750.00,
+      remainingAmount: 0.00,
       paymentDate: new Date('2024-01-15'),
-      startDate: new Date('2024-01-15'),
-      completionDate: new Date('2024-01-18'),
-      amountPaidToday: 750.00,
-      remainingBalance: 0.00,
       status: 'COMPLETED',
       transactionId: 'TXN-001-2024',
-      notes: 'Full payment at check-in',
+      notes: 'Full cash payment at check-in',
     },
   });
 
@@ -596,31 +598,29 @@ async function main() {
     data: {
       bookingId: booking2.id,
       method: 'CREDIT',
-      amount: 300.00,
+      totalAmount: 600.00,
+      paidAmount: 300.00,
+      remainingAmount: 300.00,
       paymentDate: new Date('2024-01-18'),
-      startDate: new Date('2024-01-20'),
-      completionDate: new Date('2024-01-23'),
-      amountPaidToday: 300.00,
-      remainingBalance: 300.00,
+      remainingDueDate: new Date('2024-01-23'),
       status: 'PARTIALLY_PAID',
       transactionId: 'TXN-002-2024',
-      notes: '50% deposit paid on credit',
+      notes: '50% deposit paid on credit, remaining due at checkout',
     },
   });
 
   await prisma.payment.create({
     data: {
       bookingId: booking3.id,
-      method: 'CASH',
-      amount: 900.00,
+      method: 'CREDIT',
+      totalAmount: 2200.00,
+      paidAmount: 1100.00,
+      remainingAmount: 1100.00,
       paymentDate: new Date('2024-01-22'),
-      startDate: new Date('2024-01-25'),
-      completionDate: new Date('2024-01-30'),
-      amountPaidToday: 900.00,
-      remainingBalance: 900.00,
+      remainingDueDate: new Date('2024-01-30'),
       status: 'PARTIALLY_PAID',
       transactionId: 'TXN-003-2024',
-      notes: '50% deposit paid in cash',
+      notes: '50% deposit paid on credit with alternative rate',
     },
   });
 

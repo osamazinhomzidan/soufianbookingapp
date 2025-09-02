@@ -284,8 +284,10 @@ model Booking {
   checkInDate     DateTime      @db.Date
   checkOutDate    DateTime      @db.Date
   numberOfNights  Int           // Calculated field
-  roomRate        Decimal       @db.Decimal(10, 2) // Rate applied at booking time
-  totalAmount     Decimal       @db.Decimal(12, 2) // Total booking amount
+  roomRate        Decimal       @db.Decimal(10, 2) // Base rate applied at booking time
+  alternativeRate Decimal?      @db.Decimal(10, 2) // Alternative rate if applicable
+  useAlternativeRate Boolean    @default(false) // Whether to use alternative pricing
+  totalAmount     Decimal       @db.Decimal(12, 2) // Total booking amount (calculated based on rate used)
   rateCode        String?       // Rate classification code (e.g., 'CORP')
   status          BookingStatus @default(PENDING)
   checkInTime     DateTime?
@@ -326,12 +328,11 @@ model Payment {
   id                String        @id @default(cuid())
   bookingId         String
   method            PaymentMethod
-  amount            Decimal       @db.Decimal(12, 2)
-  paymentDate       DateTime      @default(now())
-  startDate         DateTime?     @db.Date // Payment period start
-  completionDate    DateTime?     @db.Date // Expected completion date
-  amountPaidToday   Decimal?      @db.Decimal(12, 2)
-  remainingBalance  Decimal?      @db.Decimal(12, 2)
+  totalAmount       Decimal       @db.Decimal(12, 2) // Total amount to be paid
+  paidAmount        Decimal       @db.Decimal(12, 2) // Amount paid so far
+  remainingAmount   Decimal       @db.Decimal(12, 2) // Remaining amount to be paid
+  paymentDate       DateTime      @db.Date // Date of payment
+  remainingDueDate  DateTime?     @db.Date // Due date for remaining amount (for credit)
   status            PaymentStatus @default(PENDING)
   transactionId     String?       // External transaction reference
   notes             String?
@@ -347,19 +348,14 @@ model Payment {
 enum PaymentMethod {
   CASH
   CREDIT
-  CREDIT_CARD
-  DEBIT_CARD
-  BANK_TRANSFER
-  VISA
-  MASTERCARD
 }
 
 enum PaymentStatus {
   PENDING
   COMPLETED
+  PARTIALLY_PAID
   FAILED
   REFUNDED
-  PARTIALLY_PAID
 }
 
 // ================================

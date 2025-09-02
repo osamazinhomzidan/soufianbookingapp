@@ -88,6 +88,8 @@ export async function GET(request: NextRequest) {
           checkOutDate: true,
           numberOfNights: true,
           roomRate: true,
+          alternativeRate: true,
+          useAlternativeRate: true,
           totalAmount: true,
           rateCode: true,
           status: true,
@@ -137,12 +139,11 @@ export async function GET(request: NextRequest) {
             select: {
               id: true,
               method: true,
-              amount: true,
+              totalAmount: true,
+              paidAmount: true,
+              remainingAmount: true,
               paymentDate: true,
-              startDate: true,
-              completionDate: true,
-              amountPaidToday: true,
-              remainingBalance: true,
+              remainingDueDate: true,
               status: true,
             },
             orderBy: { createdAt: 'desc' },
@@ -213,6 +214,8 @@ export async function POST(request: NextRequest) {
       checkInDate,
       checkOutDate,
       roomRate,
+      alternativeRate,
+      useAlternativeRate,
       rateCode,
       specialRequests,
       notes,
@@ -265,8 +268,13 @@ export async function POST(request: NextRequest) {
     // Generate unique reservation ID
     const resId = `RES-${new Date().getFullYear()}-${Date.now().toString().slice(-6)}`;
 
-    // Calculate total amount
-    const finalRoomRate = roomRate || room.basePrice;
+    // Calculate total amount based on rate selection
+    let finalRoomRate;
+    if (useAlternativeRate && (alternativeRate || room.alternativePrice)) {
+      finalRoomRate = alternativeRate || room.alternativePrice;
+    } else {
+      finalRoomRate = roomRate || room.basePrice;
+    }
     const totalAmount = finalRoomRate.mul(numberOfNights).mul(numberOfRooms);
 
     // Start transaction for booking creation
@@ -296,9 +304,28 @@ export async function POST(request: NextRequest) {
       } else {
         // Create new guest
         const nameParts = guestData.fullName?.split(' ') || ['', ''];
+        // Generate unique profileId
+        let profileId = guestData.profileId;
+        if (!profileId) {
+          const timestamp = Date.now();
+          const random = Math.floor(Math.random() * 1000);
+          profileId = `PROF-${timestamp}-${random}`;
+        }
+        
+        // Check if profileId already exists, if so generate a new one
+        const existingGuest = await tx.guest.findUnique({
+          where: { profileId }
+        });
+        
+        if (existingGuest) {
+          const timestamp = Date.now();
+          const random = Math.floor(Math.random() * 10000);
+          profileId = `PROF-${timestamp}-${random}`;
+        }
+        
         guest = await tx.guest.create({
           data: {
-            profileId: guestData.profileId || `PROF-${Date.now()}`,
+            profileId,
             firstName: guestData.firstName || nameParts[0] || '',
             lastName: guestData.lastName || nameParts.slice(1).join(' ') || '',
             fullName: guestData.fullName || '',
@@ -326,7 +353,9 @@ export async function POST(request: NextRequest) {
           checkInDate: checkIn,
           checkOutDate: checkOut,
           numberOfNights,
-          roomRate: finalRoomRate,
+          roomRate: roomRate || room.basePrice,
+          alternativeRate: alternativeRate || room.alternativePrice,
+          useAlternativeRate: useAlternativeRate || false,
           totalAmount,
           rateCode: rateCode || 'STANDARD',
           status: 'PENDING',
@@ -376,17 +405,39 @@ export async function POST(request: NextRequest) {
 
       // Create payment record if payment data provided
       if (paymentData) {
+        // Validate payment method
+        const validPaymentMethods = ['CASH', 'CREDIT'];
+        const paymentMethod = paymentData.method?.toUpperCase() || 'CASH';
+        
+        if (!validPaymentMethods.includes(paymentMethod)) {
+          throw new Error(`Invalid payment method: ${paymentData.method}. Valid methods are: ${validPaymentMethods.join(', ')}`);
+        }
+
+        // Calculate payment amounts based on method
+        let paidAmount, remainingAmount, remainingDueDate;
+        
+        if (paymentMethod === 'CASH') {
+          // For cash: full payment on payment date
+          paidAmount = paymentData.amount || totalAmount;
+          remainingAmount = 0;
+          remainingDueDate = null;
+        } else if (paymentMethod === 'CREDIT') {
+          // For credit: partial payment today, remaining amount on future date
+          paidAmount = paymentData.paidAmount || 0;
+          remainingAmount = totalAmount.sub(paidAmount);
+          remainingDueDate = paymentData.remainingDueDate ? new Date(paymentData.remainingDueDate) : null;
+        }
+
         await tx.payment.create({
           data: {
             bookingId: booking.id,
-            method: paymentData.method?.toUpperCase() || 'CASH',
-            amount: paymentData.amount || totalAmount,
+            method: paymentMethod,
+            totalAmount: totalAmount,
+            paidAmount: paidAmount,
+            remainingAmount: remainingAmount,
             paymentDate: paymentData.date ? new Date(paymentData.date) : new Date(),
-            startDate: paymentData.startDate ? new Date(paymentData.startDate) : checkIn,
-            completionDate: paymentData.completionDate ? new Date(paymentData.completionDate) : null,
-            amountPaidToday: paymentData.amountPaidToday || null,
-            remainingBalance: paymentData.remainingBalance || null,
-            status: 'PENDING',
+            remainingDueDate: remainingDueDate,
+            status: remainingAmount > 0 ? 'PARTIALLY_PAID' : 'COMPLETED',
           },
         });
       }

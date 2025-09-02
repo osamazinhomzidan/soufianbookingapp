@@ -52,6 +52,8 @@ export async function GET(
         checkOutDate: true,
         numberOfNights: true,
         roomRate: true,
+        alternativeRate: true,
+        useAlternativeRate: true,
         totalAmount: true,
         rateCode: true,
         status: true,
@@ -125,12 +127,11 @@ export async function GET(
           select: {
             id: true,
             method: true,
-            amount: true,
+            totalAmount: true,
+            paidAmount: true,
+            remainingAmount: true,
             paymentDate: true,
-            startDate: true,
-            completionDate: true,
-            amountPaidToday: true,
-            remainingBalance: true,
+            remainingDueDate: true,
             status: true,
             createdAt: true,
           },
@@ -221,6 +222,8 @@ export async function PUT(
       checkOutDate,
       numberOfRooms,
       roomRate,
+      alternativeRate,
+      useAlternativeRate,
       rateCode,
       assignedRoomNo,
       checkInTime,
@@ -252,7 +255,14 @@ export async function PUT(
       const timeDiff = checkOut.getTime() - checkIn.getTime();
       numberOfNights = Math.ceil(timeDiff / (1000 * 3600 * 24));
       
-      const finalRoomRate = roomRate || existingBooking.roomRate;
+      // Calculate rate based on alternative pricing selection
+      let finalRoomRate;
+      if (useAlternativeRate && (alternativeRate || existingBooking.room.alternativePrice)) {
+        finalRoomRate = alternativeRate || existingBooking.room.alternativePrice;
+      } else {
+        finalRoomRate = roomRate || existingBooking.roomRate;
+      }
+      
       const finalNumberOfRooms = numberOfRooms || existingBooking.numberOfRooms;
       totalAmount = finalRoomRate.mul(numberOfNights).mul(finalNumberOfRooms);
     }
@@ -290,7 +300,9 @@ export async function PUT(
           checkOutDate: checkOut,
           numberOfNights,
           numberOfRooms,
-          roomRate,
+          roomRate: roomRate || existingBooking.roomRate,
+          alternativeRate: alternativeRate || existingBooking.alternativeRate,
+          useAlternativeRate: useAlternativeRate !== undefined ? useAlternativeRate : existingBooking.useAlternativeRate,
           totalAmount,
           rateCode,
           assignedRoomNo,
@@ -340,12 +352,11 @@ export async function PUT(
             select: {
               id: true,
               method: true,
-              amount: true,
+              totalAmount: true,
+              paidAmount: true,
+              remainingAmount: true,
               paymentDate: true,
-              startDate: true,
-              completionDate: true,
-              amountPaidToday: true,
-              remainingBalance: true,
+              remainingDueDate: true,
               status: true,
             },
             orderBy: { createdAt: 'desc' },
@@ -355,6 +366,29 @@ export async function PUT(
 
       // Update or create payment record if payment data provided
       if (paymentData) {
+        // Validate payment method
+        const validPaymentMethods = ['CASH', 'CREDIT'];
+        const paymentMethod = paymentData.method?.toUpperCase() || 'CASH';
+        
+        if (!validPaymentMethods.includes(paymentMethod)) {
+          throw new Error(`Invalid payment method: ${paymentData.method}. Valid methods are: ${validPaymentMethods.join(', ')}`);
+        }
+
+        // Calculate payment amounts based on method
+        let paidAmount, remainingAmount, remainingDueDate;
+        
+        if (paymentMethod === 'CASH') {
+          // For cash: full payment on payment date
+          paidAmount = paymentData.amount || totalAmount;
+          remainingAmount = 0;
+          remainingDueDate = null;
+        } else if (paymentMethod === 'CREDIT') {
+          // For credit: partial payment today, remaining amount on future date
+          paidAmount = paymentData.paidAmount || 0;
+          remainingAmount = totalAmount.sub(paidAmount);
+          remainingDueDate = paymentData.remainingDueDate ? new Date(paymentData.remainingDueDate) : null;
+        }
+
         const existingPayment = await tx.payment.findFirst({
           where: { bookingId: id },
           orderBy: { createdAt: 'desc' },
@@ -364,14 +398,13 @@ export async function PUT(
           await tx.payment.update({
             where: { id: existingPayment.id },
             data: {
-              method: paymentData.method?.toUpperCase(),
-              amount: paymentData.amount,
+              method: paymentMethod,
+              totalAmount: totalAmount,
+              paidAmount: paidAmount,
+              remainingAmount: remainingAmount,
               paymentDate: paymentData.date ? new Date(paymentData.date) : undefined,
-              startDate: paymentData.startDate ? new Date(paymentData.startDate) : undefined,
-              completionDate: paymentData.completionDate ? new Date(paymentData.completionDate) : undefined,
-              amountPaidToday: paymentData.amountPaidToday,
-              remainingBalance: paymentData.remainingBalance,
-              status: paymentData.status?.toUpperCase(),
+              remainingDueDate: remainingDueDate,
+              status: remainingAmount > 0 ? 'PARTIALLY_PAID' : 'COMPLETED',
               updatedAt: new Date(),
             },
           });
@@ -379,14 +412,13 @@ export async function PUT(
           await tx.payment.create({
             data: {
               bookingId: id,
-              method: paymentData.method?.toUpperCase() || 'CASH',
-              amount: paymentData.amount || totalAmount,
+              method: paymentMethod,
+              totalAmount: totalAmount,
+              paidAmount: paidAmount,
+              remainingAmount: remainingAmount,
               paymentDate: paymentData.date ? new Date(paymentData.date) : new Date(),
-              startDate: paymentData.startDate ? new Date(paymentData.startDate) : checkIn,
-              completionDate: paymentData.completionDate ? new Date(paymentData.completionDate) : null,
-              amountPaidToday: paymentData.amountPaidToday,
-              remainingBalance: paymentData.remainingBalance,
-              status: paymentData.status?.toUpperCase() || 'PENDING',
+              remainingDueDate: remainingDueDate,
+              status: remainingAmount > 0 ? 'PARTIALLY_PAID' : 'COMPLETED',
             },
           });
         }
