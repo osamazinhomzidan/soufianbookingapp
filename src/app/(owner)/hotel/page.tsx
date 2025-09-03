@@ -5,14 +5,27 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
 
+interface HotelAgreement {
+  id: string;
+  fileName: string;
+  filePath: string;
+  fileSize: number;
+  mimeType: string;
+  uploadedAt: string;
+}
+
 interface Hotel {
   id: string;
   name: string;
   code: string;
   altName: string | null;
   address: string | null;
+  location: string | null;
   description: string | null;
   altDescription: string | null;
+  roomCount?: number;
+  agreementCount?: number;
+  agreements?: HotelAgreement[];
   createdAt: string;
   updatedAt: string;
   createdBy?: {
@@ -42,10 +55,17 @@ export default function Hotel() {
   const [hotelCode, setHotelCode] = useState('');
   const [altHotelName, setAltHotelName] = useState('');
   const [hotelAddress, setHotelAddress] = useState('');
+  const [hotelLocation, setHotelLocation] = useState('');
   const [hotelDescription, setHotelDescription] = useState('');
   const [altHotelDescription, setAltHotelDescription] = useState('');
+  const [agreementFiles, setAgreementFiles] = useState<FileList | null>(null);
   const [nameFilter, setNameFilter] = useState('');
   const [codeFilter, setCodeFilter] = useState('');
+  const [locationFilter, setLocationFilter] = useState('');
+  const [hasRoomsFilter, setHasRoomsFilter] = useState<string>('');
+  const [minRoomCountFilter, setMinRoomCountFilter] = useState<string>('');
+  const [maxRoomCountFilter, setMaxRoomCountFilter] = useState<string>('');
+  const [generalSearch, setGeneralSearch] = useState('');
   const [selectedHotels, setSelectedHotels] = useState<string[]>([]);
   const [selectedHotelDetails, setSelectedHotelDetails] = useState<Hotel | null>(null);
   const [hotels, setHotels] = useState<Hotel[]>([]);
@@ -54,12 +74,20 @@ export default function Hotel() {
   const [editingHotel, setEditingHotel] = useState<Hotel | null>(null);
 
   // Fetch hotels from API
-  const fetchHotels = async (search = '') => {
+  const fetchHotels = async (search = '', location = '', hasRooms = '') => {
     try {
       setLoading(true);
       setError(null);
-      const searchParam = search ? `?search=${encodeURIComponent(search)}` : '';
-      const response = await fetch(`/api/hotels${searchParam}`);
+      
+      const params = new URLSearchParams();
+      if (search) params.append('search', search);
+      if (location) params.append('location', location);
+      if (hasRooms && hasRooms !== 'all') params.append('hasRooms', hasRooms);
+      
+      const queryString = params.toString();
+      const url = `/api/hotels${queryString ? `?${queryString}` : ''}`;
+      
+      const response = await fetch(url);
       const result: ApiResponse<Hotel[]> = await response.json();
       
       if (result.success && result.data) {
@@ -80,14 +108,50 @@ export default function Hotel() {
     fetchHotels();
   }, []);
 
-  // Filter hotels based on search inputs
-  const filteredHotels = hotels.filter(hotel => {
+  // Filter hotels based on search inputs (client-side filtering for additional refinement)
+  const filteredHotels = (hotels || []).filter(hotel => {
     const nameMatch = nameFilter === '' || 
       hotel.name.toLowerCase().includes(nameFilter.toLowerCase()) ||
       (hotel.altName && hotel.altName.toLowerCase().includes(nameFilter.toLowerCase()));
     const codeMatch = codeFilter === '' || 
       hotel.code.toLowerCase().includes(codeFilter.toLowerCase());
-    return nameMatch && codeMatch;
+    const locationMatch = locationFilter === '' ||
+      (hotel.location && hotel.location.toLowerCase().includes(locationFilter.toLowerCase()));
+    
+    // Room filtering logic
+    const roomsMatch = (() => {
+      if (hasRoomsFilter === '') return true;
+      if (hasRoomsFilter === 'true') {
+        const hasRooms = (hotel.roomCount || 0) > 0;
+        if (!hasRooms) return false;
+        
+        // If room count filters are specified, check if hotel meets the criteria
+        const roomCount = hotel.roomCount || 0;
+        
+        // Check minimum room count
+        if (minRoomCountFilter !== '') {
+          const minCount = parseInt(minRoomCountFilter);
+          if (!isNaN(minCount) && roomCount < minCount) {
+            return false;
+          }
+        }
+        
+        // Check maximum room count
+        if (maxRoomCountFilter !== '') {
+          const maxCount = parseInt(maxRoomCountFilter);
+          if (!isNaN(maxCount) && roomCount > maxCount) {
+            return false;
+          }
+        }
+        return true;
+      }
+      if (hasRoomsFilter === 'false') {
+        return (hotel.roomCount || 0) === 0;
+      }
+      return true;
+    })();
+    
+    return nameMatch && codeMatch && locationMatch && roomsMatch;
   });
 
   const handleAddHotel = async (e: React.FormEvent) => {
@@ -106,6 +170,7 @@ export default function Hotel() {
         code: hotelCode,
         altName: altHotelName || null,
         address: hotelAddress || null,
+        location: hotelLocation || null,
         description: hotelDescription || null,
         altDescription: altHotelDescription || null
       };
@@ -121,14 +186,44 @@ export default function Hotel() {
       const result: ApiResponse<Hotel> = await response.json();
       
       if (result.success && result.data) {
-        setHotels([result.data, ...hotels]);
+        let createdHotel = result.data;
+        
+        // Upload agreement files if any are selected
+        if (agreementFiles && agreementFiles.length > 0) {
+          try {
+            const formData = new FormData();
+            Array.from(agreementFiles).forEach(file => {
+              formData.append('files', file);
+            });
+
+            const uploadResponse = await fetch(`/api/hotels/${createdHotel.id}/agreements`, {
+              method: 'POST',
+              body: formData,
+            });
+
+            const uploadResult = await uploadResponse.json();
+            if (uploadResult.success) {
+              // Refresh hotel data to include uploaded agreements
+              await fetchHotels();
+            } else {
+              console.warn('File upload failed:', uploadResult.message);
+            }
+          } catch (uploadErr) {
+            console.warn('File upload error:', uploadErr);
+          }
+        } else {
+          setHotels([createdHotel, ...hotels]);
+        }
+        
         setHotelName('');
         setHotelCode('');
         setAltHotelName('');
         setHotelAddress('');
+        setHotelLocation('');
         setHotelDescription('');
         setAltHotelDescription('');
-        console.log('Hotel added:', result.data);
+        setAgreementFiles(null);
+        console.log('Hotel added:', createdHotel);
       } else {
         setError(result.message || 'Failed to add hotel');
       }
@@ -262,10 +357,10 @@ export default function Hotel() {
   };
 
   const handleSelectAllHotels = () => {
-    if (selectedHotels.length === filteredHotels.length) {
+    if (selectedHotels.length === (filteredHotels?.length || 0)) {
       setSelectedHotels([]);
     } else {
-      setSelectedHotels(filteredHotels.map(hotel => hotel.id));
+      setSelectedHotels((filteredHotels || []).map(hotel => hotel.id));
     }
   };
 
@@ -480,6 +575,79 @@ export default function Hotel() {
                   placeholder={t('hotels.enterAltHotelDescription')}
                 />
               </div>
+
+              {/* Location Field */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  {t('hotels.location')}
+                </label>
+                <input
+                  type="text"
+                  value={hotelLocation}
+                  onChange={(e) => setHotelLocation(e.target.value)}
+                  className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
+                  placeholder={t('hotels.enterLocation')}
+                />
+              </div>
+
+              {/* Agreement Files */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  {t('hotels.agreementFiles')}
+                </label>
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-apple-blue transition-colors">
+                  <input
+                    type="file"
+                    multiple
+                    accept=".pdf,.doc,.docx,.txt"
+                    onChange={(e) => setAgreementFiles(Array.from(e.target.files || []))}
+                    className="hidden"
+                    id="agreement-files"
+                  />
+                  <label htmlFor="agreement-files" className="cursor-pointer">
+                    <div className="flex flex-col items-center space-y-2">
+                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                      <span className="text-sm text-gray-600">
+                        {(agreementFiles?.length || 0) > 0
+                      ? `${agreementFiles?.length || 0} ${t('hotels.filesSelected')}`
+                          : t('hotels.clickToUploadFiles')
+                        }
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        {t('hotels.supportedFormats')}: PDF, DOC, DOCX, TXT
+                      </span>
+                    </div>
+                  </label>
+                </div>
+                {(agreementFiles?.length || 0) > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {(agreementFiles ? Array.from(agreementFiles) : []).map((file, index) => (
+                      <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg">
+                        <span className="text-sm text-gray-700 truncate">{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (agreementFiles) {
+                              const filesArray = Array.from(agreementFiles);
+                              const filteredFiles = filesArray.filter((_, i) => i !== index);
+                              const dt = new DataTransfer();
+                              filteredFiles.forEach(file => dt.items.add(file));
+                              setAgreementFiles(dt.files);
+                            }
+                          }}
+                          className="text-red-500 hover:text-red-700 ml-2"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Action Buttons */}
@@ -494,6 +662,8 @@ export default function Hotel() {
                   setHotelAddress('');
                   setHotelDescription('');
                   setAltHotelDescription('');
+                  setHotelLocation('');
+                  setAgreementFiles([]);
                 }}
               >
                 {editingHotel ? t('common.cancel') : t('hotels.clear')}
@@ -575,6 +745,119 @@ export default function Hotel() {
                   </div>
                 </div>
 
+                {/* Location Filter */}
+                <div className="flex-1 max-w-sm">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('hotels.filterByLocation')}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={locationFilter}
+                      onChange={(e) => setLocationFilter(e.target.value)}
+                      className="w-full px-4 py-3 pl-10 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
+                      placeholder={t('hotels.searchByLocation')}
+                    />
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* General Search */}
+                <div className="flex-1 max-w-sm">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('hotels.generalSearch')}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={generalSearch}
+                      onChange={(e) => setGeneralSearch(e.target.value)}
+                      className="w-full px-4 py-3 pl-10 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
+                      placeholder={t('hotels.searchAllFields')}
+                    />
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Second Row - Filters */}
+              <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-end">
+                {/* Has Rooms Filter */}
+                <div className="flex-1 max-w-sm">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('hotels.roomsFilter')}
+                  </label>
+                  <select
+                    value={hasRoomsFilter}
+                    onChange={(e) => setHasRoomsFilter(e.target.value)}
+                    className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm"
+                  >
+                    <option value="">{t('hotels.allHotels')}</option>
+                    <option value="true">{t('hotels.hotelsWithRooms')}</option>
+                    <option value="false">{t('hotels.hotelsWithoutRooms')}</option>
+                  </select>
+                </div>
+
+                {/* Room Count Filters - Hide only when 'Hotels without rooms' is selected */}
+                {hasRoomsFilter !== 'false' && (
+                  <>
+                    <div className="flex-1 max-w-sm">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {t('hotels.minimumRoomCount')}
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={minRoomCountFilter}
+                        onChange={(e) => setMinRoomCountFilter(e.target.value)}
+                        className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm"
+                        placeholder={t('hotels.enterMinimumRooms')}
+                      />
+                    </div>
+                    <div className="flex-1 max-w-sm">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {t('hotels.maximumRoomCount')}
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={maxRoomCountFilter}
+                        onChange={(e) => setMaxRoomCountFilter(e.target.value)}
+                        className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm"
+                        placeholder={t('hotels.enterMaximumRooms')}
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* Clear Filters Button */}
+                <div className="flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNameFilter('');
+                      setCodeFilter('');
+                      setLocationFilter('');
+                      setGeneralSearch('');
+                      setHasRoomsFilter('');
+                      setMinRoomCountFilter('');
+                      setMaxRoomCountFilter('');
+                    }}
+                    className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 font-medium"
+                  >
+                    {t('hotels.clearFilters')}
+                  </button>
+                </div>
+
                 
               </div>
 
@@ -616,7 +899,7 @@ export default function Hotel() {
                      <th className="text-left py-4 px-4 font-semibold text-gray-700 w-12">
                        <input
                          type="checkbox"
-                         checked={selectedHotels.length === filteredHotels.length && filteredHotels.length > 0}
+                         checked={selectedHotels.length === (filteredHotels?.length || 0) && (filteredHotels?.length || 0) > 0}
                          onChange={handleSelectAllHotels}
                          className="w-4 h-4 text-apple-blue bg-white/50 border-gray-300 rounded focus:ring-apple-blue focus:ring-2"
                        />
@@ -634,10 +917,13 @@ export default function Hotel() {
                        {t('hotels.hotelAddress')}
                      </th>
                      <th className="text-left py-4 px-4 font-semibold text-gray-700">
-                       Description
+                       {t('hotels.location')}
                      </th>
                      <th className="text-left py-4 px-4 font-semibold text-gray-700">
-                       Alt Description
+                       {t('hotels.roomCount')}
+                     </th>
+                     <th className="text-left py-4 px-4 font-semibold text-gray-700">
+                       {t('hotels.agreementCount')}
                      </th>
                      <th className="text-left py-4 px-4 font-semibold text-gray-700">
                        {t('common.actions')}
@@ -645,7 +931,7 @@ export default function Hotel() {
                    </tr>
                  </thead>
                  <tbody>
-                 {filteredHotels.map((hotel) => (
+                 {(filteredHotels || []).map((hotel) => (
                    <tr key={hotel.id} className={`border-b border-gray-100/50 hover:bg-white/30 transition-colors ${
                      selectedHotels.includes(hotel.id) ? 'bg-apple-blue/10' : ''
                    }`}>
@@ -661,15 +947,36 @@ export default function Hotel() {
                      <td className="py-4 px-4 text-gray-600">{hotel.code}</td>
                      <td className="py-4 px-4 text-gray-600">{hotel.altName || '-'}</td>
                      <td className="py-4 px-4 text-gray-600">{hotel.address || '-'}</td>
+                     <td className="py-4 px-4 text-gray-600">{hotel.location || '-'}</td>
                      <td className="py-4 px-4 text-gray-600">
-                       <div className="max-w-xs truncate" title={hotel.description || '-'}>
-                         {hotel.description || '-'}
-                       </div>
+                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                         {hotel.roomCount || 0}
+                       </span>
                      </td>
                      <td className="py-4 px-4 text-gray-600">
-                       <div className="max-w-xs truncate" title={hotel.altDescription || '-'}>
-                         {hotel.altDescription || '-'}
-                       </div>
+                       {hotel.agreements && hotel.agreements.length > 0 ? (
+                         <div className="space-y-1">
+                           {hotel.agreements.map((agreement) => (
+                             <div key={agreement.id} className="flex items-center space-x-2">
+                               <a
+                                 href={`/api/hotels/${hotel.id}/agreements/${agreement.id}/download`}
+                                 download={agreement.fileName}
+                                 className="text-apple-blue hover:text-apple-purple text-sm underline flex items-center space-x-1"
+                               >
+                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                 </svg>
+                                 <span>{agreement.fileName}</span>
+                               </a>
+                               <span className="text-xs text-gray-400">({Math.round(agreement.fileSize / 1024)}KB)</span>
+                             </div>
+                           ))}
+                         </div>
+                       ) : (
+                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                           No files
+                         </span>
+                       )}
                      </td>
                      <td className="py-4 px-4">
                        <div className="flex space-x-2">
@@ -706,7 +1013,7 @@ export default function Hotel() {
              )}
            </div>
 
-          {filteredHotels.length === 0 && (
+          {(filteredHotels?.length || 0) === 0 && (
              <div className="text-center py-12">
                <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -742,6 +1049,7 @@ export default function Hotel() {
                </div>
                
                <div className="space-y-6">
+                 {/* Basic Information */}
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                    <div className="space-y-2">
                      <label className="block text-sm font-medium text-gray-700">
@@ -772,12 +1080,133 @@ export default function Hotel() {
                    
                    <div className="space-y-2">
                      <label className="block text-sm font-medium text-gray-700">
+                       {t('hotels.hotelAddress')}
+                     </label>
+                     <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800">
+                       {selectedHotelDetails.address || '-'}
+                     </div>
+                   </div>
+                   
+                   <div className="space-y-2">
+                     <label className="block text-sm font-medium text-gray-700">
+                       {t('hotels.location')}
+                     </label>
+                     <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800">
+                       {selectedHotelDetails.location || '-'}
+                     </div>
+                   </div>
+                   
+                   <div className="space-y-2">
+                     <label className="block text-sm font-medium text-gray-700">
+                       {t('hotels.roomCount')}
+                     </label>
+                     <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800">
+                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                         {selectedHotelDetails.roomCount || 0}
+                       </span>
+                     </div>
+                   </div>
+                   
+                   <div className="space-y-2">
+                     <label className="block text-sm font-medium text-gray-700">
                        {t('hotels.createdDate')}
                      </label>
                      <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800">
                        {new Date(selectedHotelDetails.createdAt).toLocaleDateString()}
                      </div>
                    </div>
+                   
+                   {selectedHotelDetails.createdBy && (
+                     <div className="space-y-2">
+                       <label className="block text-sm font-medium text-gray-700">
+                         Created By
+                       </label>
+                       <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800">
+                         {selectedHotelDetails.createdBy.firstName && selectedHotelDetails.createdBy.lastName 
+                           ? `${selectedHotelDetails.createdBy.firstName} ${selectedHotelDetails.createdBy.lastName}` 
+                           : selectedHotelDetails.createdBy.username}
+                       </div>
+                     </div>
+                   )}
+                 </div>
+                 
+                 {/* Description Section */}
+                 {(selectedHotelDetails.description || selectedHotelDetails.altDescription) && (
+                   <div className="space-y-4">
+                     <h4 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                       {t('hotels.hotelDescription')}
+                     </h4>
+                     
+                     {selectedHotelDetails.description && (
+                       <div className="space-y-2">
+                         <label className="block text-sm font-medium text-gray-700">
+                           {t('hotels.hotelDescription')}
+                         </label>
+                         <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800 whitespace-pre-wrap">
+                           {selectedHotelDetails.description}
+                         </div>
+                       </div>
+                     )}
+                     
+                     {selectedHotelDetails.altDescription && (
+                       <div className="space-y-2">
+                         <label className="block text-sm font-medium text-gray-700">
+                           {t('hotels.altHotelDescription')}
+                         </label>
+                         <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800 whitespace-pre-wrap">
+                           {selectedHotelDetails.altDescription}
+                         </div>
+                       </div>
+                     )}
+                   </div>
+                 )}
+                 
+                 {/* Agreement Files Section */}
+                 <div className="space-y-4">
+                   <h4 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                     {t('hotels.agreementFiles')}
+                   </h4>
+                   
+                   {selectedHotelDetails.agreements && selectedHotelDetails.agreements.length > 0 ? (
+                     <div className="space-y-3">
+                       {selectedHotelDetails.agreements.map((agreement) => (
+                         <div key={agreement.id} className="flex items-center justify-between p-4 bg-gray-50/50 border border-gray-200/50 rounded-xl">
+                           <div className="flex items-center space-x-3">
+                             <div className="flex-shrink-0">
+                               <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                               </svg>
+                             </div>
+                             <div className="flex-1 min-w-0">
+                               <p className="text-sm font-medium text-gray-900 truncate">
+                                 {agreement.fileName}
+                               </p>
+                               <p className="text-xs text-gray-500">
+                                 {(agreement.fileSize / 1024).toFixed(1)} KB • {new Date(agreement.uploadedAt).toLocaleDateString()}
+                               </p>
+                             </div>
+                           </div>
+                           <a
+                             href={`/api/hotels/${selectedHotelDetails.id}/agreements/${agreement.id}/download`}
+                             download
+                             className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 transition-colors"
+                           >
+                             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                             </svg>
+                             Download
+                           </a>
+                         </div>
+                       ))}
+                     </div>
+                   ) : (
+                     <div className="text-center py-8 text-gray-500">
+                       <svg className="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                       </svg>
+                       <p>No agreement files uploaded</p>
+                     </div>
+                   )}
                  </div>
                  
                  <div className="flex gap-4 pt-4">

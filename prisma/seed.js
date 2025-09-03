@@ -29,12 +29,12 @@ async function main() {
   
   const owner = await prisma.user.create({
     data: {
-      username: 'owner',
-      email: 'owner@hotel.com',
+      username: 'administrator',
+      email: 'administrator@hotel.com',
       password: hashedPassword,
       role: 'OWNER',
-      firstName: 'Hotel',
-      lastName: 'Owner',
+      firstName: 'Administrator',
+      lastName: 'Administrator',
       phone: '+1-555-0001',
       isActive: true,
     },
@@ -77,6 +77,7 @@ async function main() {
       description: 'Luxury hotel in the heart of the city',
       altDescription: 'فندق فاخر في قلب المدينة مع خدمات متميزة ووسائل راحة حديثة',
       address: '123 Main Street, Downtown',
+      location: 'Downtown Business District',
       createdById: owner.id,
     },
   });
@@ -89,6 +90,7 @@ async function main() {
       description: 'Beautiful resort with stunning ocean views',
       altDescription: 'منتجع جميل مع إطلالات خلابة على المحيط وشاطئ خاص',
       address: '456 Ocean Drive, Beachfront',
+      location: 'Beachfront Resort Area',
       createdById: owner.id,
     },
   });
@@ -101,6 +103,7 @@ async function main() {
       description: 'Cozy lodge with mountain scenery',
       altDescription: 'نزل مريح مع مناظر جبلية خلابة وأجواء هادئة',
       address: '789 Mountain Road, Mountain View',
+      location: 'Mountain View Resort',
       createdById: owner.id,
     },
   });
@@ -113,6 +116,7 @@ async function main() {
       description: 'Modern hotel perfect for business travelers',
       altDescription: 'فندق حديث مثالي لرجال الأعمال مع مرافق متطورة',
       address: '321 Business District, City Center',
+      location: 'City Center Business Hub',
       createdById: owner.id,
     },
   });
@@ -144,6 +148,61 @@ async function main() {
 
   await prisma.hotelAmenity.createMany({ data: hotelAmenities });
   console.log('🏨 Created hotel amenities');
+
+  // Create Sample Agreement Files
+  const agreements = [
+    {
+      hotelId: grandPalace.id,
+      fileName: 'partnership_agreement.pdf',
+      filePath: '/uploads/agreements/grand_palace_partnership.pdf',
+      fileSize: 2048576, // 2MB
+      mimeType: 'application/pdf',
+      uploadedAt: new Date(),
+    },
+    {
+      hotelId: grandPalace.id,
+      fileName: 'service_contract.docx',
+      filePath: '/uploads/agreements/grand_palace_service.docx',
+      fileSize: 1024000, // 1MB
+      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      uploadedAt: new Date(),
+    },
+    {
+      hotelId: oceanView.id,
+      fileName: 'resort_management_agreement.pdf',
+      filePath: '/uploads/agreements/ocean_view_management.pdf',
+      fileSize: 3145728, // 3MB
+      mimeType: 'application/pdf',
+      uploadedAt: new Date(),
+    },
+    {
+      hotelId: mountainLodge.id,
+      fileName: 'lodge_operations_contract.pdf',
+      filePath: '/uploads/agreements/mountain_lodge_operations.pdf',
+      fileSize: 1572864, // 1.5MB
+      mimeType: 'application/pdf',
+      uploadedAt: new Date(),
+    },
+    {
+      hotelId: cityCenter.id,
+      fileName: 'business_partnership.pdf',
+      filePath: '/uploads/agreements/city_center_business.pdf',
+      fileSize: 2621440, // 2.5MB
+      mimeType: 'application/pdf',
+      uploadedAt: new Date(),
+    },
+    {
+      hotelId: cityCenter.id,
+      fileName: 'corporate_rates_agreement.txt',
+      filePath: '/uploads/agreements/city_center_corporate.txt',
+      fileSize: 51200, // 50KB
+      mimeType: 'text/plain',
+      uploadedAt: new Date(),
+    },
+  ];
+
+  await prisma.hotelAgreement.createMany({ data: agreements });
+  console.log('📄 Created sample agreement files');
 
   // Create Rooms
   const deluxeSuite = await prisma.room.create({
@@ -650,6 +709,7 @@ async function main() {
   console.log(`   📝 Bookings: ${await prisma.booking.count()}`);
   console.log(`   💳 Payments: ${await prisma.payment.count()}`);
   console.log(`   📅 Availability Slots: ${await prisma.availabilitySlot.count()}`);
+  console.log(`   📄 Agreements: ${await prisma.hotelAgreement.count()}`);
   console.log(`   ⚙️ System Settings: ${await prisma.systemSetting.count()}`);
 }
 

@@ -26,26 +26,48 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get query parameters for filtering and pagination
+    // Get query parameters
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
+    const location = searchParams.get('location') || '';
+    const hasRooms = searchParams.get('hasRooms');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
-    const skip = (page - 1) * limit;
+    const offset = (page - 1) * limit;
 
-    // Build where clause for search
-    const whereClause = search
-      ? {
-          OR: [
-            { name: { contains: search, mode: 'insensitive' as const } },
-            { altName: { contains: search, mode: 'insensitive' as const } },
-            { code: { contains: search, mode: 'insensitive' as const } },
-            { address: { contains: search, mode: 'insensitive' as const } },
-          ],
-        }
-      : {};
+    // Build where clause for search and filters
+    const whereClause: any = {};
+    
+    // General search across multiple fields
+    if (search) {
+      whereClause.OR = [
+        { name: { contains: search, mode: 'insensitive' as const } },
+        { altName: { contains: search, mode: 'insensitive' as const } },
+        { code: { contains: search, mode: 'insensitive' as const } },
+        { description: { contains: search, mode: 'insensitive' as const } },
+        { altDescription: { contains: search, mode: 'insensitive' as const } },
+        { address: { contains: search, mode: 'insensitive' as const } },
+        { location: { contains: search, mode: 'insensitive' as const } },
+      ];
+    }
+    
+    // Location filter
+    if (location) {
+      whereClause.location = { contains: location, mode: 'insensitive' as const };
+    }
+    
+    // Filter for hotels that have rooms
+    if (hasRooms === 'true') {
+      whereClause.rooms = {
+        some: {}
+      };
+    } else if (hasRooms === 'false') {
+      whereClause.rooms = {
+        none: {}
+      };
+    }
 
-    // Get hotels with pagination
+    // Get hotels with pagination and room count
     const [hotels, totalCount] = await Promise.all([
       prisma.hotel.findMany({
         where: whereClause,
@@ -57,8 +79,26 @@ export async function GET(request: NextRequest) {
           description: true,
           altDescription: true,
           address: true,
+          location: true,
           createdAt: true,
           updatedAt: true,
+          _count: {
+            select: {
+              rooms: true,
+              agreements: true
+            }
+          },
+          agreements: {
+            select: {
+              id: true,
+              fileName: true,
+              filePath: true,
+              fileSize: true,
+              mimeType: true,
+              uploadedAt: true,
+            },
+            orderBy: { createdAt: 'desc' },
+          },
           createdBy: {
             select: {
               id: true,
@@ -69,15 +109,23 @@ export async function GET(request: NextRequest) {
           },
         },
         orderBy: { createdAt: 'desc' },
-        skip,
+        skip: offset,
         take: limit,
       }),
       prisma.hotel.count({ where: whereClause }),
     ]);
 
+    // Transform data to include room count in a more accessible format
+    const transformedHotels = hotels.map(hotel => ({
+      ...hotel,
+      roomCount: hotel._count.rooms,
+      agreementCount: hotel._count.agreements,
+      _count: undefined // Remove the _count object from response
+    }));
+
     return NextResponse.json({
       success: true,
-      data: hotels,
+      data: transformedHotels,
       pagination: {
         page,
         limit,
@@ -118,7 +166,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { name, altName, code, description, altDescription, address } = body;
+    const { name, altName, code, description, altDescription, address, location } = body;
 
     // Validate required fields
     if (!name || !code) {
@@ -132,6 +180,14 @@ export async function POST(request: NextRequest) {
     if (typeof name !== 'string' || typeof code !== 'string') {
       return NextResponse.json(
         { success: false, message: 'Invalid input format' },
+        { status: 400 }
+      );
+    }
+
+    // Validate location if provided
+    if (location && typeof location !== 'string') {
+      return NextResponse.json(
+        { success: false, message: 'Location must be a string' },
         { status: 400 }
       );
     }
@@ -157,6 +213,7 @@ export async function POST(request: NextRequest) {
         description: description?.trim() || null,
         altDescription: altDescription?.trim() || null,
         address: address?.trim() || null,
+        location: location?.trim() || null,
         createdById: user.id,
       },
       select: {
@@ -167,8 +224,15 @@ export async function POST(request: NextRequest) {
         description: true,
         altDescription: true,
         address: true,
+        location: true,
         createdAt: true,
         updatedAt: true,
+        _count: {
+          select: {
+            rooms: true,
+            agreements: true
+          }
+        },
         createdBy: {
           select: {
             id: true,

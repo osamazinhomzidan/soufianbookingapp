@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 // GET /api/hotels/[id] - Get a single hotel by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get auth token from cookies
@@ -29,7 +29,7 @@ export async function GET(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Validate ID format
     if (!id || typeof id !== 'string') {
@@ -50,6 +50,7 @@ export async function GET(
         description: true,
         altDescription: true,
         address: true,
+        location: true,
         createdAt: true,
         updatedAt: true,
         createdBy: {
@@ -65,6 +66,7 @@ export async function GET(
             rooms: true,
             bookings: true,
             amenities: true,
+            agreements: true,
           },
         },
       },
@@ -93,7 +95,7 @@ export async function GET(
 // PUT /api/hotels/[id] - Update a hotel
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get auth token from cookies
@@ -115,7 +117,7 @@ export async function PUT(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Validate ID format
     if (!id || typeof id !== 'string') {
@@ -127,7 +129,7 @@ export async function PUT(
 
     // Parse request body
     const body = await request.json();
-    const { name, altName, code, description, altDescription, address } = body;
+    const { name, altName, code, description, altDescription, address, location } = body;
 
     // Validate required fields
     if (!name || !code) {
@@ -141,6 +143,14 @@ export async function PUT(
     if (typeof name !== 'string' || typeof code !== 'string') {
       return NextResponse.json(
         { success: false, message: 'Invalid input format' },
+        { status: 400 }
+      );
+    }
+
+    // Validate location if provided
+    if (location && typeof location !== 'string') {
+      return NextResponse.json(
+        { success: false, message: 'Location must be a string' },
         { status: 400 }
       );
     }
@@ -181,6 +191,7 @@ export async function PUT(
         description: description?.trim() || null,
         altDescription: altDescription?.trim() || null,
         address: address?.trim() || null,
+        location: location?.trim() || null,
       },
       select: {
         id: true,
@@ -190,8 +201,17 @@ export async function PUT(
         description: true,
         altDescription: true,
         address: true,
+        location: true,
         createdAt: true,
         updatedAt: true,
+        _count: {
+          select: {
+            rooms: true,
+            bookings: true,
+            amenities: true,
+            agreements: true,
+          },
+        },
         createdBy: {
           select: {
             id: true,
@@ -220,7 +240,7 @@ export async function PUT(
 // DELETE /api/hotels/[id] - Delete a hotel
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get auth token from cookies
@@ -250,7 +270,7 @@ export async function DELETE(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Validate ID format
     if (!id || typeof id !== 'string') {

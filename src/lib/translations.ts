@@ -242,6 +242,27 @@ export interface Translations {
     clear: string;
     confirmDeleteHotel: string;
     confirmDeleteSelectedHotels: string;
+    location: string;
+    enterLocation: string;
+    agreementFiles: string;
+    filesSelected: string;
+    clickToUploadFiles: string;
+    supportedFormats: string;
+    filterByLocation: string;
+    searchByLocation: string;
+    generalSearch: string;
+    searchAllFields: string;
+    roomsFilter: string;
+    allHotels: string;
+    hotelsWithRooms: string;
+    hotelsWithoutRooms: string;
+    roomCount: string;
+    agreementCount: string;
+    clearFilters: string;
+    minimumRoomCount: string;
+    enterMinimumRooms: string;
+    maximumRoomCount: string;
+    enterMaximumRooms: string;
   };
   
   // Rooms page translations (Owner only)
@@ -677,6 +698,27 @@ const en: Translations = {
     clear: 'Clear',
     confirmDeleteHotel: 'Are you sure you want to delete this hotel?',
     confirmDeleteSelectedHotels: 'Are you sure you want to delete {{count}} selected hotel(s)?',
+    location: 'Location',
+    enterLocation: 'Enter hotel location',
+    agreementFiles: 'Agreement Files',
+    filesSelected: 'files selected',
+    clickToUploadFiles: 'Click to upload files',
+    supportedFormats: 'Supported formats: PDF, DOC, DOCX, TXT',
+    filterByLocation: 'Filter by Location',
+    searchByLocation: 'Search by location...',
+    generalSearch: 'General Search',
+    searchAllFields: 'Search all fields...',
+    roomsFilter: 'Rooms Filter',
+    allHotels: 'All Hotels',
+    hotelsWithRooms: 'Hotels with Rooms',
+    hotelsWithoutRooms: 'Hotels without Rooms',
+    roomCount: 'Rooms',
+    agreementCount: 'Agreements',
+    clearFilters: 'Clear Filters',
+    minimumRoomCount: 'Minimum Room Count',
+    enterMinimumRooms: 'Enter minimum number of rooms',
+    maximumRoomCount: 'Maximum Room Count',
+    enterMaximumRooms: 'Enter maximum number of rooms',
   },
   
   rooms: {
@@ -1132,6 +1174,27 @@ const ar: Translations = {
     clear: 'مسح',
     confirmDeleteHotel: 'هل أنت متأكد من حذف هذا الفندق؟',
     confirmDeleteSelectedHotels: 'هل أنت متأكد من حذف {{count}} فندق محدد؟',
+    location: 'الموقع',
+    enterLocation: 'أدخل موقع الفندق',
+    agreementFiles: 'ملفات الاتفاقيات',
+    filesSelected: 'ملف محدد',
+    clickToUploadFiles: 'انقر لرفع الملفات',
+    supportedFormats: 'الصيغ المدعومة: PDF, DOC, DOCX, TXT',
+    filterByLocation: 'تصفية حسب الموقع',
+    searchByLocation: 'البحث حسب الموقع...',
+    generalSearch: 'البحث العام',
+    searchAllFields: 'البحث في جميع الحقول...',
+    roomsFilter: 'تصفية الغرف',
+    allHotels: 'جميع الفنادق',
+    hotelsWithRooms: 'الفنادق التي بها غرف',
+    hotelsWithoutRooms: 'الفنادق بدون غرف',
+    roomCount: 'الغرف',
+    agreementCount: 'الاتفاقيات',
+    clearFilters: 'مسح التصفية',
+    minimumRoomCount: 'الحد الأدنى لعدد الغرف',
+    enterMinimumRooms: 'أدخل الحد الأدنى لعدد الغرف',
+    maximumRoomCount: 'الحد الأقصى لعدد الغرف',
+    enterMaximumRooms: 'أدخل الحد الأقصى لعدد الغرف',
   },
   
   rooms: {

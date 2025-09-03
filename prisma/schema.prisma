@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("POSTGRES_URL_NON_POOLING")
+  url      = env("DATABASE_URL_LOCAL")
 }
 
 // ================================
@@ -53,6 +53,7 @@ model Hotel {
   description    String?
   altDescription String?
   address        String?
+  location       String?  // New field for hotel location (separate from address)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   createdById    String
@@ -62,6 +63,7 @@ model Hotel {
   amenities     HotelAmenity[]
   rooms         Room[]
   bookings      Booking[]
+  agreements    HotelAgreement[] // New relation for agreement files
   
   @@map("hotels")
 }
@@ -77,6 +79,23 @@ model HotelAmenity {
 
   @@unique([hotelId, name])
   @@map("hotel_amenities")
+}
+
+model HotelAgreement {
+  id         String   @id @default(cuid())
+  hotelId    String
+  fileName   String   // Original filename
+  filePath   String   // Path where file is stored
+  fileSize   Int      // File size in bytes
+  mimeType   String   // MIME type of the file
+  uploadedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  hotel Hotel @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+
+  @@map("hotel_agreements")
 }
 
 // ================================
