@@ -58,7 +58,7 @@ export default function Hotel() {
   const [hotelLocation, setHotelLocation] = useState('');
   const [hotelDescription, setHotelDescription] = useState('');
   const [altHotelDescription, setAltHotelDescription] = useState('');
-  const [agreementFiles, setAgreementFiles] = useState<FileList | null>(null);
+  const [agreementFiles, setAgreementFiles] = useState<File[]>([]);
   const [nameFilter, setNameFilter] = useState('');
   const [codeFilter, setCodeFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
@@ -189,10 +189,10 @@ export default function Hotel() {
         let createdHotel = result.data;
         
         // Upload agreement files if any are selected
-        if (agreementFiles && agreementFiles.length > 0) {
+        if (agreementFiles.length > 0) {
           try {
             const formData = new FormData();
-            Array.from(agreementFiles).forEach(file => {
+            agreementFiles.forEach(file => {
               formData.append('files', file);
             });
 
@@ -222,7 +222,7 @@ export default function Hotel() {
         setHotelLocation('');
         setHotelDescription('');
         setAltHotelDescription('');
-        setAgreementFiles(null);
+        setAgreementFiles([]);
         console.log('Hotel added:', createdHotel);
       } else {
         setError(result.message || 'Failed to add hotel');
@@ -279,15 +279,42 @@ export default function Hotel() {
       const result: ApiResponse<Hotel> = await response.json();
       
       if (result.success && result.data) {
-        setHotels(hotels.map(h => h.id === editingHotel.id ? result.data! : h));
+        let updatedHotel = result.data;
+        
+        // Upload agreement files if any are selected
+        if (agreementFiles.length > 0) {
+          try {
+            const formData = new FormData();
+            agreementFiles.forEach(file => {
+              formData.append('files', file);
+            });
+
+            const uploadResponse = await fetch(`/api/hotels/${updatedHotel.id}/agreements`, {
+              method: 'POST',
+              body: formData,
+            });
+
+            if (uploadResponse.ok) {
+              console.log('Agreement files uploaded successfully');
+            } else {
+              console.error('Failed to upload agreement files');
+            }
+          } catch (uploadErr) {
+            console.error('Agreement upload error:', uploadErr);
+          }
+        }
+        
+        setHotels(hotels.map(h => h.id === editingHotel.id ? updatedHotel : h));
         setEditingHotel(null);
         setHotelName('');
         setHotelCode('');
         setAltHotelName('');
         setHotelAddress('');
+        setHotelLocation('');
         setHotelDescription('');
         setAltHotelDescription('');
-        console.log('Hotel updated:', result.data);
+        setAgreementFiles([]);
+        console.log('Hotel updated:', updatedHotel);
       } else {
         setError(result.message || 'Failed to update hotel');
       }
@@ -600,7 +627,10 @@ export default function Hotel() {
                     type="file"
                     multiple
                     accept=".pdf,.doc,.docx,.txt"
-                    onChange={(e) => setAgreementFiles(Array.from(e.target.files || []))}
+                    onChange={(e) => {
+                      const newFiles = Array.from(e.target.files || []);
+                      setAgreementFiles(prev => [...prev, ...newFiles]);
+                    }}
                     className="hidden"
                     id="agreement-files"
                   />
@@ -610,8 +640,8 @@ export default function Hotel() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                       </svg>
                       <span className="text-sm text-gray-600">
-                        {(agreementFiles?.length || 0) > 0
-                      ? `${agreementFiles?.length || 0} ${t('hotels.filesSelected')}`
+                        {agreementFiles.length > 0
+                          ? `${agreementFiles.length} ${t('hotels.filesSelected')}`
                           : t('hotels.clickToUploadFiles')
                         }
                       </span>
@@ -621,21 +651,15 @@ export default function Hotel() {
                     </div>
                   </label>
                 </div>
-                {(agreementFiles?.length || 0) > 0 && (
+                {agreementFiles.length > 0 && (
                   <div className="mt-2 space-y-1">
-                    {(agreementFiles ? Array.from(agreementFiles) : []).map((file, index) => (
+                    {agreementFiles.map((file, index) => (
                       <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg">
                         <span className="text-sm text-gray-700 truncate">{file.name}</span>
                         <button
                           type="button"
                           onClick={() => {
-                            if (agreementFiles) {
-                              const filesArray = Array.from(agreementFiles);
-                              const filteredFiles = filesArray.filter((_, i) => i !== index);
-                              const dt = new DataTransfer();
-                              filteredFiles.forEach(file => dt.items.add(file));
-                              setAgreementFiles(dt.files);
-                            }
+                            setAgreementFiles(prev => prev.filter((_, i) => i !== index));
                           }}
                           className="text-red-500 hover:text-red-700 ml-2"
                         >
