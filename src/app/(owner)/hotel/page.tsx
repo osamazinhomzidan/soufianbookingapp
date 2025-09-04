@@ -62,6 +62,8 @@ export default function Hotel() {
   const [nameFilter, setNameFilter] = useState('');
   const [codeFilter, setCodeFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
+  const [addressFilter, setAddressFilter] = useState('');
+  const [hasFilesFilter, setHasFilesFilter] = useState<string>('');
   const [hasRoomsFilter, setHasRoomsFilter] = useState<string>('');
   const [minRoomCountFilter, setMinRoomCountFilter] = useState<string>('');
   const [maxRoomCountFilter, setMaxRoomCountFilter] = useState<string>('');
@@ -117,6 +119,20 @@ export default function Hotel() {
       hotel.code.toLowerCase().includes(codeFilter.toLowerCase());
     const locationMatch = locationFilter === '' ||
       (hotel.location && hotel.location.toLowerCase().includes(locationFilter.toLowerCase()));
+    const addressMatch = addressFilter === '' ||
+      (hotel.address && hotel.address.toLowerCase().includes(addressFilter.toLowerCase()));
+    
+    // Files filtering logic
+    const filesMatch = (() => {
+      if (hasFilesFilter === '') return true;
+      if (hasFilesFilter === 'true') {
+        return (hotel.agreementCount || 0) > 0 || (hotel.agreements && hotel.agreements.length > 0);
+      }
+      if (hasFilesFilter === 'false') {
+        return (hotel.agreementCount || 0) === 0 && (!hotel.agreements || hotel.agreements.length === 0);
+      }
+      return true;
+    })();
     
     // Room filtering logic
     const roomsMatch = (() => {
@@ -151,7 +167,7 @@ export default function Hotel() {
       return true;
     })();
     
-    return nameMatch && codeMatch && locationMatch && roomsMatch;
+    return nameMatch && codeMatch && locationMatch && addressMatch && filesMatch && roomsMatch;
   });
 
   const handleAddHotel = async (e: React.FormEvent) => {
@@ -461,17 +477,7 @@ export default function Hotel() {
 
   return (
     <ProtectedRoute requiredRole="OWNER">
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6 relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-apple-blue/20 to-apple-purple/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-apple-green/20 to-apple-teal/20 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-apple-pink/10 to-apple-orange/10 rounded-full blur-3xl"></div>
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto space-y-8">
-        
-
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 px-4 py-8 relative overflow-hidden">
         {/* Error Display */}
         {error && (
           <div className="backdrop-blur-xl bg-red-50/70 border border-red-200/50 rounded-3xl shadow-2xl p-6">
@@ -499,533 +505,689 @@ export default function Hotel() {
           </div>
         )}
 
-        {/* Add/Edit Hotel Section */}
-        <div className="backdrop-blur-xl bg-white/70 border border-white/20 rounded-3xl shadow-2xl p-8">
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-              {editingHotel ? t('hotels.editHotel') : t('hotels.addNewHotel')}
-            </h2>
-            <p className="text-gray-600">
-              {editingHotel ? t('hotels.updateHotelDetails') : t('hotels.enterHotelDetails')}
-            </p>
+        {/* Add/Edit Hotel Section - Enhanced */}
+        <div className="backdrop-blur-sm bg-white/85 border-2 border-slate-200/70 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-16 mx-4 mb-16">
+          <div className="mb-16">
+            <div className="flex items-center space-x-12 mb-16">
+              <div className="w-32 h-32 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl flex items-center justify-center shadow-xl">
+                <svg className="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h2 className="text-4xl font-black text-slate-900 tracking-tight leading-tight mb-6">
+                  {editingHotel ? t('hotels.editHotel') : t('hotels.addNewHotel')}
+                </h2>
+                <p className="text-slate-700 text-xl font-bold mt-6 leading-relaxed">
+                  {editingHotel ? t('hotels.updateHotelDetails') : t('hotels.enterHotelDetails')}
+                </p>
+              </div>
+            </div>
           </div>
 
-          <form onSubmit={editingHotel ? handleUpdateHotel : handleAddHotel} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Hotel Name */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('hotels.hotelName')}
-                </label>
-                <input
-                  type="text"
-                  value={hotelName}
-                  onChange={(e) => setHotelName(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                  placeholder={t('hotels.enterHotelName')}
-                  required
-                />
-              </div>
-
-              {/* Hotel Code */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('hotels.hotelCode')}
-                </label>
-                <input
-                  type="text"
-                  value={hotelCode}
-                  onChange={(e) => setHotelCode(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                  placeholder={t('hotels.enterHotelCode')}
-                  required
-                />
-              </div>
-
-              {/* Alt Hotel Name */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('hotels.altHotelName')}
-                </label>
-                <input
-                  type="text"
-                  value={altHotelName}
-                  onChange={(e) => setAltHotelName(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                  placeholder={t('hotels.enterAltName')}
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Hotel Address */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                {t('hotels.hotelAddress')}
-              </label>
-              <input
-                type="text"
-                value={hotelAddress}
-                onChange={(e) => setHotelAddress(e.target.value)}
-                className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                placeholder={t('hotels.enterHotelAddress')}
-                required
-              />
-            </div>
-
-            {/* Description Fields */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Hotel Description */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('hotels.hotelDescription')}
-                </label>
-                <textarea
-                  value={hotelDescription}
-                  onChange={(e) => setHotelDescription(e.target.value)}
-                  rows={4}
-                  className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400 resize-none"
-                  placeholder={t('hotels.enterHotelDescription')}
-                />
-              </div>
-
-              {/* Alt Hotel Description */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('hotels.altHotelDescription')}
-                </label>
-                <textarea
-                  value={altHotelDescription}
-                  onChange={(e) => setAltHotelDescription(e.target.value)}
-                  rows={4}
-                  className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400 resize-none"
-                  placeholder={t('hotels.enterAltHotelDescription')}
-                />
-              </div>
-
-              {/* Location Field */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('hotels.location')}
-                </label>
-                <input
-                  type="text"
-                  value={hotelLocation}
-                  onChange={(e) => setHotelLocation(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                  placeholder={t('hotels.enterLocation')}
-                />
-              </div>
-
-              {/* Agreement Files */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('hotels.agreementFiles')}
-                </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-apple-blue transition-colors">
-                  <input
-                    type="file"
-                    multiple
-                    accept=".pdf,.doc,.docx,.txt"
-                    onChange={(e) => {
-                      const newFiles = Array.from(e.target.files || []);
-                      setAgreementFiles(prev => [...prev, ...newFiles]);
-                    }}
-                    className="hidden"
-                    id="agreement-files"
-                  />
-                  <label htmlFor="agreement-files" className="cursor-pointer">
-                    <div className="flex flex-col items-center space-y-2">
-                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                      </svg>
-                      <span className="text-sm text-gray-600">
-                        {agreementFiles.length > 0
-                          ? `${agreementFiles.length} ${t('hotels.filesSelected')}`
-                          : t('hotels.clickToUploadFiles')
-                        }
-                      </span>
-                      <span className="text-xs text-gray-400">
-                        {t('hotels.supportedFormats')}: PDF, DOC, DOCX, TXT
-                      </span>
-                    </div>
+          <form onSubmit={editingHotel ? handleUpdateHotel : handleAddHotel} className="space-y-8">
+            {/* Basic Information Section */}
+            <div className="space-y-8">
+              
+              
+              {/* First Row: Hotel Name, Alt Name, Code */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+                {/* Hotel Name */}
+                <div className="space-y-8">
+                  <label className="block text-2xl font-black text-slate-900 tracking-wide mb-4">
+                    {t('hotels.hotelName')}
                   </label>
-                </div>
-                {agreementFiles.length > 0 && (
-                  <div className="mt-2 space-y-1">
-                    {agreementFiles.map((file, index) => (
-                      <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg">
-                        <span className="text-sm text-gray-700 truncate">{file.name}</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setAgreementFiles(prev => prev.filter((_, i) => i !== index));
-                          }}
-                          className="text-red-500 hover:text-red-700 ml-2"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      </div>
-                    ))}
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      value={hotelName}
+                      onChange={(e) => setHotelName(e.target.value)}
+                      className="w-full pl-14 pr-6 py-5 bg-slate-50/70 border-2 border-slate-300 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-800 font-semibold text-lg shadow-sm hover:shadow-md hover:border-slate-400"
+                      placeholder={t('hotels.enterHotelName')}
+                      required
+                    />
                   </div>
-                )}
+                </div>
+
+                {/* Alt Hotel Name */}
+                <div className="space-y-8">
+                  <label className="block text-2xl font-black text-slate-900 tracking-wide mb-4">
+                    {t('hotels.altHotelName')}
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      value={altHotelName}
+                      onChange={(e) => setAltHotelName(e.target.value)}
+                      className="w-full pl-14 pr-6 py-5 bg-slate-50/70 border-2 border-slate-300 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-800 font-semibold text-lg shadow-sm hover:shadow-md hover:border-slate-400"
+                      placeholder={t('hotels.enterAltName')}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Hotel Code */}
+                <div className="space-y-8">
+                  <label className="block text-2xl font-black text-slate-900 tracking-wide mb-4">
+                    {t('hotels.hotelCode')}
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      value={hotelCode}
+                      onChange={(e) => setHotelCode(e.target.value)}
+                      className="w-full pl-14 pr-6 py-5 bg-slate-50/70 border-2 border-slate-300 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-800 font-semibold text-lg shadow-sm hover:shadow-md hover:border-slate-400"
+                      placeholder={t('hotels.enterHotelCode')}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Second Row: Address, Location */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                {/* Hotel Address */}
+                <div className="space-y-8">
+                  <label className="block text-2xl font-black text-slate-900 tracking-wide mb-4">
+                    {t('hotels.hotelAddress')}
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      value={hotelAddress}
+                      onChange={(e) => setHotelAddress(e.target.value)}
+                      className="w-full pl-14 pr-6 py-5 bg-slate-50/70 border-2 border-slate-300 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-800 font-semibold text-lg shadow-sm hover:shadow-md hover:border-slate-400"
+                      placeholder={t('hotels.enterHotelAddress')}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Location Field */}
+                <div className="space-y-8">
+                  <label className="block text-2xl font-black text-slate-900 tracking-wide mb-4">
+                    {t('hotels.location')}
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      value={hotelLocation}
+                      onChange={(e) => setHotelLocation(e.target.value)}
+                      className="w-full pl-14 pr-6 py-5 bg-slate-50/70 border-2 border-slate-300 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-800 font-semibold text-lg shadow-sm hover:shadow-md hover:border-slate-400"
+                      placeholder={t('hotels.enterLocation')}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex justify-end space-x-4">
-              <button
-                type="button"
-                className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 font-medium"
-                onClick={editingHotel ? handleCancelEdit : () => {
-                  setHotelName('');
-                  setHotelCode('');
-                  setAltHotelName('');
-                  setHotelAddress('');
-                  setHotelDescription('');
-                  setAltHotelDescription('');
-                  setHotelLocation('');
-                  setAgreementFiles([]);
-                }}
-              >
-                {editingHotel ? t('common.cancel') : t('hotels.clear')}
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-8 py-3 bg-gradient-to-r from-apple-blue to-apple-purple text-white rounded-xl hover:from-apple-blue/90 hover:to-apple-purple/90 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                {loading ? (
-                  <div className="flex items-center space-x-2">
-                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    <span>{editingHotel ? t('hotels.updating') : t('hotels.adding')}</span>
+            {/* Description Section */}
+            <div className="space-y-8">
+              
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                {/* Hotel Description */}
+                <div className="space-y-8">
+                  <label className="block text-2xl font-black text-slate-900 tracking-wide mb-4">
+                    {t('hotels.hotelDescription')}
+                  </label>
+                  <div className="relative">
+                    <div className="absolute top-5 left-5 pointer-events-none">
+                      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h7" />
+                      </svg>
+                    </div>
+                    <textarea
+                      value={hotelDescription}
+                      onChange={(e) => setHotelDescription(e.target.value)}
+                      rows={6}
+                      className="w-full pl-14 pr-6 py-5 bg-slate-50/70 border-2 border-slate-300 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-800 font-semibold text-lg resize-none shadow-sm hover:shadow-md hover:border-slate-400"
+                      placeholder={t('hotels.enterHotelDescription')}
+                    />
                   </div>
-                ) : (
-                  editingHotel ? t('hotels.updateHotel') : t('hotels.addHotel')
-                )}
-              </button>
+                </div>
+
+                {/* Alt Hotel Description */}
+                <div className="space-y-8">
+                  <label className="block text-2xl font-black text-slate-900 tracking-wide mb-4">
+                    {t('hotels.altHotelDescription')}
+                  </label>
+                  <div className="relative">
+                    <div className="absolute top-5 left-5 pointer-events-none">
+                      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h7" />
+                      </svg>
+                    </div>
+                    <textarea
+                      value={altHotelDescription}
+                      onChange={(e) => setAltHotelDescription(e.target.value)}
+                      rows={6}
+                      className="w-full pl-14 pr-6 py-5 bg-slate-50/70 border-2 border-slate-300 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-800 font-semibold text-lg resize-none shadow-sm hover:shadow-md hover:border-slate-400"
+                      placeholder={t('hotels.enterAltHotelDescription')}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+
+            {/* File Upload Section and Action Buttons - Reversed Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-8 border-t-2 border-slate-200/70 items-stretch">
+              {/* File Upload Section - Left Side */}
+              <div className="space-y-8 h-full">
+                <div className="space-y-8 h-full flex flex-col">
+                  
+                  <div className="border-3 border-dashed border-slate-300 rounded-2xl p-10 text-center hover:border-blue-400 bg-blue-50/40 transition-all duration-300 group shadow-sm hover:shadow-md flex-1 flex flex-col justify-center">
+                    <input
+                      type="file"
+                      multiple
+                      accept=".pdf,.doc,.docx,.txt"
+                      onChange={(e) => {
+                        const newFiles = Array.from(e.target.files || []);
+                        setAgreementFiles(prev => [...prev, ...newFiles]);
+                      }}
+                      className="hidden"
+                      id="agreement-files"
+                    />
+                    <label htmlFor="agreement-files" className="cursor-pointer">
+                      <div className="flex flex-col items-center space-y-2">
+                        <div className="w-20 h-20 bg-slate-100 group-hover:bg-blue-100 rounded-2xl flex items-center justify-center transition-colors duration-300 shadow-sm">
+                          <svg className="w-10 h-10 text-slate-500 group-hover:text-blue-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                        </div>
+                        <div className="text-center">
+                          <span className="text-xl font-bold text-slate-700 group-hover:text-blue-600 transition-colors duration-300">
+                            {agreementFiles.length > 0
+                              ? `${agreementFiles.length} ${t('hotels.filesSelected')}`
+                              : t('hotels.clickToUploadFiles')
+                            }
+                          </span>
+                          <p className="text-lg font-semibold text-slate-500 mt-3">
+                            {t('hotels.supportedFormats')}: PDF, DOC, DOCX, TXT
+                          </p>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                  {agreementFiles.length > 0 && (
+                    <div className="mt-3 space-y-2">
+                      {agreementFiles.map((file, index) => (
+                        <div key={index} className="flex items-center justify-between bg-slate-50 border border-slate-200 px-4 py-3 rounded-lg hover:bg-slate-100 transition-colors duration-200">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                              <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                            </div>
+                            <span className="text-sm font-medium text-slate-700 truncate">{file.name}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAgreementFiles(prev => prev.filter((_, i) => i !== index));
+                            }}
+                            className="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-lg flex items-center justify-center transition-colors duration-200 group"
+                          >
+                            <svg className="w-4 h-4 text-red-500 group-hover:text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Buttons - Right Side with Full Height */}
+               <div className="flex flex-col space-y-6 h-full">
+                 <button
+                   type="submit"
+                   disabled={loading}
+                   className="flex-[2] px-8 py-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl transition-all duration-300 font-black text-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-4 min-h-[180px]"
+                 >
+                   {loading ? (
+                     <>
+                       <svg className="animate-spin w-8 h-8" viewBox="0 0 24 24">
+                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                       </svg>
+                       <span className="font-black text-2xl">{editingHotel ? t('hotels.updating') : t('hotels.adding')}</span>
+                     </>
+                   ) : (
+                     <>
+                       <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                       </svg>
+                       <span className="font-black text-2xl">{editingHotel ? t('hotels.updateHotel') : t('hotels.addHotel')}</span>
+                     </>
+                   )}
+                 </button>
+                 
+                 <button
+                   type="button"
+                   className="flex-1 px-8 py-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl transition-all duration-300 font-black text-xl flex items-center justify-center space-x-3 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 min-h-[140px]"
+                   onClick={editingHotel ? handleCancelEdit : () => {
+                     setHotelName('');
+                     setHotelCode('');
+                     setAltHotelName('');
+                     setHotelAddress('');
+                     setHotelDescription('');
+                     setAltHotelDescription('');
+                     setHotelLocation('');
+                     setAgreementFiles([]);
+                   }}
+                 >
+                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                   </svg>
+                   <span className="font-black text-xl">{editingHotel ? t('common.cancel') : t('hotels.clear')}</span>
+                 </button>
+               </div>
             </div>
           </form>
         </div>
 
-        {/* Hotels List Section */}
-         <div className="backdrop-blur-xl bg-white/70 border border-white/20 rounded-3xl shadow-2xl p-8">
-           <div className="mb-6">
-             <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-               {t('hotels.hotelsList')}
-             </h2>
-             <p className="text-gray-600">
-               {t('hotels.viewManageHotels')}
-             </p>
-           </div>
-
-           {/* Search and Filter Section */}
-            <div className="mb-6 space-y-4">
-              <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-end">
-                {/* Name Filter */}
-                <div className="flex-1 max-w-sm">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('hotels.filterByName')}
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={nameFilter}
-                      onChange={(e) => setNameFilter(e.target.value)}
-                      className="w-full px-4 py-3 pl-10 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                      placeholder={t('hotels.searchByName')}
-                    />
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                      </svg>
-                    </div>
-                  </div>
+        {/* Hotels List Section - Redesigned */}
+        <div className="backdrop-blur-sm bg-white/80 border border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-12 mx-4 mb-12">
+          <div className="mb-12">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-8">
+                <div className="w-24 h-24 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl flex items-center justify-center shadow-xl">
+                  <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
                 </div>
-
-                {/* Code Filter */}
-                <div className="flex-1 max-w-sm">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('hotels.filterByCode')}
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={codeFilter}
-                      onChange={(e) => setCodeFilter(e.target.value)}
-                      className="w-full px-4 py-3 pl-10 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                      placeholder={t('hotels.searchByCode')}
-                    />
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
-                      </svg>
-                    </div>
-                  </div>
+                <div className="flex-1">
+                  <h2 className="text-4xl font-black text-slate-900 tracking-tight leading-tight mb-3">
+                    {t('hotels.hotelsList')}
+                  </h2>
+                  <p className="text-slate-700 text-xl font-bold mt-3 leading-relaxed">
+                    {t('hotels.viewManageHotels')}
+                  </p>
                 </div>
+              </div>
+              <div className="text-xl text-slate-700 font-black bg-gradient-to-r from-blue-100 to-indigo-100 px-6 py-3 rounded-2xl border border-blue-200">
+                {filteredHotels?.length || 0} {filteredHotels?.length === 1 ? 'hotel' : 'hotels'}
+              </div>
+            </div>
+          </div>
 
-                {/* Location Filter */}
-                <div className="flex-1 max-w-sm">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('hotels.filterByLocation')}
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={locationFilter}
-                      onChange={(e) => setLocationFilter(e.target.value)}
-                      className="w-full px-4 py-3 pl-10 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                      placeholder={t('hotels.searchByLocation')}
-                    />
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </div>
+          {/* Search and Filter Section */}
+          <div className="mb-12 space-y-10">
+            {/* Primary Search Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {/* Name Filter */}
+              <div className="space-y-3">
+                <label className="block text-base font-bold text-slate-700">
+                  {t('hotels.filterByName')}
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
                   </div>
-                </div>
-
-                {/* General Search */}
-                <div className="flex-1 max-w-sm">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('hotels.generalSearch')}
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={generalSearch}
-                      onChange={(e) => setGeneralSearch(e.target.value)}
-                      className="w-full px-4 py-3 pl-10 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                      placeholder={t('hotels.searchAllFields')}
-                    />
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                      </svg>
-                    </div>
-                  </div>
+                  <input
+                    type="text"
+                    value={nameFilter}
+                    onChange={(e) => setNameFilter(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50/50 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 focus:shadow-md transition-all duration-200 placeholder-slate-400 text-slate-700 hover:border-slate-400"
+                    placeholder={t('hotels.searchByName')}
+                  />
                 </div>
               </div>
 
-              {/* Second Row - Filters */}
-              <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-end">
-                {/* Has Rooms Filter */}
-                <div className="flex-1 max-w-sm">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('hotels.roomsFilter')}
-                  </label>
-                  <select
-                    value={hasRoomsFilter}
-                    onChange={(e) => setHasRoomsFilter(e.target.value)}
-                    className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm"
-                  >
-                    <option value="">{t('hotels.allHotels')}</option>
-                    <option value="true">{t('hotels.hotelsWithRooms')}</option>
-                    <option value="false">{t('hotels.hotelsWithoutRooms')}</option>
-                  </select>
+              {/* Code Filter */}
+              <div className="space-y-3">
+                <label className="block text-base font-bold text-slate-700">
+                  {t('hotels.filterByCode')}
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    value={codeFilter}
+                    onChange={(e) => setCodeFilter(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50/50 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 focus:shadow-md transition-all duration-200 placeholder-slate-400 text-slate-700 hover:border-slate-400"
+                    placeholder={t('hotels.searchByCode')}
+                  />
                 </div>
-
-                {/* Room Count Filters - Hide only when 'Hotels without rooms' is selected */}
-                {hasRoomsFilter !== 'false' && (
-                  <>
-                    <div className="flex-1 max-w-sm">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t('hotels.minimumRoomCount')}
-                      </label>
-                      <input
-                        type="number"
-                        min="1"
-                        value={minRoomCountFilter}
-                        onChange={(e) => setMinRoomCountFilter(e.target.value)}
-                        className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm"
-                        placeholder={t('hotels.enterMinimumRooms')}
-                      />
-                    </div>
-                    <div className="flex-1 max-w-sm">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t('hotels.maximumRoomCount')}
-                      </label>
-                      <input
-                        type="number"
-                        min="1"
-                        value={maxRoomCountFilter}
-                        onChange={(e) => setMaxRoomCountFilter(e.target.value)}
-                        className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm"
-                        placeholder={t('hotels.enterMaximumRooms')}
-                      />
-                    </div>
-                  </>
-                )}
-
-                {/* Clear Filters Button */}
-                <div className="flex-shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setNameFilter('');
-                      setCodeFilter('');
-                      setLocationFilter('');
-                      setGeneralSearch('');
-                      setHasRoomsFilter('');
-                      setMinRoomCountFilter('');
-                      setMaxRoomCountFilter('');
-                    }}
-                    className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 font-medium"
-                  >
-                    {t('hotels.clearFilters')}
-                  </button>
-                </div>
-
-                
               </div>
 
-              {/* Selected Hotels Actions */}
-              {selectedHotels.length > 0 && (
-                <div className="flex gap-2 pt-2">
-                  <button
-                    onClick={handleDeleteSelected}
-                    className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm rounded-lg hover:shadow-md transition-all duration-200"
-                  >
-                    {`${t('hotels.deleteSelected')} (${selectedHotels.length})`}
-                  </button>
-                  <button
-                    onClick={handlePrintSelected}
-                    className="px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-sm rounded-lg hover:shadow-md transition-all duration-200"
-                  >
-                    {`${t('hotels.printSelected')} (${selectedHotels.length})`}
-                  </button>
+              {/* Location Filter */}
+              <div className="space-y-3">
+                <label className="block text-base font-bold text-slate-700">
+                  {t('hotels.filterByLocation')}
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    value={locationFilter}
+                    onChange={(e) => setLocationFilter(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50/50 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 focus:shadow-md transition-all duration-200 placeholder-slate-400 text-slate-700 hover:border-slate-400"
+                    placeholder={t('hotels.searchByLocation')}
+                  />
                 </div>
-              )}
+              </div>
+
+              {/* Address Filter */}
+              <div className="space-y-3">
+                <label className="block text-base font-bold text-slate-700">
+                  Filter by Address
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    value={addressFilter}
+                    onChange={(e) => setAddressFilter(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50/50 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 focus:shadow-md transition-all duration-200 placeholder-slate-400 text-slate-700 hover:border-slate-400"
+                    placeholder="Search by address"
+                  />
+                </div>
+              </div>
             </div>
 
+            {/* Secondary Filters Row */}
+            <div className="flex flex-wrap gap-6 items-end">
+              {/* Has Rooms Filter */}
+              <div className="min-w-[200px]">
+                <label className="block text-base font-bold text-slate-700 mb-3">
+                  {t('hotels.roomsFilter')}
+                </label>
+                <select
+                  value={hasRoomsFilter}
+                  onChange={(e) => setHasRoomsFilter(e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-slate-700"
+                >
+                  <option value="">{t('hotels.allHotels')}</option>
+                  <option value="true">{t('hotels.hotelsWithRooms')}</option>
+                  <option value="false">{t('hotels.hotelsWithoutRooms')}</option>
+                </select>
+              </div>
+
+              
+
+              {/* Room Count Filters */}
+              {hasRoomsFilter !== 'false' && (
+                <>
+                  <div className="min-w-[150px]">
+                    <label className="block text-sm font-medium text-slate-600 mb-2">
+                      {t('hotels.minimumRoomCount')}
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={minRoomCountFilter}
+                      onChange={(e) => setMinRoomCountFilter(e.target.value)}
+                      className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 placeholder-slate-400 text-slate-700"
+                      placeholder={t('hotels.enterMinimumRooms')}
+                    />
+                  </div>
+                  <div className="min-w-[150px]">
+                    <label className="block text-sm font-medium text-slate-600 mb-2">
+                      {t('hotels.maximumRoomCount')}
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={maxRoomCountFilter}
+                      onChange={(e) => setMaxRoomCountFilter(e.target.value)}
+                      className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 placeholder-slate-400 text-slate-700"
+                      placeholder={t('hotels.enterMaximumRooms')}
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* Has Files Filter */}
+              <div className="min-w-[200px]">
+                <label className="block text-base font-bold text-slate-700 mb-3">
+                  Files Filter
+                </label>
+                <select
+                  value={hasFilesFilter}
+                  onChange={(e) => setHasFilesFilter(e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-slate-700"
+                >
+                  <option value="">All Hotels</option>
+                  <option value="true">Hotels with Files</option>
+                  <option value="false">Hotels without Files</option>
+                </select>
+              </div>
+              
+              {/* Clear Filters Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setNameFilter('');
+                  setCodeFilter('');
+                  setLocationFilter('');
+                  setAddressFilter('');
+                  setHasFilesFilter('');
+                  setGeneralSearch('');
+                  setHasRoomsFilter('');
+                  setMinRoomCountFilter('');
+                  setMaxRoomCountFilter('');
+                }}
+                className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all duration-200 font-medium flex items-center space-x-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>{t('hotels.clearFilters')}</span>
+              </button>
+            </div>
+
+            {/* Selected Hotels Actions */}
+            {selectedHotels.length > 0 && (
+              <div className="flex flex-wrap gap-3 p-4 bg-blue-50/50 border border-blue-200/50 rounded-xl">
+                <div className="flex items-center space-x-2 text-blue-700 font-medium">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>{selectedHotels.length} selected</span>
+                </div>
+                <button
+                  onClick={handleDeleteSelected}
+                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg transition-all duration-200 flex items-center space-x-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  <span>{t('hotels.deleteSelected')}</span>
+                </button>
+                <button
+                  onClick={handlePrintSelected}
+                  className="px-4 py-2 bg-slate-500 hover:bg-slate-600 text-white text-sm rounded-lg transition-all duration-200 flex items-center space-x-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  </svg>
+                  <span>{t('hotels.printSelected')}</span>
+                </button>
+              </div>
+            )}
+          </div>
+
           {/* Hotels Table */}
-           <div className="overflow-x-auto">
+           <div className="overflow-x-auto bg-white/60 backdrop-blur-sm rounded-2xl border-2 border-slate-200/50 shadow-lg">
              {loading ? (
-               <div className="flex justify-center items-center py-12">
-                 <div className="flex items-center space-x-3">
-                   <svg className="animate-spin h-8 w-8 text-apple-blue" viewBox="0 0 24 24">
+               <div className="flex justify-center items-center py-16">
+                 <div className="flex items-center space-x-4">
+                   <svg className="animate-spin h-10 w-10 text-blue-600" viewBox="0 0 24 24">
                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                    </svg>
-                   <span className="text-gray-600 font-medium">{t('common.loading')}</span>
+                   <span className="text-slate-700 font-semibold text-lg">{t('common.loading')}</span>
                  </div>
                </div>
              ) : (
                <table className="w-full">
-                 <thead>
-                   <tr className="border-b border-gray-200/30">
-                     <th className="text-left py-4 px-4 font-semibold text-gray-700 w-12">
+                 <thead className="bg-gradient-to-r from-slate-50 to-slate-100/80">
+                   <tr className="border-b-2 border-slate-300/60">
+                     <th className="text-left py-5 px-6 font-bold text-slate-800 w-12 text-sm uppercase tracking-wide">
                        <input
                          type="checkbox"
                          checked={selectedHotels.length === (filteredHotels?.length || 0) && (filteredHotels?.length || 0) > 0}
                          onChange={handleSelectAllHotels}
-                         className="w-4 h-4 text-apple-blue bg-white/50 border-gray-300 rounded focus:ring-apple-blue focus:ring-2"
+                         className="w-5 h-5 text-blue-600 bg-white border-2 border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-200 cursor-pointer"
                        />
                      </th>
-                     <th className="text-left py-4 px-4 font-semibold text-gray-700">
+                     <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
                        {t('hotels.hotelName')}
                      </th>
-                     <th className="text-left py-4 px-4 font-semibold text-gray-700">
+                     <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
                        {t('hotels.hotelCode')}
                      </th>
-                     <th className="text-left py-4 px-4 font-semibold text-gray-700">
+                     <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
                        {t('hotels.altHotelName')}
                      </th>
-                     <th className="text-left py-4 px-4 font-semibold text-gray-700">
+                     <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
                        {t('hotels.hotelAddress')}
                      </th>
-                     <th className="text-left py-4 px-4 font-semibold text-gray-700">
+                     <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
                        {t('hotels.location')}
                      </th>
-                     <th className="text-left py-4 px-4 font-semibold text-gray-700">
+                     <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
                        {t('hotels.roomCount')}
                      </th>
-                     <th className="text-left py-4 px-4 font-semibold text-gray-700">
+                     <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
                        {t('hotels.agreementCount')}
                      </th>
-                     <th className="text-left py-4 px-4 font-semibold text-gray-700">
+                     <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
                        {t('common.actions')}
                      </th>
                    </tr>
                  </thead>
-                 <tbody>
-                 {(filteredHotels || []).map((hotel) => (
-                   <tr key={hotel.id} className={`border-b border-gray-100/50 hover:bg-white/30 transition-colors ${
-                     selectedHotels.includes(hotel.id) ? 'bg-apple-blue/10' : ''
+                 <tbody className="divide-y-2 divide-slate-200/40">
+                 {(filteredHotels || []).map((hotel, index) => (
+                   <tr key={hotel.id} className={`hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-slate-50/50 transition-all duration-300 ${
+                     selectedHotels.includes(hotel.id) ? 'bg-gradient-to-r from-blue-100/60 to-slate-100/60 shadow-sm' : index % 2 === 0 ? 'bg-white/40' : 'bg-slate-50/30'
                    }`}>
-                     <td className="py-4 px-4">
+                     <td className="py-5 px-6">
                        <input
                          type="checkbox"
                          checked={selectedHotels.includes(hotel.id)}
                          onChange={() => handleSelectHotel(hotel.id)}
-                         className="w-4 h-4 text-apple-blue bg-white/50 border-gray-300 rounded focus:ring-apple-blue focus:ring-2"
+                         className="w-5 h-5 text-blue-600 bg-white border-2 border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-200 cursor-pointer"
                        />
                      </td>
-                     <td className="py-4 px-4 text-gray-800 font-medium">{hotel.name}</td>
-                     <td className="py-4 px-4 text-gray-600">{hotel.code}</td>
-                     <td className="py-4 px-4 text-gray-600">{hotel.altName || '-'}</td>
-                     <td className="py-4 px-4 text-gray-600">{hotel.address || '-'}</td>
-                     <td className="py-4 px-4 text-gray-600">{hotel.location || '-'}</td>
-                     <td className="py-4 px-4 text-gray-600">
-                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                     <td className="py-5 px-6 text-slate-900 font-bold text-base">{hotel.name}</td>
+                     <td className="py-5 px-6 text-slate-700 font-semibold">{hotel.code}</td>
+                     <td className="py-5 px-6 text-slate-600 font-medium">{hotel.altName || '-'}</td>
+                     <td className="py-5 px-6 text-slate-600 font-medium">{hotel.address || '-'}</td>
+                     <td className="py-5 px-6 text-slate-600 font-medium">{hotel.location || '-'}</td>
+                     <td className="py-5 px-6 text-slate-600">
+                       <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900 border border-blue-300/50 shadow-sm">
                          {hotel.roomCount || 0}
                        </span>
                      </td>
-                     <td className="py-4 px-4 text-gray-600">
+                     <td className="py-5 px-6 text-slate-600">
                        {hotel.agreements && hotel.agreements.length > 0 ? (
-                         <div className="space-y-1">
+                         <div className="space-y-2">
                            {hotel.agreements.map((agreement) => (
                              <div key={agreement.id} className="flex items-center space-x-2">
                                <a
                                  href={`/api/hotels/${hotel.id}/agreements/${agreement.id}/download`}
                                  download={agreement.fileName}
-                                 className="text-apple-blue hover:text-apple-purple text-sm underline flex items-center space-x-1"
+                                 className="text-blue-600 hover:text-blue-800 text-sm font-medium underline decoration-2 underline-offset-2 flex items-center space-x-2 transition-colors duration-200"
                                >
-                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                  </svg>
                                  <span>{agreement.fileName}</span>
                                </a>
-                               <span className="text-xs text-gray-400">({Math.round(agreement.fileSize / 1024)}KB)</span>
+                               <span className="text-xs text-slate-500 font-medium bg-slate-100 px-2 py-1 rounded-md">({Math.round(agreement.fileSize / 1024)}KB)</span>
                              </div>
                            ))}
                          </div>
                        ) : (
-                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                         <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border border-gray-300/50 shadow-sm">
                            No files
                          </span>
                        )}
                      </td>
-                     <td className="py-4 px-4">
-                       <div className="flex space-x-2">
+                     <td className="py-5 px-6">
+                       <div className="flex flex-wrap gap-2">
                          <button
                            onClick={() => handleViewHotel(hotel.id)}
-                           className="px-3 py-1 bg-gradient-to-r from-apple-blue to-apple-purple text-white text-sm rounded-lg hover:shadow-md transition-all duration-200"
+                           className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border border-blue-500/30"
                          >
+                           <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                           </svg>
                            {t('common.view')}
                          </button>
                          <button
                            onClick={() => handleEditHotel(hotel.id)}
-                           className="px-3 py-1 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-sm rounded-lg hover:shadow-md transition-all duration-200"
+                           className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border border-amber-400/30"
                          >
+                           <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                           </svg>
                            {t('common.edit')}
                          </button>
                          <button
                            onClick={() => handleDeleteHotel(hotel.id)}
-                           className="px-3 py-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm rounded-lg hover:shadow-md transition-all duration-200"
+                           className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border border-red-400/30"
                          >
+                           <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                           </svg>
                            {t('common.delete')}
                          </button>
                          <button
                            onClick={handlePrint}
-                           className="px-3 py-1 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-sm rounded-lg hover:shadow-md transition-all duration-200"
+                           className="px-4 py-2 bg-gradient-to-r from-slate-600 to-slate-700 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border border-slate-500/30"
                          >
+                           <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                           </svg>
                            {t('hotels.print')}
                          </button>
                        </div>
@@ -1038,13 +1200,13 @@ export default function Hotel() {
            </div>
 
           {(filteredHotels?.length || 0) === 0 && (
-             <div className="text-center py-12">
-               <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                 <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+             <div className="text-center py-20 bg-white/60 backdrop-blur-sm rounded-2xl border-2 border-slate-200/50 shadow-lg">
+               <div className="w-20 h-20 mx-auto bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center mb-6 shadow-md">
+                 <svg className="w-10 h-10 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                  </svg>
                </div>
-               <p className="text-gray-500">
+               <p className="text-slate-600 font-semibold text-lg">
                   {(nameFilter || codeFilter) ? 
                     t('hotels.noHotelsMatch') :
                     t('hotels.noHotelsAdded')
@@ -1186,26 +1348,35 @@ export default function Hotel() {
                  )}
                  
                  {/* Agreement Files Section */}
-                 <div className="space-y-4">
-                   <h4 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
-                     {t('hotels.agreementFiles')}
-                   </h4>
+                 <div className="space-y-6">
+                   <div className="flex items-center space-x-3">
+                     <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md">
+                       <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                       </svg>
+                     </div>
+                     <h4 className="text-xl font-bold text-slate-800">
+                       {t('hotels.agreementFiles')}
+                     </h4>
+                   </div>
                    
                    {selectedHotelDetails.agreements && selectedHotelDetails.agreements.length > 0 ? (
-                     <div className="space-y-3">
+                     <div className="space-y-4">
                        {selectedHotelDetails.agreements.map((agreement) => (
-                         <div key={agreement.id} className="flex items-center justify-between p-4 bg-gray-50/50 border border-gray-200/50 rounded-xl">
-                           <div className="flex items-center space-x-3">
+                         <div key={agreement.id} className="group flex items-center justify-between p-5 bg-gradient-to-r from-slate-50 to-blue-50/30 border border-slate-200 rounded-2xl hover:shadow-lg hover:border-blue-300 transition-all duration-300">
+                           <div className="flex items-center space-x-4">
                              <div className="flex-shrink-0">
-                               <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                               </svg>
+                               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow duration-300">
+                                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                 </svg>
+                               </div>
                              </div>
                              <div className="flex-1 min-w-0">
-                               <p className="text-sm font-medium text-gray-900 truncate">
+                               <p className="text-base font-bold text-slate-800 truncate group-hover:text-blue-700 transition-colors duration-300">
                                  {agreement.fileName}
                                </p>
-                               <p className="text-xs text-gray-500">
+                               <p className="text-sm font-medium text-slate-500 mt-1">
                                  {(agreement.fileSize / 1024).toFixed(1)} KB • {new Date(agreement.uploadedAt).toLocaleDateString()}
                                </p>
                              </div>
@@ -1213,10 +1384,10 @@ export default function Hotel() {
                            <a
                              href={`/api/hotels/${selectedHotelDetails.id}/agreements/${agreement.id}/download`}
                              download
-                             className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 transition-colors"
+                             className="inline-flex items-center px-5 py-3 text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 group-hover:scale-105"
                            >
-                             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                              </svg>
                              Download
                            </a>
@@ -1224,11 +1395,14 @@ export default function Hotel() {
                        ))}
                      </div>
                    ) : (
-                     <div className="text-center py-8 text-gray-500">
-                       <svg className="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                       </svg>
-                       <p>No agreement files uploaded</p>
+                     <div className="text-center py-12 bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl border-2 border-dashed border-slate-300">
+                       <div className="w-16 h-16 bg-gradient-to-br from-slate-400 to-gray-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
+                         <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                         </svg>
+                       </div>
+                       <p className="text-lg font-bold text-slate-600">No agreement files uploaded</p>
+                       <p className="text-sm font-medium text-slate-500 mt-2">Agreement files will appear here once uploaded</p>
                      </div>
                    )}
                  </div>
@@ -1261,10 +1435,6 @@ export default function Hotel() {
            </div>
          )}
 
-        {/* Floating elements for extra visual appeal */}
-        <div className="absolute -top-6 -left-6 w-12 h-12 bg-gradient-to-br from-apple-pink/30 to-apple-orange/30 rounded-full blur-sm animate-pulse"></div>
-        <div className="absolute -bottom-6 -right-6 w-8 h-8 bg-gradient-to-br from-apple-green/30 to-apple-teal/30 rounded-full blur-sm animate-pulse delay-1000"></div>
-      </div>
       </div>
     </ProtectedRoute>
   );
