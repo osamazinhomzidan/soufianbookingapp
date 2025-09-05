@@ -72,6 +72,11 @@ export interface Translations {
     optional: string;
     clearFilters: string;
     createdDate: string;
+    filters: string;
+    results: string;
+    clearAll: string;
+    min: string;
+    max: string;
   };
   
   // Booking page translations
@@ -390,6 +395,16 @@ export interface Translations {
     removeThisRoom: string;
     addAnotherRoom: string;
     removeLastRoom: string;
+    allStatuses: string;
+    active: string;
+    inactive: string;
+    pricingAvailability: string;
+    capacityRange: string;
+    minCapacity: string;
+    maxCapacity: string;
+    filterByFloor: string;
+    filterByCreatedBy: string;
+    confirmDeleteRoom: string;
   };
   
   // Layout and navigation
@@ -536,6 +551,11 @@ const en: Translations = {
     optional: 'Optional',
     clearFilters: 'Clear Filters',
     createdDate: 'Created Date',
+    filters: 'Filters',
+    results: 'results',
+    clearAll: 'Clear All',
+    min: 'Min',
+    max: 'Max',
   },
   
   booking: {
@@ -818,6 +838,7 @@ const en: Translations = {
     enableAlternativePrice: 'Enable Alternative Price',
     alternativePrice: 'Alternative Price',
     alternativePricePerNight: 'Alternative Price',
+    purchasePrice: 'Purchase Price',
     seasonalPricingNote: 'Seasonal pricing can be configured later',
     viewAddedRooms: 'View Added Rooms',
     deleteAll: 'Delete All',
@@ -857,6 +878,8 @@ const en: Translations = {
     priceRange: 'Price Range',
     minPrice: 'Min Price',
     maxPrice: 'Max Price',
+    purchasePriceRange: 'Purchase Price Range',
+    basePriceRange: 'Base Price Range',
     quantityRange: 'Quantity Range',
     minQty: 'Min Qty',
     maxQty: 'Max Qty',
@@ -904,6 +927,16 @@ const en: Translations = {
     removeThisRoom: 'Remove This Room',
     addAnotherRoom: 'Add Another Room',
     removeLastRoom: 'Remove Last Room',
+    allStatuses: 'All Statuses',
+    active: 'Active',
+    inactive: 'Inactive',
+    pricingAvailability: 'Pricing & Availability',
+    capacityRange: 'Capacity Range',
+    minCapacity: 'Min Capacity',
+    maxCapacity: 'Max Capacity',
+    filterByFloor: 'Filter by Floor',
+    filterByCreatedBy: 'Filter by Created By',
+    confirmDeleteRoom: 'Are you sure you want to delete this room?',
   },
   
   layout: {
@@ -1046,6 +1079,11 @@ const ar: Translations = {
     optional: 'اختياري',
     clearFilters: 'مسح المرشحات',
     createdDate: 'تاريخ الإنشاء',
+    filters: 'المرشحات',
+    results: 'نتيجة',
+    clearAll: 'مسح الكل',
+    min: 'أدنى',
+    max: 'أعلى',
   },
   
   booking: {
@@ -1328,6 +1366,7 @@ const ar: Translations = {
     enableAlternativePrice: 'تفعيل السعر البديل',
     alternativePrice: 'السعر البديل',
     alternativePricePerNight: 'السعر البديل',
+    purchasePrice: 'سعر الشراء',
     seasonalPricingNote: 'يمكن تكوين التسعير الموسمي لاحقاً',
     viewAddedRooms: 'عرض الغرف المضافة',
     deleteAll: 'حذف الكل',
@@ -1367,6 +1406,8 @@ const ar: Translations = {
     priceRange: 'نطاق السعر',
     minPrice: 'أقل سعر',
     maxPrice: 'أعلى سعر',
+    purchasePriceRange: 'نطاق سعر الشراء',
+    basePriceRange: 'نطاق السعر الأساسي',
     quantityRange: 'نطاق الكمية',
     minQty: 'أقل كمية',
     maxQty: 'أعلى كمية',
@@ -1392,6 +1433,16 @@ const ar: Translations = {
     removeThisRoom: 'إزالة هذه الغرفة',
     addAnotherRoom: 'إضافة غرفة أخرى',
     removeLastRoom: 'إزالة الغرفة الأخيرة',
+    allStatuses: 'جميع الحالات',
+    active: 'نشط',
+    inactive: 'غير نشط',
+    pricingAvailability: 'التسعير والتوفر',
+    capacityRange: 'نطاق السعة',
+    minCapacity: 'أقل سعة',
+    maxCapacity: 'أعلى سعة',
+    filterByFloor: 'تصفية بالطابق',
+    filterByCreatedBy: 'تصفية بالمنشئ',
+    confirmDeleteRoom: 'هل أنت متأكد من حذف هذه الغرفة؟',
     roomTypePlaceholder: 'أدخل نوع الغرفة',
     roomDescriptionPlaceholder: 'وصف مفصل للغرفة',
     altDescriptionPlaceholder: 'الوصف بلغة أخرى',

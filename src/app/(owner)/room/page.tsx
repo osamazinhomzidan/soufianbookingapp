@@ -130,6 +130,27 @@ export default function Room() {
   const [nameFilter, setNameFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [hotelFilter, setHotelFilter] = useState('');
+  
+  // Date-based availability filters
+  const [availableFromFilter, setAvailableFromFilter] = useState('');
+  const [availableToFilter, setAvailableToFilter] = useState('');
+  
+  // Price filters
+  const [minPurchasePriceFilter, setMinPurchasePriceFilter] = useState('');
+  const [maxPurchasePriceFilter, setMaxPurchasePriceFilter] = useState('');
+  const [minBasePriceFilter, setMinBasePriceFilter] = useState('');
+  const [maxBasePriceFilter, setMaxBasePriceFilter] = useState('');
+  
+  // Additional filters
+  const [boardTypeFilter, setBoardTypeFilter] = useState('');
+  const [minQuantityFilter, setMinQuantityFilter] = useState('');
+  const [maxQuantityFilter, setMaxQuantityFilter] = useState('');
+  const [isActiveFilter, setIsActiveFilter] = useState('');
+  const [minCapacityFilter, setMinCapacityFilter] = useState('');
+  const [maxCapacityFilter, setMaxCapacityFilter] = useState('');
+  const [floorFilter, setFloorFilter] = useState('');
+  const [createdByFilter, setCreatedByFilter] = useState('');
+  
   const [selectedRooms, setSelectedRooms] = useState<string[]>([]);
   const [selectedRoomDetails, setSelectedRoomDetails] = useState<Room | null>(null);
 
@@ -439,7 +460,80 @@ export default function Room() {
       room.hotel?.name?.toLowerCase().includes(hotelFilter.toLowerCase()) ||
       room.hotelName?.toLowerCase().includes(hotelFilter.toLowerCase());
     
-    return nameMatch && typeMatch && hotelMatch;
+    // Date-based availability filtering
+    const availableFromMatch = availableFromFilter === '' || 
+      !room.availableFrom || 
+      new Date(room.availableFrom) >= new Date(availableFromFilter);
+    
+    const availableToMatch = availableToFilter === '' || 
+      !room.availableTo || 
+      new Date(room.availableTo) <= new Date(availableToFilter);
+    
+    // Price filtering for purchase price
+    const minPurchasePriceMatch = minPurchasePriceFilter === '' || 
+      !minPurchasePriceFilter || 
+      (room.purchasePrice && room.purchasePrice >= parseFloat(minPurchasePriceFilter));
+    
+    const maxPurchasePriceMatch = maxPurchasePriceFilter === '' || 
+      !maxPurchasePriceFilter || 
+      (room.purchasePrice && room.purchasePrice <= parseFloat(maxPurchasePriceFilter));
+    
+    // Price filtering for base (selling) price
+    const minBasePriceMatch = minBasePriceFilter === '' || 
+      !minBasePriceFilter || 
+      (room.basePrice && room.basePrice >= parseFloat(minBasePriceFilter));
+    
+    const maxBasePriceMatch = maxBasePriceFilter === '' || 
+      !maxBasePriceFilter || 
+      (room.basePrice && room.basePrice <= parseFloat(maxBasePriceFilter));
+    
+    // Board type filtering
+    const boardTypeMatch = boardTypeFilter === '' || 
+      room.boardType === boardTypeFilter;
+    
+    // Quantity filtering
+    const minQuantityMatch = minQuantityFilter === '' || 
+      !minQuantityFilter || 
+      (room.quantity && room.quantity >= parseInt(minQuantityFilter));
+    
+    const maxQuantityMatch = maxQuantityFilter === '' || 
+      !maxQuantityFilter || 
+      (room.quantity && room.quantity <= parseInt(maxQuantityFilter));
+    
+    // Active status filtering
+    const isActiveMatch = isActiveFilter === '' || 
+      (isActiveFilter === 'true' && room.isActive) || 
+      (isActiveFilter === 'false' && !room.isActive);
+    
+    // Capacity filtering (if available in room data)
+    const minCapacityMatch = minCapacityFilter === '' || 
+      !minCapacityFilter || 
+      (room.capacity && room.capacity >= parseInt(minCapacityFilter));
+    
+    const maxCapacityMatch = maxCapacityFilter === '' || 
+      !maxCapacityFilter || 
+      (room.capacity && room.capacity <= parseInt(maxCapacityFilter));
+    
+    // Floor filtering (if available in room data)
+    const floorMatch = floorFilter === '' || 
+      !floorFilter || 
+      (room.floor && room.floor.toString() === floorFilter);
+    
+    // Created by filtering
+    const createdByMatch = createdByFilter === '' || 
+      (room.createdBy && (
+        room.createdBy.username?.toLowerCase().includes(createdByFilter.toLowerCase()) ||
+        room.createdBy.firstName?.toLowerCase().includes(createdByFilter.toLowerCase()) ||
+        room.createdBy.lastName?.toLowerCase().includes(createdByFilter.toLowerCase())
+      ));
+    
+    return nameMatch && typeMatch && hotelMatch && 
+           availableFromMatch && availableToMatch && 
+           minPurchasePriceMatch && maxPurchasePriceMatch && 
+           minBasePriceMatch && maxBasePriceMatch &&
+           boardTypeMatch && minQuantityMatch && maxQuantityMatch &&
+           isActiveMatch && minCapacityMatch && maxCapacityMatch &&
+           floorMatch && createdByMatch;
   });
 
   const handleViewRoom = async (id: string) => {
@@ -801,6 +895,40 @@ export default function Room() {
                             step="0.01"
                           />
                         </div>
+
+                        {/* Available From */}
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-700">
+                            {t('rooms.availableFrom')}
+                          </label>
+                          <input
+                            type="date"
+                            value={roomForm.availableFrom}
+                            onChange={(e) => updateRoomForm(roomForm.id, 'availableFrom', e.target.value)}
+                            className={`w-full px-4 py-3 bg-white/50 border rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 backdrop-blur-sm ${
+                              formErrors[roomForm.id]?.some(error => error.includes('date') || error.includes('Date') || error.includes('availability')) 
+                                ? 'border-red-300 focus:ring-red-400' 
+                                : 'border-gray-200/50 focus:ring-blue-400'
+                            }`}
+                          />
+                        </div>
+
+                        {/* Available To */}
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium text-gray-700">
+                            {t('rooms.availableTo')}
+                          </label>
+                          <input
+                            type="date"
+                            value={roomForm.availableTo}
+                            onChange={(e) => updateRoomForm(roomForm.id, 'availableTo', e.target.value)}
+                            className={`w-full px-4 py-3 bg-white/50 border rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 backdrop-blur-sm ${
+                              formErrors[roomForm.id]?.some(error => error.includes('date') || error.includes('Date') || error.includes('availability')) 
+                                ? 'border-red-300 focus:ring-red-400' 
+                                : 'border-gray-200/50 focus:ring-blue-400'
+                            }`}
+                          />
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -839,20 +967,57 @@ export default function Room() {
                 </h2>
               </div>
 
-              {/* Search and Filter Section */}
-              <div className="mb-6 space-y-4">
-                <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-end">
-                  {/* Name Filter */}
-                  <div className="flex-1 max-w-sm">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('rooms.filterByName')}
-                    </label>
+              {/* Modern Filter Section */}
+              <div className="mb-8">
+                {/* Filter Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full"></div>
+                    <h3 className="text-lg font-semibold text-gray-800">{t('common.filters')}</h3>
+                    <span className="text-sm text-gray-500">({filteredRooms.length} {t('common.results')})</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setNameFilter('');
+                      setTypeFilter('');
+                      setHotelFilter('');
+                      setAvailableFromFilter('');
+                      setAvailableToFilter('');
+                      setMinPurchasePriceFilter('');
+                      setMaxPurchasePriceFilter('');
+                      setMinBasePriceFilter('');
+                      setMaxBasePriceFilter('');
+                      setBoardTypeFilter('');
+                      setMinQuantityFilter('');
+                      setMaxQuantityFilter('');
+                      setIsActiveFilter('');
+                      setMinCapacityFilter('');
+                      setMaxCapacityFilter('');
+                      setFloorFilter('');
+                      setCreatedByFilter('');
+                    }}
+                    className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200 flex items-center space-x-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>{t('common.clearAll')}</span>
+                  </button>
+                </div>
+
+                {/* Filter Groups */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Basic Search & Selection Group */}
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-medium text-gray-700 uppercase tracking-wide">{t('common.search')}</h4>
+                    
+                    {/* Global Search */}
                     <div className="relative">
                       <input
                         type="text"
                         value={nameFilter}
                         onChange={(e) => setNameFilter(e.target.value)}
-                        className="w-full px-4 py-3 pl-10 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
+                        className="w-full px-4 py-3 pl-11 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
                         placeholder={t('rooms.searchRoomOrHotel')}
                       />
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -861,38 +1026,12 @@ export default function Room() {
                         </svg>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Type Filter */}
-                  <div className="flex-1 max-w-sm">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('rooms.filterByType')}
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={typeFilter}
-                        onChange={(e) => setTypeFilter(e.target.value)}
-                        className="w-full px-4 py-3 pl-10 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                        placeholder={t('rooms.searchRoomType')}
-                      />
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Hotel Filter */}
-                  <div className="flex-1 max-w-sm">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('rooms.filterByHotel')}
-                    </label>
+                    {/* Hotel Selection */}
                     <select
                       value={hotelFilter}
                       onChange={(e) => setHotelFilter(e.target.value)}
-                      className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
+                      className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
                     >
                       <option value="">{t('rooms.allHotels')}</option>
                       {hotels.map((hotel) => (
@@ -901,20 +1040,141 @@ export default function Room() {
                         </option>
                       ))}
                     </select>
+
+                    {/* Board Type */}
+                    <select
+                      value={boardTypeFilter}
+                      onChange={(e) => setBoardTypeFilter(e.target.value)}
+                      className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                    >
+                      <option value="">{t('rooms.allBoardTypes')}</option>
+                      <option value="Room only">{t('rooms.roomOnly')}</option>
+                      <option value="Bed & breakfast">{t('rooms.bedBreakfast')}</option>
+                      <option value="Half board">{t('rooms.halfBoard')}</option>
+                      <option value="Full board">{t('rooms.fullBoard')}</option>
+                    </select>
+
+                    {/* Status Filter */}
+                    <select
+                      value={isActiveFilter}
+                      onChange={(e) => setIsActiveFilter(e.target.value)}
+                      className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                    >
+                      <option value="">{t('rooms.allStatuses')}</option>
+                      <option value="true">{t('rooms.active')}</option>
+                      <option value="false">{t('rooms.inactive')}</option>
+                    </select>
                   </div>
 
-                  {/* Clear Filters Button */}
-                  <div className="flex-shrink-0">
-                    <button
-                      onClick={() => {
-                        setNameFilter('');
-                        setTypeFilter('');
-                        setHotelFilter('');
-                      }}
-                      className="px-4 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 text-sm font-medium"
-                    >
-                      {t('common.clearFilters')}
-                    </button>
+                  {/* Pricing & Availability Group */}
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-medium text-gray-700 uppercase tracking-wide">{t('rooms.pricingAvailability')}</h4>
+                    
+                    {/* Purchase Price Range */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-2">{t('rooms.purchasePriceRange')}</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          type="number"
+                          value={minPurchasePriceFilter}
+                          onChange={(e) => setMinPurchasePriceFilter(e.target.value)}
+                          className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                          placeholder={t('common.min')}
+                          min="0"
+                          step="0.01"
+                        />
+                        <input
+                          type="number"
+                          value={maxPurchasePriceFilter}
+                          onChange={(e) => setMaxPurchasePriceFilter(e.target.value)}
+                          className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                          placeholder={t('common.max')}
+                          min="0"
+                          step="0.01"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Base Price Range */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-2">{t('rooms.basePriceRange')}</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          type="number"
+                          value={minBasePriceFilter}
+                          onChange={(e) => setMinBasePriceFilter(e.target.value)}
+                          className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                          placeholder={t('common.min')}
+                          min="0"
+                          step="0.01"
+                        />
+                        <input
+                          type="number"
+                          value={maxBasePriceFilter}
+                          onChange={(e) => setMaxBasePriceFilter(e.target.value)}
+                          className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                          placeholder={t('common.max')}
+                          min="0"
+                          step="0.01"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Availability Dates */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-2">{t('rooms.availabilityRange')}</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          type="date"
+                          value={availableFromFilter}
+                          onChange={(e) => setAvailableFromFilter(e.target.value)}
+                          className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                        />
+                        <input
+                          type="date"
+                          value={availableToFilter}
+                          onChange={(e) => setAvailableToFilter(e.target.value)}
+                          className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Room Details Group */}
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-medium text-gray-700 uppercase tracking-wide">{t('rooms.roomDetails')}</h4>
+                    
+                    {/* Room Type */}
+                    <input
+                      type="text"
+                      value={typeFilter}
+                      onChange={(e) => setTypeFilter(e.target.value)}
+                      className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
+                      placeholder={t('rooms.searchRoomType')}
+                    />
+
+                    {/* Quantity Range */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-2">{t('rooms.quantityRange')}</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          type="number"
+                          value={minQuantityFilter}
+                          onChange={(e) => setMinQuantityFilter(e.target.value)}
+                          className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                          placeholder={t('common.min')}
+                          min="0"
+                        />
+                        <input
+                          type="number"
+                          value={maxQuantityFilter}
+                          onChange={(e) => setMaxQuantityFilter(e.target.value)}
+                          className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                          placeholder={t('common.max')}
+                          min="0"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -948,10 +1208,25 @@ export default function Room() {
                           {t('rooms.boardType')}
                         </th>
                         <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
-                          Base Price
+                          {t('rooms.purchasePrice')}
+                        </th>
+                        <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                          {t('rooms.basePrice')}
+                        </th>
+                        <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                          {t('rooms.alternativePrice')}
                         </th>
                         <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
                           {t('rooms.quantity')}
+                        </th>
+                        <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                          {t('rooms.availableFrom')}
+                        </th>
+                        <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                          {t('rooms.availableTo')}
+                        </th>
+                        <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                          {t('common.createdDate')}
                         </th>
                         <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
                           {t('common.actions')}
@@ -967,8 +1242,13 @@ export default function Room() {
                           <td className="py-2 px-2 text-gray-600 text-sm max-w-[100px] truncate" title={room.roomType}>
                             {room.roomType}
                           </td>
-                          <td className="py-2 px-2 text-gray-600 text-sm max-w-[120px] truncate" title={room.roomTypeDescription}>
-                            {room.roomTypeDescription}
+                          <td className="py-2 px-2 text-gray-600 text-sm max-w-[120px] truncate" title={`${room.roomTypeDescription}${room.altDescription ? ` | ${room.altDescription}` : ''}`}>
+                            <div className="flex flex-col">
+                              <span>{room.roomTypeDescription}</span>
+                              {room.altDescription && (
+                                <span className="text-xs text-gray-400 italic truncate">{room.altDescription}</span>
+                              )}
+                            </div>
                           </td>
                           <td className="py-2 px-2 text-gray-600 text-sm">
                             <span className="px-2 py-1 bg-blue-100/50 text-blue-800 text-xs rounded-full whitespace-nowrap">
@@ -976,9 +1256,40 @@ export default function Room() {
                             </span>
                           </td>
                           <td className="py-2 px-2 text-gray-600 text-sm font-medium">
+                            {room.purchasePrice ? (
+                              <span className="text-green-600">SAR {room.purchasePrice}</span>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                          <td className="py-2 px-2 text-gray-600 text-sm font-medium">
                             SAR {room.basePrice}
                           </td>
+                          <td className="py-2 px-2 text-gray-600 text-sm font-medium">
+                            {room.alternativePrice ? (
+                              <span className="text-orange-600">SAR {room.alternativePrice}</span>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
                           <td className="py-2 px-2 text-gray-600 text-sm font-medium">{room.quantity}</td>
+                          <td className="py-2 px-2 text-gray-600 text-sm">
+                            {room.availableFrom ? (
+                              new Date(room.availableFrom).toLocaleDateString()
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                          <td className="py-2 px-2 text-gray-600 text-sm">
+                            {room.availableTo ? (
+                              new Date(room.availableTo).toLocaleDateString()
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                          <td className="py-2 px-2 text-gray-600 text-sm">
+                            {new Date(room.createdAt).toLocaleDateString()}
+                          </td>
                           <td className="py-2 px-2">
                             <div className="flex space-x-2">
                               <button
