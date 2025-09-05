@@ -12,8 +12,11 @@ interface Room {
   roomType: string;
   roomTypeDescription: string;
   altDescription: string;
+  purchasePrice: number;
   basePrice: number;
   alternativePrice?: number;
+  availableFrom?: string;
+  availableTo?: string;
   price?: number; // For backward compatibility
   quantity: number;
   boardType: 'Room only' | 'Bed & breakfast' | 'Half board' | 'Full board';
@@ -106,11 +109,15 @@ export default function Room() {
   const [roomType, setRoomType] = useState('');
   const [roomTypeDescription, setRoomTypeDescription] = useState('');
   const [altDescription, setAltDescription] = useState('');
-  const [price, setPrice] = useState('');
+  const [purchasePrice, setPurchasePrice] = useState('');
+  const [basePrice, setBasePrice] = useState('');
+  const [alternativePrice, setAlternativePrice] = useState('');
+  const [availableFrom, setAvailableFrom] = useState('');
+  const [availableTo, setAvailableTo] = useState('');
+  const [price, setPrice] = useState(''); // Keep for backward compatibility
   const [quantity, setQuantity] = useState('1');
   const [boardType, setBoardType] = useState<'Room only' | 'Bed & breakfast' | 'Half board' | 'Full board'>('Room only');
   const [hasAlternativePrice, setHasAlternativePrice] = useState(true);
-  const [alternativePrice, setAlternativePrice] = useState('');
   
   // Filter and selection states
   const [nameFilter, setNameFilter] = useState('');
@@ -121,6 +128,8 @@ export default function Room() {
   const [maxPrice, setMaxPrice] = useState('');
   const [minQuantity, setMinQuantity] = useState('');
   const [maxQuantity, setMaxQuantity] = useState('');
+  const [availableFromFilter, setAvailableFromFilter] = useState('');
+  const [availableToFilter, setAvailableToFilter] = useState('');
   const [selectedRooms, setSelectedRooms] = useState<string[]>([]);
   const [selectedRoomDetails, setSelectedRoomDetails] = useState<Room | null>(null);
 
@@ -200,13 +209,63 @@ export default function Room() {
       (maxQuantity === '' || (room.quantity && room.quantity <= parseInt(maxQuantity)))
     );
     
-    return nameMatch && typeMatch && hotelMatch && boardMatch && priceMatch && quantityMatch;
+    const availabilityMatch = (() => {
+      // If no date filters are set, show all rooms
+      if (availableFromFilter === '' && availableToFilter === '') {
+        return true;
+      }
+      
+      // If room has no availability dates, exclude it when date filters are applied
+      if (!room.availableFrom && !room.availableTo) {
+        return false;
+      }
+      
+      const roomAvailableFrom = room.availableFrom ? new Date(room.availableFrom) : null;
+      const roomAvailableTo = room.availableTo ? new Date(room.availableTo) : null;
+      const filterFrom = availableFromFilter ? new Date(availableFromFilter) : null;
+      const filterTo = availableToFilter ? new Date(availableToFilter) : null;
+      
+      // Check if room is available within the filtered date range
+      let fromMatch = true;
+      let toMatch = true;
+      
+      if (filterFrom && roomAvailableFrom) {
+        // Room should be available from the filter date or earlier
+        fromMatch = roomAvailableFrom <= filterFrom;
+      }
+      
+      if (filterTo && roomAvailableTo) {
+        // Room should be available until the filter date or later
+        toMatch = roomAvailableTo >= filterTo;
+      }
+      
+      // If only availableFrom filter is set, check if room is available from that date
+      if (filterFrom && !filterTo && roomAvailableFrom) {
+        return roomAvailableFrom <= filterFrom && (!roomAvailableTo || roomAvailableTo >= filterFrom);
+      }
+      
+      // If only availableTo filter is set, check if room is available until that date
+      if (filterTo && !filterFrom && roomAvailableTo) {
+        return roomAvailableTo >= filterTo && (!roomAvailableFrom || roomAvailableFrom <= filterTo);
+      }
+      
+      // If both filters are set, check if room availability overlaps with the filter range
+      if (filterFrom && filterTo) {
+        const roomStart = roomAvailableFrom || new Date('1900-01-01');
+        const roomEnd = roomAvailableTo || new Date('2100-12-31');
+        return roomStart <= filterTo && roomEnd >= filterFrom;
+      }
+      
+      return fromMatch && toMatch;
+    })();
+    
+    return nameMatch && typeMatch && hotelMatch && boardMatch && priceMatch && quantityMatch && availabilityMatch;
   });
 
   const handleAddRoom = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!hotelId || !roomType || !roomTypeDescription || !price || !quantity) {
+    if (!hotelId || !roomType || !roomTypeDescription || !purchasePrice || !basePrice || !quantity) {
       setMessage({ type: 'error', text: t('rooms.fillAllFields') });
       return;
     }
@@ -225,8 +284,11 @@ export default function Room() {
         roomType,
         roomTypeDescription,
         altDescription: altDescription || null,
-        basePrice: parseFloat(price),
-        alternativePrice: hasAlternativePrice && alternativePrice ? parseFloat(alternativePrice) : null,
+        purchasePrice: parseFloat(purchasePrice),
+        basePrice: parseFloat(basePrice),
+        alternativePrice: alternativePrice ? parseFloat(alternativePrice) : null,
+        availableFrom: availableFrom || null,
+        availableTo: availableTo || null,
         quantity: parseInt(quantity),
         boardType: BOARD_TYPE_MAPPINGS.displayToApi[boardType] || 'ROOM_ONLY',
       };
@@ -282,11 +344,15 @@ export default function Room() {
         setRoomType('');
         setRoomTypeDescription('');
         setAltDescription('');
-        setPrice('');
+        setPurchasePrice('');
+        setBasePrice('');
+        setAlternativePrice('');
+        setAvailableFrom('');
+        setAvailableTo('');
+        setPrice(''); // Keep for backward compatibility
         setQuantity('1');
         setBoardType(t('rooms.roomOnly'));
         setHasAlternativePrice(true);
-        setAlternativePrice('');
         
         setMessage({ type: 'success', text: successMessage });
       } else {
@@ -316,11 +382,15 @@ export default function Room() {
         setRoomType(room.roomType);
         setRoomTypeDescription(room.roomTypeDescription);
         setAltDescription(room.altDescription || '');
-        setPrice(room.basePrice.toString());
+        setPurchasePrice(room.purchasePrice?.toString() || '');
+        setBasePrice(room.basePrice.toString());
+        setAlternativePrice(room.alternativePrice?.toString() || '');
+        setAvailableFrom(room.availableFrom || '');
+        setAvailableTo(room.availableTo || '');
+        setPrice(room.basePrice.toString()); // Keep for backward compatibility
         setQuantity(room.quantity.toString());
         setBoardType(BOARD_TYPE_MAPPINGS.apiToDisplay[room.boardType] || 'Room only');
         setHasAlternativePrice(!!room.alternativePrice);
-        setAlternativePrice(room.alternativePrice?.toString() || '');
         
         setMessage({ type: 'success', text: t('rooms.roomLoadedForEdit') });
       } else {
@@ -664,20 +734,46 @@ export default function Room() {
 
               {/* Pricing Section - Full Width */}
               <div className="bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-md rounded-2xl p-6 border border-white/30 shadow-lg w-full">
-                <div className="space-y-5 w-full">
-                  {/* Main Price */}
-                  <div className="space-y-3 w-full">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Pricing Structure</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Purchase Price */}
+                  <div className="space-y-3">
                     <label className="flex items-center gap-2 text-sm font-semibold text-gray-800">
-                      <div className="w-2 h-2 bg-apple-blue rounded-full"></div>
-                      {t('rooms.basePrice')}
+                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                      Purchase Price (سعر الشراء)
                     </label>
                     <div className="relative">
                       <input
                         type="number"
-                        value={price}
-                        onChange={(e) => setPrice(e.target.value)}
+                        value={purchasePrice}
+                        onChange={(e) => setPurchasePrice(e.target.value)}
+                        className="w-full px-4 py-4 bg-red-50/70 border border-red-200/60 rounded-xl focus:ring-2 focus:ring-red-400 focus:border-transparent transition-all duration-300 backdrop-blur-sm placeholder-red-400 text-lg font-medium shadow-sm hover:shadow-md"
+                        placeholder="Enter purchase price"
+                        min="0"
+                        step="0.01"
+                        required
+                      />
+                      <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                        <span className="text-red-500 font-medium text-sm">
+                          {t('common.currency')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Base (Selling) Price */}
+                  <div className="space-y-3">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                      <div className="w-2 h-2 bg-apple-blue rounded-full"></div>
+                      Base Price (السعر الأساسي)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        value={basePrice}
+                        onChange={(e) => setBasePrice(e.target.value)}
                         className="w-full px-4 py-4 bg-white/70 border border-gray-200/60 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-300 backdrop-blur-sm placeholder-gray-400 text-lg font-medium shadow-sm hover:shadow-md"
-                        placeholder={t('rooms.enterBasePrice')}
+                        placeholder="Enter base selling price"
                         min="0"
                         step="0.01"
                         required
@@ -690,58 +786,62 @@ export default function Room() {
                     </div>
                   </div>
 
-                  {/* Alternative Price Toggle */}
-                  <div className="border-t border-gray-200/50 pt-4 w-full">
-                    <div className="flex items-center justify-between p-3 bg-white/40 rounded-xl border border-gray-200/40 hover:bg-white/60 transition-all duration-200 w-full">
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          id="hasAlternativePrice"
-                          checked={hasAlternativePrice}
-                          onChange={(e) => setHasAlternativePrice(e.target.checked)}
-                          className="w-5 h-5 text-apple-blue bg-white/80 border-gray-300 rounded-md focus:ring-apple-blue focus:ring-2 transition-all duration-200"
-                        />
-                        <label htmlFor="hasAlternativePrice" className="text-sm font-semibold text-gray-700 cursor-pointer">
-                          {t('rooms.enableAlternativePrice')}
-                        </label>
-                      </div>
-                      <div className="text-xs text-gray-500 bg-gray-100/60 px-2 py-1 rounded-full">
-                        {t('common.optional')}
-                      </div>
-                    </div>
-                    
-                    {/* Alternative Price Input */}
-                    <div className={`transition-all duration-300 ease-in-out overflow-hidden w-full ${
-                       hasAlternativePrice ? 'max-h-40 opacity-100 mt-4' : 'max-h-0 opacity-0'
-                     }`}>
-                      <div className="space-y-3 w-full">
-                        <label className="flex items-center gap-2 text-sm font-semibold text-gray-800">
-                          <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                          {t('rooms.alternativePrice')}
-                        </label>
-                        <div className="relative w-full">
-                          <input
-                            type="number"
-                            value={alternativePrice}
-                            onChange={(e) => setAlternativePrice(e.target.value)}
-                            className="w-full px-4 py-4 bg-orange-50/70 border border-orange-200/60 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all duration-300 backdrop-blur-sm placeholder-orange-400 text-lg font-medium shadow-sm hover:shadow-md"
-                            placeholder={t('rooms.enterAlternativePrice')}
-                            min="0"
-                            step="0.01"
-                          />
-                          <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                            <span className="text-orange-500 font-medium text-sm">
-                              {t('common.currency')}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="w-full bg-gradient-to-r from-blue-50/80 to-indigo-50/80 p-4 rounded-xl border border-blue-200/50 shadow-sm">
-                          <p className="text-sm font-medium text-blue-800 leading-relaxed">
-                            {t('rooms.alternativePriceDescription')}
-                          </p>
-                        </div>
+                  {/* Alternative Price */}
+                  <div className="space-y-3">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                      Alternative Price (السعر البديل)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        value={alternativePrice}
+                        onChange={(e) => setAlternativePrice(e.target.value)}
+                        className="w-full px-4 py-4 bg-orange-50/70 border border-orange-200/60 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all duration-300 backdrop-blur-sm placeholder-orange-400 text-lg font-medium shadow-sm hover:shadow-md"
+                        placeholder="Enter alternative price (optional)"
+                        min="0"
+                        step="0.01"
+                      />
+                      <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                        <span className="text-orange-500 font-medium text-sm">
+                          {t('common.currency')}
+                        </span>
                       </div>
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Availability Section - Full Width */}
+              <div className="bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-md rounded-2xl p-6 border border-white/30 shadow-lg w-full">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Availability Dates</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Available From */}
+                  <div className="space-y-3">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      Available From
+                    </label>
+                    <input
+                      type="date"
+                      value={availableFrom}
+                      onChange={(e) => setAvailableFrom(e.target.value)}
+                      className="w-full px-4 py-4 bg-green-50/70 border border-green-200/60 rounded-xl focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-300 backdrop-blur-sm text-lg font-medium shadow-sm hover:shadow-md"
+                    />
+                  </div>
+
+                  {/* Available To */}
+                  <div className="space-y-3">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                      Available To
+                    </label>
+                    <input
+                      type="date"
+                      value={availableTo}
+                      onChange={(e) => setAvailableTo(e.target.value)}
+                      className="w-full px-4 py-4 bg-purple-50/70 border border-purple-200/60 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300 backdrop-blur-sm text-lg font-medium shadow-sm hover:shadow-md"
+                    />
                   </div>
                 </div>
               </div>
@@ -926,6 +1026,29 @@ export default function Room() {
                   </div>
                 </div>
 
+                {/* Availability Date Range Filter */}
+                <div className="flex-1 max-w-sm">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('rooms.availabilityRange')}
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="date"
+                      value={availableFromFilter}
+                      onChange={(e) => setAvailableFromFilter(e.target.value)}
+                      className="w-1/2 px-3 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
+                      placeholder={t('rooms.availableFrom')}
+                    />
+                    <input
+                      type="date"
+                      value={availableToFilter}
+                      onChange={(e) => setAvailableToFilter(e.target.value)}
+                      className="w-1/2 px-3 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-apple-blue focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
+                      placeholder={t('rooms.availableTo')}
+                    />
+                  </div>
+                </div>
+
                 {/* Clear Filters Button */}
                 <div className="flex-shrink-0">
                   <button
@@ -938,6 +1061,8 @@ export default function Room() {
                       setMaxPrice('');
                       setMinQuantity('');
                       setMaxQuantity('');
+                      setAvailableFromFilter('');
+                      setAvailableToFilter('');
                     }}
                     className="px-4 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl hover:shadow-lg transition-all duration-200 text-sm font-medium"
                 >
@@ -1044,10 +1169,19 @@ export default function Room() {
                         {t('rooms.boardType')}
                       </th>
                       <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
-                        {t('rooms.basePrice')}
+                        Purchase Price
                       </th>
                       <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
-                        {t('rooms.alternativePrice')}
+                        Base Price
+                      </th>
+                      <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                        Alternative Price
+                      </th>
+                      <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                        Available From
+                      </th>
+                      <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                        Available To
                       </th>
                       <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
                         {t('rooms.quantity')}
@@ -1086,11 +1220,32 @@ export default function Room() {
                           </span>
                         </td>
                         <td className="py-2 px-2 text-gray-600 text-sm font-medium">
+                          {room.purchasePrice ? (
+                            <span className="text-red-600 font-medium">SAR {room.purchasePrice}</span>
+                          ) : (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </td>
+                        <td className="py-2 px-2 text-gray-600 text-sm font-medium">
                           SAR {room.basePrice}
                         </td>
                         <td className="py-2 px-2 text-gray-600 text-sm">
                           {room.alternativePrice ? (
                             <span className="text-orange-600 font-medium">SAR {room.alternativePrice}</span>
+                          ) : (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </td>
+                        <td className="py-2 px-2 text-gray-600 text-sm">
+                          {room.availableFrom ? (
+                            <span className="text-green-600 font-medium">{new Date(room.availableFrom).toLocaleDateString()}</span>
+                          ) : (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </td>
+                        <td className="py-2 px-2 text-gray-600 text-sm">
+                          {room.availableTo ? (
+                            <span className="text-purple-600 font-medium">{new Date(room.availableTo).toLocaleDateString()}</span>
                           ) : (
                             <span className="text-gray-400">-</span>
                           )}
@@ -1199,6 +1354,19 @@ export default function Room() {
                 
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">
+                    {t('rooms.purchasePrice')}
+                  </label>
+                  <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800 font-semibold">
+                    {selectedRoomDetails.purchasePrice ? (
+                      <span className="text-green-600 font-semibold">SAR {selectedRoomDetails.purchasePrice}</span>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
                     {t('rooms.basePrice')}
                   </label>
                   <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800 font-semibold">
@@ -1225,6 +1393,32 @@ export default function Room() {
                   </label>
                   <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800 font-semibold">
                     {selectedRoomDetails.quantity}
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {t('rooms.availableFrom')}
+                  </label>
+                  <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800">
+                    {selectedRoomDetails.availableFrom ? (
+                      new Date(selectedRoomDetails.availableFrom).toLocaleDateString()
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {t('rooms.availableTo')}
+                  </label>
+                  <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800">
+                    {selectedRoomDetails.availableTo ? (
+                      new Date(selectedRoomDetails.availableTo).toLocaleDateString()
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
                   </div>
                 </div>
                 

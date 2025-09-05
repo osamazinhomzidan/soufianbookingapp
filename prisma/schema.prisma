@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("POSTGRES_URL_NON_POOLING")
+  url      = env("DATABASE_URL_LOCAL")
 }
 
 // ================================
@@ -108,8 +108,16 @@ model Room {
   roomType            String    // e.g., 'Deluxe Suite', 'Family Room'
   roomTypeDescription String    // English description
   altDescription      String?   // Arabic description
-  basePrice           Decimal   @db.Decimal(10, 2)
-  alternativePrice    Decimal?  @db.Decimal(10, 2) // Optional alternative pricing
+  
+  // Enhanced Pricing Structure
+  purchasePrice       Decimal   @db.Decimal(10, 2) // سعر الشراء (Purchase Price)
+  basePrice           Decimal   @db.Decimal(10, 2) // السعر الأساسي (Base/Selling Price)
+  alternativePrice    Decimal?  @db.Decimal(10, 2) // السعر البديل (Alternative Price)
+  
+  // Availability Tracking
+  availableFrom       DateTime? @db.Date // Available from date
+  availableTo         DateTime? @db.Date // Available to date
+  
   quantity            Int       @default(1) // Number of rooms of this type
   boardType           BoardType @default(ROOM_ONLY)
   size                String?   // e.g., "45 sqm"

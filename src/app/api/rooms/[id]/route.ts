@@ -48,8 +48,11 @@ export async function GET(
         roomType: true,
         roomTypeDescription: true,
         altDescription: true,
+        purchasePrice: true,
         basePrice: true,
         alternativePrice: true,
+        availableFrom: true,
+        availableTo: true,
         quantity: true,
         boardType: true,
         size: true,
@@ -156,8 +159,11 @@ export async function PUT(
       roomType,
       roomTypeDescription,
       altDescription,
+      purchasePrice,
       basePrice,
       alternativePrice,
+      availableFrom,
+      availableTo,
       quantity,
       boardType,
       size,
@@ -189,6 +195,13 @@ export async function PUT(
     if (roomTypeDescription !== undefined && (!roomTypeDescription || typeof roomTypeDescription !== 'string')) {
       return NextResponse.json(
         { success: false, message: 'Room type description must be a non-empty string' },
+        { status: 400 }
+      );
+    }
+
+    if (purchasePrice !== undefined && (typeof purchasePrice !== 'number' || purchasePrice <= 0)) {
+      return NextResponse.json(
+        { success: false, message: 'Purchase price must be a positive number' },
         { status: 400 }
       );
     }
@@ -244,8 +257,11 @@ export async function PUT(
     if (roomType !== undefined) updateData.roomType = roomType.trim();
     if (roomTypeDescription !== undefined) updateData.roomTypeDescription = roomTypeDescription.trim();
     if (altDescription !== undefined) updateData.altDescription = altDescription?.trim() || null;
+    if (purchasePrice !== undefined) updateData.purchasePrice = parseFloat(purchasePrice.toString());
     if (basePrice !== undefined) updateData.basePrice = parseFloat(basePrice.toString());
     if (alternativePrice !== undefined) updateData.alternativePrice = alternativePrice ? parseFloat(alternativePrice.toString()) : null;
+    if (availableFrom !== undefined) updateData.availableFrom = availableFrom ? new Date(availableFrom) : null;
+    if (availableTo !== undefined) updateData.availableTo = availableTo ? new Date(availableTo) : null;
     if (quantity !== undefined) updateData.quantity = parseInt(quantity.toString());
     if (boardType !== undefined) updateData.boardType = boardType;
     if (size !== undefined) updateData.size = size?.trim() || null;
@@ -263,8 +279,11 @@ export async function PUT(
         roomType: true,
         roomTypeDescription: true,
         altDescription: true,
+        purchasePrice: true,
         basePrice: true,
         alternativePrice: true,
+        availableFrom: true,
+        availableTo: true,
         quantity: true,
         boardType: true,
         size: true,

@@ -31,6 +31,9 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search') || '';
     const hotelId = searchParams.get('hotelId') || '';
     const boardType = searchParams.get('boardType') || '';
+
+    const availableFrom = searchParams.get('availableFrom');
+    const availableTo = searchParams.get('availableTo');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     const skip = (page - 1) * limit;
@@ -54,6 +57,21 @@ export async function GET(request: NextRequest) {
     if (boardType) {
       whereClause.boardType = boardType;
     }
+    
+
+    // Availability date filtering
+    if (availableFrom || availableTo) {
+      if (availableFrom) {
+        whereClause.availableFrom = {
+          gte: new Date(availableFrom)
+        };
+      }
+      if (availableTo) {
+        whereClause.availableTo = {
+          lte: new Date(availableTo)
+        };
+      }
+    }
 
     // Get rooms with pagination
     const [rooms, totalCount] = await Promise.all([
@@ -65,8 +83,11 @@ export async function GET(request: NextRequest) {
           roomType: true,
           roomTypeDescription: true,
           altDescription: true,
+          purchasePrice: true,
           basePrice: true,
           alternativePrice: true,
+          availableFrom: true,
+          availableTo: true,
           quantity: true,
           boardType: true,
           size: true,
@@ -141,24 +162,100 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const {
-      hotelId,
-      roomType,
-      roomTypeDescription,
-      altDescription,
-      basePrice,
-      alternativePrice,
-      quantity,
-      boardType,
-      size,
-      capacity,
-      floor
-    } = body;
+    
+    // Support both single room and bulk room creation
+    const isBulkCreation = Array.isArray(body.rooms);
+    
+    if (isBulkCreation) {
+      // Handle bulk room creation
+      const { hotelId, rooms } = body;
+      
+      if (!hotelId || !rooms || !Array.isArray(rooms) || rooms.length === 0) {
+        return NextResponse.json(
+          { success: false, message: 'Hotel ID and rooms array are required for bulk creation' },
+          { status: 400 }
+        );
+      }
+      
+      // Validate each room in the array
+      for (let i = 0; i < rooms.length; i++) {
+        const room = rooms[i];
+        if (!room.roomType || !room.roomTypeDescription || !room.purchasePrice || !room.basePrice || !room.quantity) {
+          return NextResponse.json(
+            { success: false, message: `Room ${i + 1}: Room type, description, purchase price, base price, and quantity are required` },
+            { status: 400 }
+          );
+        }
+        
+        if (room.purchasePrice <= 0 || room.basePrice <= 0 || room.quantity <= 0) {
+          return NextResponse.json(
+            { success: false, message: `Room ${i + 1}: Purchase price, base price, and quantity must be positive numbers` },
+            { status: 400 }
+          );
+        }
+      }
+      
+      // Create all rooms in a transaction
+      try {
+        const createdRooms = await prisma.$transaction(
+          rooms.map((room: any) => 
+            prisma.room.create({
+              data: {
+                hotelId,
+                roomType: room.roomType,
+                roomTypeDescription: room.roomTypeDescription,
+                altDescription: room.altDescription || null,
+                purchasePrice: room.purchasePrice,
+                basePrice: room.basePrice,
+                alternativePrice: room.alternativePrice || null,
+                availableFrom: room.availableFrom ? new Date(room.availableFrom) : null,
+                availableTo: room.availableTo ? new Date(room.availableTo) : null,
+                quantity: room.quantity,
+                boardType: room.boardType || 'ROOM_ONLY',
+                size: room.size || null,
+                capacity: room.capacity || 2,
+                floor: room.floor || null,
+                createdById: user.id,
+              },
+            })
+          )
+        );
+        
+        return NextResponse.json({
+          success: true,
+          data: createdRooms,
+          message: `Successfully created ${createdRooms.length} rooms`,
+        });
+      } catch (error) {
+        console.error('Bulk room creation error:', error);
+        return NextResponse.json(
+          { success: false, message: 'Failed to create rooms' },
+          { status: 500 }
+        );
+      }
+    } else {
+      // Handle single room creation (existing logic with new fields)
+      const {
+        hotelId,
+        roomType,
+        roomTypeDescription,
+        altDescription,
+        purchasePrice,
+        basePrice,
+        alternativePrice,
+        availableFrom,
+        availableTo,
+        quantity,
+        boardType,
+        size,
+        capacity,
+        floor
+      } = body;
 
     // Validate required fields
-    if (!hotelId || !roomType || !roomTypeDescription || !basePrice || !quantity) {
+    if (!hotelId || !roomType || !roomTypeDescription || !purchasePrice || !basePrice || !quantity) {
       return NextResponse.json(
-        { success: false, message: 'Hotel, room type, description, base price, and quantity are required' },
+        { success: false, message: 'Hotel ID, room type, description, purchase price, base price, and quantity are required' },
         { status: 400 }
       );
     }
@@ -168,6 +265,7 @@ export async function POST(request: NextRequest) {
       typeof hotelId !== 'string' ||
       typeof roomType !== 'string' ||
       typeof roomTypeDescription !== 'string' ||
+      typeof purchasePrice !== 'number' ||
       typeof basePrice !== 'number' ||
       typeof quantity !== 'number'
     ) {
@@ -178,9 +276,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate numeric values
-    if (basePrice <= 0 || quantity <= 0) {
+    if (purchasePrice <= 0 || basePrice <= 0 || quantity <= 0) {
       return NextResponse.json(
-        { success: false, message: 'Base price and quantity must be positive numbers' },
+        { success: false, message: 'Purchase price, base price, and quantity must be positive numbers' },
         { status: 400 }
       );
     }
@@ -213,38 +311,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create new room
-    const room = await prisma.room.create({
-      data: {
-        hotelId: hotelId.trim(),
-        roomType: roomType.trim(),
-        roomTypeDescription: roomTypeDescription.trim(),
-        altDescription: altDescription?.trim() || null,
-        basePrice: parseFloat(basePrice.toString()),
-        alternativePrice: alternativePrice ? parseFloat(alternativePrice.toString()) : null,
-        quantity: parseInt(quantity.toString()),
-        boardType: boardType || 'ROOM_ONLY',
-        size: size?.trim() || null,
-        capacity: capacity ? parseInt(capacity.toString()) : 2,
-        floor: floor ? parseInt(floor.toString()) : null,
-        createdById: user.id,
-      },
-      select: {
-        id: true,
-        hotelId: true,
-        roomType: true,
-        roomTypeDescription: true,
-        altDescription: true,
-        basePrice: true,
-        alternativePrice: true,
-        quantity: true,
-        boardType: true,
-        size: true,
-        capacity: true,
-        floor: true,
-        isActive: true,
-        createdAt: true,
-        updatedAt: true,
+      // Create new room
+      const room = await prisma.room.create({
+        data: {
+          hotelId: hotelId.trim(),
+          roomType: roomType.trim(),
+          roomTypeDescription: roomTypeDescription.trim(),
+          altDescription: altDescription?.trim() || null,
+          purchasePrice: parseFloat(purchasePrice.toString()),
+          basePrice: parseFloat(basePrice.toString()),
+          alternativePrice: alternativePrice ? parseFloat(alternativePrice.toString()) : null,
+          availableFrom: availableFrom ? new Date(availableFrom) : null,
+          availableTo: availableTo ? new Date(availableTo) : null,
+          quantity: parseInt(quantity.toString()),
+          boardType: boardType || 'ROOM_ONLY',
+          size: size?.trim() || null,
+          capacity: capacity ? parseInt(capacity.toString()) : 2,
+          floor: floor ? parseInt(floor.toString()) : null,
+          createdById: user.id,
+        },
+        select: {
+          id: true,
+          hotelId: true,
+          roomType: true,
+          roomTypeDescription: true,
+          altDescription: true,
+          purchasePrice: true,
+          basePrice: true,
+          alternativePrice: true,
+          availableFrom: true,
+          availableTo: true,
+          quantity: true,
+          boardType: true,
+          size: true,
+          capacity: true,
+          floor: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
         hotel: {
           select: {
             id: true,
@@ -263,14 +367,15 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(
-      {
-        success: true,
-        data: room,
-        message: 'Room created successfully',
-      },
-      { status: 201 }
-    );
+      return NextResponse.json(
+        {
+          success: true,
+          data: room,
+          message: 'Room created successfully',
+        },
+        { status: 201 }
+      );
+    }
   } catch (error) {
     console.error('Create room API error:', error);
     return NextResponse.json(
