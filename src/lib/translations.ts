@@ -352,6 +352,44 @@ export interface Translations {
     createdBy: string;
     filterByHotel: string;
     filterByBoardType: string;
+    unknownHotel: string;
+    printSelectedRooms: string;
+    exitDashboard: string;
+    removeRoom: string;
+    roomNumber: string;
+    addMultipleRooms: string;
+    multipleRoomsSuccess: string;
+    multipleRoomsError: string;
+    addingRooms: string;
+    validatingRooms: string;
+    addRoomsCount: string;
+    roomValidationErrors: string;
+    hotelSelection: string;
+    roomTypePlaceholder: string;
+    roomDescriptionPlaceholder: string;
+    altDescriptionPlaceholder: string;
+    basePricePlaceholder: string;
+    alternativePricePlaceholder: string;
+    seasonalPriceNote: string;
+    filterByName: string;
+    searchByName: string;
+    filterByType: string;
+    searchByType: string;
+    noRoomsMatch: string;
+    roomDetails: string;
+    price: string;
+    enterRoomDescription: string;
+    enterAltDescription: string;
+    enterBasePrice: string;
+    enterAlternativePrice: string;
+    alternativePriceDescription: string;
+    searchRoomOrHotel: string;
+    searchRoomType: string;
+    noMatchingRooms: string;
+    roomInformation: string;
+    removeThisRoom: string;
+    addAnotherRoom: string;
+    removeLastRoom: string;
   };
   
   // Layout and navigation
@@ -389,6 +427,25 @@ export interface Translations {
     maxLength: string;
   };
   
+  // Validation messages
+  validation: {
+    roomTypeRequired: string;
+    roomDescriptionRequired: string;
+    purchasePriceRequired: string;
+    basePriceRequired: string;
+    quantityRequired: string;
+    purchasePriceInvalid: string;
+    basePriceInvalid: string;
+    quantityInvalid: string;
+    alternativePriceInvalid: string;
+    basePriceHigher: string;
+    dateRangeInvalid: string;
+    roomTypeTooLong: string;
+    descriptionTooLong: string;
+    formHasErrors: string;
+    duplicateRoomTypes: string;
+  };
+
   // Success messages
   success: {
     loginSuccess: string;
@@ -809,9 +866,19 @@ const en: Translations = {
     createdBy: 'Created By',
      filterByHotel: 'Filter by Hotel',
      filterByBoardType: 'Filter by Board Type',
-     unknownHotel: 'Unknown Hotel',
+    unknownHotel: 'Unknown Hotel',
     printSelectedRooms: 'Print selected rooms',
     exitDashboard: 'Exit dashboard',
+    removeRoom: 'Remove Room',
+    roomNumber: 'Room {{number}}',
+    addMultipleRooms: 'Add Multiple Rooms',
+    multipleRoomsSuccess: '{{count}} rooms added successfully',
+    multipleRoomsError: 'Error adding rooms: {{error}}',
+    addingRooms: 'Adding...',
+    validatingRooms: 'Validating...',
+    addRoomsCount: 'Add {{count}} Rooms',
+    roomValidationErrors: 'Room {{number}} - Validation Errors:',
+    hotelSelection: 'Hotel Selection',
     roomTypePlaceholder: 'Enter room type',
     roomDescriptionPlaceholder: 'Detailed room description',
     altDescriptionPlaceholder: 'Description in other language',
@@ -834,6 +901,9 @@ const en: Translations = {
     searchRoomType: 'Search by room type...',
     noMatchingRooms: 'No rooms match your search',
     roomInformation: 'Room Information',
+    removeThisRoom: 'Remove This Room',
+    addAnotherRoom: 'Add Another Room',
+    removeLastRoom: 'Remove Last Room',
   },
   
   layout: {
@@ -867,6 +937,24 @@ const en: Translations = {
     invalidDate: 'Please enter a valid date.',
     minLength: 'Minimum length required.',
     maxLength: 'Maximum length exceeded.',
+  },
+  
+  validation: {
+    roomTypeRequired: 'Room type is required',
+    roomDescriptionRequired: 'Room description is required',
+    purchasePriceRequired: 'Purchase price is required',
+    basePriceRequired: 'Base price is required',
+    quantityRequired: 'Quantity is required',
+    purchasePriceInvalid: 'Purchase price must be a positive number',
+    basePriceInvalid: 'Base price must be a positive number',
+    quantityInvalid: 'Quantity must be a positive number',
+    alternativePriceInvalid: 'Alternative price must be a positive number',
+    basePriceHigher: 'Base price must be higher than purchase price',
+    dateRangeInvalid: 'Available from date must be before available to date',
+    roomTypeTooLong: 'Room type must be 100 characters or less',
+    descriptionTooLong: 'Description must be 500 characters or less',
+    formHasErrors: 'Please fix {{count}} validation errors before submitting',
+    duplicateRoomTypes: 'Duplicate room types are not allowed',
   },
   
   success: {
@@ -1291,6 +1379,19 @@ const ar: Translations = {
     unknownHotel: 'فندق غير معروف',
     printSelectedRooms: 'طباعة الغرف المحددة',
     exitDashboard: 'الخروج من لوحة التحكم',
+    removeRoom: 'إزالة غرفة',
+    roomNumber: 'غرفة {{number}}',
+    addMultipleRooms: 'إضافة غرف متعددة',
+    multipleRoomsSuccess: 'تم إضافة {{count}} غرفة بنجاح',
+    multipleRoomsError: 'خطأ في إضافة الغرف: {{error}}',
+    addingRooms: 'جاري الإضافة...',
+    validatingRooms: 'جاري التحقق...',
+    addRoomsCount: 'إضافة {{count}} غرف',
+    roomValidationErrors: 'غرفة {{number}} - أخطاء التحقق:',
+    hotelSelection: 'اختيار الفندق',
+    removeThisRoom: 'إزالة هذه الغرفة',
+    addAnotherRoom: 'إضافة غرفة أخرى',
+    removeLastRoom: 'إزالة الغرفة الأخيرة',
     roomTypePlaceholder: 'أدخل نوع الغرفة',
     roomDescriptionPlaceholder: 'وصف مفصل للغرفة',
     altDescriptionPlaceholder: 'الوصف بلغة أخرى',
@@ -1346,6 +1447,24 @@ const ar: Translations = {
     invalidDate: 'يرجى إدخال تاريخ صحيح.',
     minLength: 'الحد الأدنى للطول مطلوب.',
     maxLength: 'تم تجاوز الحد الأقصى للطول.',
+  },
+  
+  validation: {
+    roomTypeRequired: 'نوع الغرفة مطلوب',
+    roomDescriptionRequired: 'وصف الغرفة مطلوب',
+    purchasePriceRequired: 'سعر الشراء مطلوب',
+    basePriceRequired: 'السعر الأساسي مطلوب',
+    quantityRequired: 'الكمية مطلوبة',
+    purchasePriceInvalid: 'يجب أن يكون سعر الشراء رقماً موجباً',
+    basePriceInvalid: 'يجب أن يكون السعر الأساسي رقماً موجباً',
+    quantityInvalid: 'يجب أن تكون الكمية رقماً موجباً',
+    alternativePriceInvalid: 'يجب أن يكون السعر البديل رقماً موجباً',
+    basePriceHigher: 'يجب أن يكون السعر الأساسي أعلى من سعر الشراء',
+    dateRangeInvalid: 'يجب أن يكون تاريخ البداية قبل تاريخ النهاية',
+    roomTypeTooLong: 'يجب أن يكون نوع الغرفة 100 حرف أو أقل',
+    descriptionTooLong: 'يجب أن يكون الوصف 500 حرف أو أقل',
+    formHasErrors: 'يرجى إصلاح {{count}} أخطاء التحقق قبل الإرسال',
+    duplicateRoomTypes: 'أنواع الغرف المكررة غير مسموحة',
   },
   
   success: {
