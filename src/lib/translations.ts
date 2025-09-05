@@ -23,6 +23,7 @@ export interface Translations {
     createReservation: string;
     allReservations: string;
     allGuests: string;
+    security: string;
     logout: string;
     loggingOut: string;
     languageToggle: string;
@@ -461,6 +462,78 @@ export interface Translations {
     duplicateRoomTypes: string;
   };
 
+  security: {
+    title: string;
+    userManagement: string;
+    addUser: string;
+    editUser: string;
+    deleteUser: string;
+    username: string;
+    email: string;
+    password: string;
+    role: string;
+    status: string;
+    createdAt: string;
+    lastLogin: string;
+    actions: string;
+    active: string;
+    inactive: string;
+    owner: string;
+    staff: string;
+    searchUsers: string;
+    filterByRole: string;
+    filterByStatus: string;
+    confirmDeleteUser: string;
+    userAddedSuccessfully: string;
+    userUpdatedSuccessfully: string;
+    userDeletedSuccessfully: string;
+    errorAddingUser: string;
+    errorUpdatingUser: string;
+    errorDeletingUser: string;
+    usernameRequired: string;
+    emailRequired: string;
+    passwordRequired: string;
+    roleRequired: string;
+    invalidEmail: string;
+    passwordMinLength: string;
+    usernameExists: string;
+    emailExists: string;
+    cannotDeleteOwner: string;
+    cannotDeleteSelf: string;
+    newPassword: string;
+    confirmPassword: string;
+    passwordsDoNotMatch: string;
+    changePassword: string;
+    leaveBlankToKeep: string;
+    firstName: string;
+    lastName: string;
+    enterUsername: string;
+    enterFirstName: string;
+    enterLastName: string;
+    enterPassword: string;
+    confirmPasswordPlaceholder: string;
+    activeUser: string;
+    noUsersFound: string;
+    errorFetchingUsers: string;
+    fullName: string;
+    enterConfirmPassword: string;
+    userCreated: string;
+    userUpdated: string;
+    userDeleted: string;
+    createError: string;
+    updateError: string;
+    deleteError: string;
+    passwordMismatch: string;
+    creating: string;
+    createUser: string;
+    updating: string;
+    updateUser: string;
+    deleting: string;
+    delete: string;
+    deleteConfirmation: string;
+    cancel: string;
+  };
+
   // Success messages
   success: {
     loginSuccess: string;
@@ -497,15 +570,16 @@ const en: Translations = {
   },
   
   sidebar: {
-    logo: 'Hotel Management',
+    logo: 'Hotel Management System',
     hotelsManagement: 'Hotels Management',
     roomsManagement: 'Rooms Management',
-    createReservation: 'Create a Reservation',
+    createReservation: 'Create Reservation',
     allReservations: 'All Reservations',
     allGuests: 'All Guests',
+    security: 'Security',
     logout: 'Logout',
     loggingOut: 'Logging out...',
-    languageToggle: 'Switch Language',
+    languageToggle: 'Language',
     english: 'English',
     arabic: 'العربية',
   },
@@ -990,6 +1064,78 @@ const en: Translations = {
     duplicateRoomTypes: 'Duplicate room types are not allowed',
   },
   
+  security: {
+    title: 'Security',
+    userManagement: 'User Management',
+    addUser: 'Add User',
+    editUser: 'Edit User',
+    deleteUser: 'Delete User',
+    username: 'Username',
+    email: 'Email',
+    password: 'Password',
+    role: 'Role',
+    status: 'Status',
+    createdAt: 'Created At',
+    lastLogin: 'Last Login',
+    actions: 'Actions',
+    active: 'Active',
+    inactive: 'Inactive',
+    owner: 'Adminstrator',
+    staff: 'Staff',
+    searchUsers: 'Search Users',
+    filterByRole: 'Filter by Role',
+    filterByStatus: 'Filter by Status',
+    confirmDeleteUser: 'Are you sure you want to delete this user?',
+    userAddedSuccessfully: 'User added successfully',
+    userUpdatedSuccessfully: 'User updated successfully',
+    userDeletedSuccessfully: 'User deleted successfully',
+    errorAddingUser: 'Error adding user',
+    errorUpdatingUser: 'Error updating user',
+    errorDeletingUser: 'Error deleting user',
+    usernameRequired: 'Username is required',
+    emailRequired: 'Email is required',
+    passwordRequired: 'Password is required',
+    roleRequired: 'Role is required',
+    invalidEmail: 'Please enter a valid email address',
+    passwordMinLength: 'Password must be at least 6 characters',
+    usernameExists: 'Username already exists',
+    emailExists: 'Email already exists',
+    cannotDeleteOwner: 'Cannot delete owner user',
+    cannotDeleteSelf: 'Cannot delete your own account',
+    newPassword: 'New Password',
+    confirmPassword: 'Confirm Password',
+    passwordsDoNotMatch: 'Passwords do not match',
+    changePassword: 'Change Password',
+    leaveBlankToKeep: 'Leave blank to keep current password',
+    firstName: 'First Name',
+    lastName: 'Last Name',
+    enterUsername: 'Enter username',
+    enterFirstName: 'Enter first name',
+    enterLastName: 'Enter last name',
+    enterPassword: 'Enter password',
+    confirmPasswordPlaceholder: 'Confirm password',
+    activeUser: 'Active user',
+    noUsersFound: 'No users found',
+    errorFetchingUsers: 'Error fetching users',
+    fullName: 'Full Name',
+    enterConfirmPassword: 'Confirm password',
+    userCreated: 'User created successfully',
+    userUpdated: 'User updated successfully',
+    userDeleted: 'User deleted successfully',
+    createError: 'Error creating user',
+    updateError: 'Error updating user',
+    deleteError: 'Error deleting user',
+    passwordMismatch: 'Passwords do not match',
+    creating: 'Creating...',
+    createUser: 'Create User',
+    updating: 'Updating...',
+    updateUser: 'Update User',
+    deleting: 'Deleting...',
+    delete: 'Delete',
+    deleteConfirmation: 'Are you sure you want to delete user',
+    cancel: 'Cancel',
+  },
+  
   success: {
     loginSuccess: 'Login successful!',
     logoutSuccess: 'Logout successful!',
@@ -1025,15 +1171,16 @@ const ar: Translations = {
   },
   
   sidebar: {
-    logo: 'إدارة الفنادق',
+    logo: 'نظام إدارة الفنادق',
     hotelsManagement: 'إدارة الفنادق',
     roomsManagement: 'إدارة الغرف',
     createReservation: 'إنشاء حجز',
     allReservations: 'جميع الحجوزات',
     allGuests: 'جميع النزلاء',
+    security: 'الأمان',
     logout: 'تسجيل الخروج',
     loggingOut: 'جاري تسجيل الخروج...',
-    languageToggle: 'تغيير اللغة',
+    languageToggle: 'تبديل اللغة',
     english: 'English',
     arabic: 'العربية',
   },
@@ -1517,7 +1664,78 @@ const ar: Translations = {
     formHasErrors: 'يرجى إصلاح {{count}} أخطاء التحقق قبل الإرسال',
     duplicateRoomTypes: 'أنواع الغرف المكررة غير مسموحة',
   },
-  
+
+  security: {
+    title: 'الأمان',
+    userManagement: 'إدارة المستخدمين',
+    addUser: 'إضافة مستخدم',
+    editUser: 'تعديل مستخدم',
+    deleteUser: 'حذف مستخدم',
+    username: 'اسم المستخدم',
+    email: 'البريد الإلكتروني',
+    password: 'كلمة المرور',
+    role: 'الدور',
+    status: 'الحالة',
+    createdAt: 'تاريخ الإنشاء',
+    lastLogin: 'آخر تسجيل دخول',
+    actions: 'الإجراءات',
+    active: 'نشط',
+    inactive: 'غير نشط',
+    owner: 'مسؤول',
+    staff: 'موظف',
+    searchUsers: 'البحث عن المستخدمين',
+    filterByRole: 'تصفية بالدور',
+    filterByStatus: 'تصفية بالحالة',
+    firstName: 'الاسم الأول',
+    lastName: 'اسم العائلة',
+    enterUsername: 'أدخل اسم المستخدم',
+    enterFirstName: 'أدخل الاسم الأول',
+    enterLastName: 'أدخل اسم العائلة',
+    enterPassword: 'أدخل كلمة المرور',
+    confirmPasswordPlaceholder: 'أكد كلمة المرور',
+    activeUser: 'مستخدم نشط',
+    noUsersFound: 'لم يتم العثور على مستخدمين',
+    confirmDeleteUser: 'هل أنت متأكد من حذف هذا المستخدم؟',
+    userAddedSuccessfully: 'تم إضافة المستخدم بنجاح',
+    userUpdatedSuccessfully: 'تم تحديث المستخدم بنجاح',
+    userDeletedSuccessfully: 'تم حذف المستخدم بنجاح',
+    errorAddingUser: 'خطأ في إضافة المستخدم',
+    errorUpdatingUser: 'خطأ في تحديث المستخدم',
+    errorDeletingUser: 'خطأ في حذف المستخدم',
+    errorFetchingUsers: 'خطأ في جلب المستخدمين',
+    usernameRequired: 'اسم المستخدم مطلوب',
+    passwordRequired: 'كلمة المرور مطلوبة',
+    roleRequired: 'الدور مطلوب',
+    invalidEmail: 'يرجى إدخال عنوان بريد إلكتروني صحيح',
+    passwordMinLength: 'يجب أن تكون كلمة المرور 6 أحرف على الأقل',
+    usernameExists: 'اسم المستخدم موجود بالفعل',
+    emailExists: 'البريد الإلكتروني موجود بالفعل',
+    cannotDeleteOwner: 'لا يمكن حذف المستخدم المالك',
+    cannotDeleteSelf: 'لا يمكن حذف حسابك الخاص',
+    newPassword: 'كلمة المرور الجديدة',
+    confirmPassword: 'تأكيد كلمة المرور',
+    passwordsDoNotMatch: 'كلمات المرور غير متطابقة',
+    changePassword: 'تغيير كلمة المرور',
+    leaveBlankToKeep: 'اتركه فارغاً للاحتفاظ بكلمة المرور الحالية',
+    fullName: 'الاسم الكامل',
+    enterConfirmPassword: 'أكد كلمة المرور',
+    userCreated: 'تم إنشاء المستخدم بنجاح',
+    userUpdated: 'تم تحديث المستخدم بنجاح',
+    userDeleted: 'تم حذف المستخدم بنجاح',
+    createError: 'خطأ في إنشاء المستخدم',
+    updateError: 'خطأ في تحديث المستخدم',
+    deleteError: 'خطأ في حذف المستخدم',
+    passwordMismatch: 'كلمات المرور غير متطابقة',
+    creating: 'جاري الإنشاء...',
+    createUser: 'إنشاء مستخدم',
+    updating: 'جاري التحديث...',
+    updateUser: 'تحديث المستخدم',
+    deleting: 'جاري الحذف...',
+    delete: 'حذف',
+    deleteConfirmation: 'هل أنت متأكد من حذف المستخدم',
+    cancel: 'إلغاء',
+  },
+
   success: {
     loginSuccess: 'تم تسجيل الدخول بنجاح!',
     logoutSuccess: 'تم تسجيل الخروج بنجاح!',

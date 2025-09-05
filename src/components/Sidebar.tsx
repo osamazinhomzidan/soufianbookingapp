@@ -13,6 +13,7 @@ import {
   CalendarDaysIcon,
   ClipboardDocumentListIcon,
   UsersIcon,
+  ShieldCheckIcon,
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
@@ -63,6 +64,13 @@ const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
       href: '/guests',
       icon: UsersIcon,
       isActive: pathname === '/guests'
+    },
+    {
+      title: t('sidebar.security'),
+      href: '/security',
+      icon: ShieldCheckIcon,
+      isActive: pathname === '/security',
+      requiredRole: 'OWNER'
     }
   ];
 
