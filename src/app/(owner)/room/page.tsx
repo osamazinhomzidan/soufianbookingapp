@@ -1089,235 +1089,294 @@ export default function Room() {
                 </div>
               </div>
 
-              {/* Modern Filter Section */}
-              <div className="mb-10">
-                {/* Filter Header */}
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-lg">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                      </svg>
+              {/* Enhanced Modern Filter Section */}
+              <div className="mb-12">
+                {/* Filter Header with Enhanced Styling */}
+                <div className="bg-gradient-to-r from-slate-50 via-blue-50 to-indigo-50 rounded-3xl p-8 mb-8 border border-slate-200/60 shadow-xl shadow-slate-200/40">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-6">
+                      <div className="relative">
+                        <div className="w-16 h-16 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-500/30 transform rotate-3 hover:rotate-0 transition-transform duration-300">
+                          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                          </svg>
+                        </div>
+                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-lg">
+                          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="text-3xl font-black text-slate-900 tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent">{t('common.filters')}</h3>
+                        <p className="text-slate-600 font-semibold mt-2 text-lg">Refine and customize your search results</p>
+                        <div className="flex items-center space-x-2 mt-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                          <span className="text-sm text-slate-500 font-medium">Advanced filtering enabled</span>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t('common.filters')}</h3>
-                      <p className="text-slate-600 font-semibold mt-1">Refine your search results</p>
-                    </div>
+                    <button
+                      onClick={() => {
+                        setNameFilter('');
+                        setTypeFilter('');
+                        setHotelFilter('');
+                        setAvailableFromFilter('');
+                        setAvailableToFilter('');
+                        setMinPurchasePriceFilter('');
+                        setMaxPurchasePriceFilter('');
+                        setMinBasePriceFilter('');
+                        setMaxBasePriceFilter('');
+                        setBoardTypeFilter('');
+                        setMinQuantityFilter('');
+                        setMaxQuantityFilter('');
+                        setIsActiveFilter('');
+                        setMinCapacityFilter('');
+                        setMaxCapacityFilter('');
+                        setFloorFilter('');
+                        setCreatedByFilter('');
+                      }}
+                      className="group px-8 py-4 bg-gradient-to-br from-slate-600 via-slate-700 to-slate-800 hover:from-slate-700 hover:via-slate-800 hover:to-slate-900 text-white font-bold rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-[1.05] hover:-translate-y-1 transition-all duration-300 focus:ring-4 focus:ring-slate-500/50 focus:ring-offset-2 backdrop-blur-sm flex items-center space-x-4 border border-slate-500/20"
+                    >
+                      <div className="relative">
+                        <svg className="w-6 h-6 group-hover:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:scale-110 transition-transform duration-300"></div>
+                      </div>
+                      <span className="text-lg">{t('common.clearAll')}</span>
+                    </button>
                   </div>
-                  <button
-                    onClick={() => {
-                      setNameFilter('');
-                      setTypeFilter('');
-                      setHotelFilter('');
-                      setAvailableFromFilter('');
-                      setAvailableToFilter('');
-                      setMinPurchasePriceFilter('');
-                      setMaxPurchasePriceFilter('');
-                      setMinBasePriceFilter('');
-                      setMaxBasePriceFilter('');
-                      setBoardTypeFilter('');
-                      setMinQuantityFilter('');
-                      setMaxQuantityFilter('');
-                      setIsActiveFilter('');
-                      setMinCapacityFilter('');
-                      setMaxCapacityFilter('');
-                      setFloorFilter('');
-                      setCreatedByFilter('');
-                    }}
-                    className="px-6 py-3 bg-gradient-to-br from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 focus:ring-4 focus:ring-slate-500/50 focus:ring-offset-2 backdrop-blur-sm flex items-center space-x-3"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    <span>{t('common.clearAll')}</span>
-                  </button>
                 </div>
 
-                {/* Filter Groups */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Basic Search & Selection Group */}
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-medium text-gray-700 uppercase tracking-wide">{t('common.search')}</h4>
-                    
+              {/* Enhanced Filter Groups - Two Rows Layout with Modern UI/UX */}
+              {/* First Row - Basic Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
                     {/* Global Search */}
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={nameFilter}
-                        onChange={(e) => setNameFilter(e.target.value)}
-                        className="w-full px-4 py-3 pl-11 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
-                        placeholder={t('rooms.searchRoomOrHotel')}
-                      />
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
+                    <div className="relative group bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                      <div className="flex items-center mb-4">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
+                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                        </div>
+                        <label className="block text-lg font-bold text-slate-800">{t('rooms.searchRoomOrHotel')}</label>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={nameFilter}
+                          onChange={(e) => setNameFilter(e.target.value)}
+                          className="w-full px-5 py-4 pl-12 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold placeholder-slate-400"
+                          placeholder={t('rooms.searchRoomOrHotel')}
+                        />
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <svg className="w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                        </div>
+                        {nameFilter && (
+                          <button
+                            onClick={() => setNameFilter('')}
+                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-red-500 transition-colors duration-200"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        )}
                       </div>
                     </div>
 
                     {/* Hotel Selection */}
-                    <select
-                      value={hotelFilter}
-                      onChange={(e) => setHotelFilter(e.target.value)}
-                      className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
-                    >
-                      <option value="">{t('rooms.allHotels')}</option>
-                      {hotels.map((hotel) => (
-                        <option key={hotel.id} value={hotel.id}>
-                          {hotel.name}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="relative group bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                      <div className="flex items-center mb-4">
+                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
+                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                          </svg>
+                        </div>
+                        <label className="block text-lg font-bold text-slate-800">{t('rooms.hotel')}</label>
+                      </div>
+                      <div className="relative">
+                        <select
+                          value={hotelFilter}
+                          onChange={(e) => setHotelFilter(e.target.value)}
+                          className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold appearance-none cursor-pointer"
+                        >
+                          <option value="">{t('rooms.allHotels')}</option>
+                          {hotels.map((hotel) => (
+                            <option key={hotel.id} value={hotel.id}>
+                              {hotel.name}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                          <svg className="w-5 h-5 text-slate-400 group-focus-within:text-emerald-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
 
                     {/* Board Type */}
-                    <select
-                      value={boardTypeFilter}
-                      onChange={(e) => setBoardTypeFilter(e.target.value)}
-                      className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
-                    >
-                      <option value="">{t('rooms.allBoardTypes')}</option>
-                      <option value="Room only">{t('rooms.roomOnly')}</option>
-                      <option value="Bed & breakfast">{t('rooms.bedBreakfast')}</option>
-                      <option value="Half board">{t('rooms.halfBoard')}</option>
-                      <option value="Full board">{t('rooms.fullBoard')}</option>
-                    </select>
-
-                    {/* Status Filter */}
-                    <select
-                      value={isActiveFilter}
-                      onChange={(e) => setIsActiveFilter(e.target.value)}
-                      className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
-                    >
-                      <option value="">{t('rooms.allStatuses')}</option>
-                      <option value="true">{t('rooms.active')}</option>
-                      <option value="false">{t('rooms.inactive')}</option>
-                    </select>
-                  </div>
-
-                  {/* Pricing & Availability Group */}
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-medium text-gray-700 uppercase tracking-wide">{t('rooms.pricingAvailability')}</h4>
-                    
-                    {/* Purchase Price Range */}
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-2">{t('rooms.purchasePriceRange')}</label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                            <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="relative group bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                      <div className="flex items-center mb-4">
+                        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
+                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h2m0-8h10a2 2 0 012 2v6a2 2 0 01-2 2H9m0-8v8" />
+                          </svg>
+                        </div>
+                        <label className="block text-lg font-bold text-slate-800">{t('rooms.boardType')}</label>
+                      </div>
+                      <div className="relative">
+                        <select
+                          value={boardTypeFilter}
+                          onChange={(e) => setBoardTypeFilter(e.target.value)}
+                          className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold appearance-none cursor-pointer"
+                        >
+                          <option value="">{t('rooms.allBoardTypes')}</option>
+                          <option value="Room only">{t('rooms.roomOnly')}</option>
+                          <option value="Bed & breakfast">{t('rooms.bedBreakfast')}</option>
+                          <option value="Half board">{t('rooms.halfBoard')}</option>
+                          <option value="Full board">{t('rooms.fullBoard')}</option>
+                        </select>
+                        <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                          <svg className="w-5 h-5 text-slate-400 group-focus-within:text-purple-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+              
+              </div>
+                {/* Second Row - Price & Date Filters */}
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
+                      {/* Purchase Price Range */}
+                      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <div className="flex items-center mb-4">
+                          <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                             </svg>
                           </div>
+                          <label className="block text-base font-bold text-slate-800">{t('rooms.purchasePriceRange')}</label>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
                           <input
                             type="number"
                             value={minPurchasePriceFilter}
                             onChange={(e) => setMinPurchasePriceFilter(e.target.value)}
-                            className="w-full pl-8 pr-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                            className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold placeholder-slate-400"
                             placeholder={t('common.min')}
                             min="0"
                             step="0.01"
                           />
-                        </div>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                            <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                            </svg>
-                          </div>
                           <input
                             type="number"
                             value={maxPurchasePriceFilter}
                             onChange={(e) => setMaxPurchasePriceFilter(e.target.value)}
-                            className="w-full pl-8 pr-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                            className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold placeholder-slate-400"
                             placeholder={t('common.max')}
                             min="0"
                             step="0.01"
                           />
                         </div>
                       </div>
-                    </div>
 
-                    {/* Base Price Range */}
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-2">{t('rooms.basePriceRange')}</label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                            <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                      {/* Base Price Range */}
+                      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <div className="flex items-center mb-4">
+                          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                             </svg>
                           </div>
+                          <label className="block text-base font-bold text-slate-800">Selling / {t('rooms.basePriceRange')}</label>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
                           <input
                             type="number"
                             value={minBasePriceFilter}
                             onChange={(e) => setMinBasePriceFilter(e.target.value)}
-                            className="w-full pl-8 pr-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                            className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold placeholder-slate-400"
                             placeholder={t('common.min')}
                             min="0"
                             step="0.01"
                           />
-                        </div>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                            <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                            </svg>
-                          </div>
                           <input
                             type="number"
                             value={maxBasePriceFilter}
                             onChange={(e) => setMaxBasePriceFilter(e.target.value)}
-                            className="w-full pl-8 pr-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                            className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold placeholder-slate-400"
                             placeholder={t('common.max')}
                             min="0"
                             step="0.01"
                           />
                         </div>
                       </div>
-                    </div>
 
-                    {/* Availability Dates */}
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-2">{t('rooms.availabilityRange')}</label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <input
-                          type="date"
-                          value={availableFromFilter}
-                          onChange={(e) => setAvailableFromFilter(e.target.value)}
-                          className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
-                        />
-                        <input
-                          type="date"
-                          value={availableToFilter}
-                          onChange={(e) => setAvailableToFilter(e.target.value)}
-                          className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
-                        />
+                      {/* Availability Dates */}
+                      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <div className="flex items-center mb-4">
+                          <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          <label className="block text-base font-bold text-slate-800">{t('rooms.availabilityRange')}</label>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <input
+                            type="date"
+                            value={availableFromFilter}
+                            onChange={(e) => setAvailableFromFilter(e.target.value)}
+                            className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold"
+                          />
+                          <input
+                            type="date"
+                            value={availableToFilter}
+                            onChange={(e) => setAvailableToFilter(e.target.value)}
+                            className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold"
+                          />
+                        </div>
                       </div>
-                    </div>
-                  </div>
 
-                  {/* Room Details Group */}
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-medium text-gray-700 uppercase tracking-wide">{t('rooms.roomDetails')}</h4>
-                    
-                    {/* Room Type */}
-                    <input
-                      type="text"
-                      value={typeFilter}
-                      onChange={(e) => setTypeFilter(e.target.value)}
-                      className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm placeholder-gray-400"
-                      placeholder={t('rooms.searchRoomType')}
-                    />
+                    {/* Room Details Group - Enhanced Layout */}
+                    <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                      <div className="flex items-center mb-4">
+                        <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                          </svg>
+                        </div>
+                        <label className="block text-base font-bold text-slate-800">{t('rooms.roomType')}</label>
+                      </div>
+                      <input
+                        type="text"
+                        value={typeFilter}
+                        onChange={(e) => setTypeFilter(e.target.value)}
+                        className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold placeholder-slate-400"
+                        placeholder={t('rooms.searchRoomType')}
+                      />
+                    </div>
 
                     {/* Quantity Range */}
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-2">{t('rooms.quantityRange')}</label>
-                      <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                      <div className="flex items-center mb-4">
+                        <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center mr-3">
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                          </svg>
+                        </div>
+                        <label className="block text-base font-bold text-slate-800">{t('rooms.quantityRange')}</label>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
                         <input
                           type="number"
                           value={minQuantityFilter}
                           onChange={(e) => setMinQuantityFilter(e.target.value)}
-                          className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                          className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold placeholder-slate-400"
                           placeholder={t('common.min')}
                           min="0"
                         />
@@ -1325,13 +1384,12 @@ export default function Room() {
                           type="number"
                           value={maxQuantityFilter}
                           onChange={(e) => setMaxQuantityFilter(e.target.value)}
-                          className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                          className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold placeholder-slate-400"
                           placeholder={t('common.max')}
                           min="0"
                         />
                       </div>
                     </div>
-                  </div>
                 </div>
               </div>
 
