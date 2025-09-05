@@ -601,127 +601,94 @@ export default function Room() {
           {/* Glassmorphism card */}
           <div className="backdrop-blur-xl bg-white/70 border border-white/20 rounded-3xl shadow-2xl p-8 space-y-8">
             
-            {/* Add New Room Section - Redesigned with Hotel Page Style */}
-            <div className="backdrop-blur-sm bg-white/80 border border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-12 mx-4 mb-12">
-              <div className="mb-12">
-                <div className="flex items-center space-x-8">
-                  <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl flex items-center justify-center shadow-xl">
-                    <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h2 className="text-4xl font-black text-slate-900 tracking-tight leading-tight mb-3">
-                      {t('rooms.addNewRoom')}
-                    </h2>
-                    <p className="text-slate-700 text-xl font-bold mt-3 leading-relaxed">
-                      Create and manage room inventory for your hotels
-                    </p>
-                  </div>
-                </div>
+            {/* Add New Room Section */}
+            <div className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-2xl p-6 shadow-lg">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-blue-400 rounded-full animate-pulse"></div>
+                <h2 className="text-xl font-semibold text-gray-800">
+                  {t('rooms.addNewRoom')}
+                </h2>
               </div>
 
-              {/* Message Display - Hotel Page Style */}
+              {/* Message Display */}
               {message && (
-                <div className={`mb-10 p-6 rounded-2xl border-2 shadow-lg backdrop-blur-md transition-all duration-300 ${
+                <div className={`mb-6 p-4 rounded-xl border ${
                   message.type === 'success'
-                    ? 'bg-emerald-50/90 border-emerald-300/60 text-emerald-900' 
-                    : 'bg-red-50/90 border-red-300/60 text-red-900'
-                }`}>
-                  <div className="flex items-center space-x-4">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-md ${
-                      message.type === 'success' ? 'bg-emerald-100' : 'bg-red-100'
-                    }`}>
-                      {message.type === 'success' ? (
-                        <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                        </svg>
-                      ) : (
-                        <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      )}
-                    </div>
-                    <span className="font-bold text-lg">{message.text}</span>
+                    ? 'bg-green-50/80 border-green-200 text-green-800' 
+                    : 'bg-red-50/80 border-red-200 text-red-800'
+                } backdrop-blur-sm`}>
+                  <div className="flex items-center space-x-2">
+                    {message.type === 'success' ? (
+                      <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    )}
+                    <span className="font-medium">{message.text}</span>
                   </div>
                 </div>
               )}
 
-              {/* Hotel Selection - Hotel Page Style */}
-              <div className="backdrop-blur-sm bg-gradient-to-br from-slate-50/90 to-white/80 border-2 border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-10 mb-10">
-                <div className="flex items-center space-x-4 mb-8">
-                  <div className="w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl flex items-center justify-center shadow-lg">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t('rooms.hotelSelection')}</h3>
-                    <p className="text-slate-600 font-bold mt-1">Choose the hotel for your room inventory</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-6">
+              {/* Hotel Selection */}
+              <div className="bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-md rounded-2xl p-6 border border-white/30 shadow-lg mb-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('rooms.hotelSelection')}</h3>
+                <div className="flex items-center gap-4">
                   <div className="flex-1">
-                    <label className="block text-base font-bold text-slate-700 mb-4">
-                      {t('rooms.selectHotel')} <span className="text-red-500">*</span>
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                      {t('rooms.selectHotel')}
                     </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <svg className="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
-                      </div>
-                      <select
-                        value={selectedHotelForMultiple}
-                        onChange={(e) => {
-                          setSelectedHotelForMultiple(e.target.value);
-                          if (e.target.value) {
-                            resetMultipleRoomForms();
-                          }
-                        }}
-                        className="w-full pl-14 pr-4 py-4 bg-slate-50/50 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-indigo-600 focus:shadow-lg transition-all duration-200 placeholder-slate-400 text-slate-700 hover:border-slate-400 font-medium text-lg"
-                        required
-                      >
-                        <option value="">{t('rooms.selectHotel')}</option>
-                        {hotels.map((hotel) => (
-                          <option key={hotel.id} value={hotel.id}>
-                            {hotel.name} ({hotel.code})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <select
+                      value={selectedHotelForMultiple}
+                      onChange={(e) => {
+                        setSelectedHotelForMultiple(e.target.value);
+                        if (e.target.value) {
+                          resetMultipleRoomForms();
+                        }
+                      }}
+                      className="w-full px-4 py-4 bg-white/70 border border-gray-200/60 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300 backdrop-blur-sm text-lg font-medium shadow-sm hover:shadow-md"
+                      required
+                    >
+                      <option value="">{t('rooms.selectHotel')}</option>
+                      {hotels.map((hotel) => (
+                        <option key={hotel.id} value={hotel.id}>
+                          {hotel.name} ({hotel.code})
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   
-                  {/* Plus/Minus Controls - Hotel Page Style */}
+                  {/* Plus/Minus Controls */}
                   {selectedHotelForMultiple && (
-                    <div className="flex items-center gap-4 mt-8">
+                    <div className="flex items-center gap-2 mt-8">
                       <button
                         type="button"
                         onClick={addRoomForm}
-                        className="w-14 h-14 bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-700 text-white rounded-2xl flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300 focus:ring-4 focus:ring-emerald-500/50 focus:ring-offset-2 hover:from-emerald-600 hover:to-teal-800"
+                        className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                         title={t('rooms.addAnotherRoom')}
                       >
-                        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
                       </button>
                       {roomForms.length > 1 && (
                         <button
                           type="button"
                           onClick={() => removeRoomForm(roomForms[roomForms.length - 1].id)}
-                          className="w-14 h-14 bg-gradient-to-br from-red-500 via-red-600 to-rose-700 text-white rounded-2xl flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300 focus:ring-4 focus:ring-red-500/50 focus:ring-offset-2 hover:from-red-600 hover:to-rose-800"
+                          className="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                           title={t('rooms.removeLastRoom')}
                         >
-                          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M18 12H6" />
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 12H6" />
                           </svg>
                         </button>
                       )}
-                      <div className="bg-gradient-to-r from-slate-100 to-slate-200 px-6 py-3 rounded-2xl border border-slate-300 shadow-md">
-                        <span className="text-base font-black text-slate-700">
-                          {roomForms.length} room{roomForms.length !== 1 ? 's' : ''}
-                        </span>
-                      </div>
+                      <span className="text-sm text-gray-600 ml-2">
+                        {roomForms.length} room{roomForms.length !== 1 ? 's' : ''}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -731,52 +698,41 @@ export default function Room() {
               {selectedHotelForMultiple && (
                 <form onSubmit={handleAddMultipleRooms} className="space-y-6">
                   {roomForms.map((roomForm, index) => (
-                    <div key={roomForm.id} className="backdrop-blur-sm bg-gradient-to-br from-slate-50/90 to-blue-50/80 border-2 border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-10 relative">
-                      {/* Room Header - Hotel Page Style */}
-                      <div className="flex items-center justify-between mb-8">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-lg">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                            </svg>
-                          </div>
-                          <div>
-                            <h4 className="text-2xl font-black text-slate-900 tracking-tight">
-                              {tInterpolate('rooms.roomNumber', { number: index + 1 })}
-                            </h4>
-                            <p className="text-slate-600 font-bold mt-1">Configure room details and pricing</p>
-                          </div>
-                        </div>
+                    <div key={roomForm.id} className="bg-gradient-to-br from-blue-50/60 to-indigo-50/40 backdrop-blur-md rounded-2xl p-6 border border-blue-200/30 shadow-lg relative">
+                      {/* Room Header */}
+                      <div className="flex items-center justify-between mb-4">
+                        <h4 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          {tInterpolate('rooms.roomNumber', { number: index + 1 })}
+                        </h4>
                         {roomForms.length > 1 && (
                           <button
                             type="button"
                             onClick={() => removeRoomForm(roomForm.id)}
-                            className="w-12 h-12 bg-gradient-to-br from-red-100 to-red-200 hover:from-red-200 hover:to-red-300 text-red-600 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 focus:ring-4 focus:ring-red-500/30"
+                            className="w-8 h-8 bg-red-100 hover:bg-red-200 text-red-600 rounded-full flex items-center justify-center transition-all duration-200"
                             title={t('rooms.removeThisRoom')}
                           >
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                           </button>
                         )}
                       </div>
 
-                      {/* Form Validation Errors - Hotel Page Style */}
+                      {/* Form Validation Errors */}
                       {formErrors[roomForm.id] && formErrors[roomForm.id].length > 0 && (
-                        <div className="mb-8 p-6 bg-red-50/90 border-2 border-red-300/60 rounded-2xl backdrop-blur-md shadow-lg">
-                          <div className="flex items-start space-x-4">
-                            <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center shadow-md flex-shrink-0">
-                              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                            </div>
+                        <div className="mb-4 p-3 bg-red-50/80 border border-red-200 rounded-xl backdrop-blur-sm">
+                          <div className="flex items-start space-x-2">
+                            <svg className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
                             <div className="flex-1">
-                              <h5 className="text-lg font-black text-red-900 mb-3">{tInterpolate('rooms.roomValidationErrors', { number: index + 1 })}</h5>
-                              <ul className="text-base text-red-800 space-y-2">
+                              <h5 className="text-sm font-medium text-red-800 mb-1">{tInterpolate('rooms.roomValidationErrors', { number: index + 1 })}</h5>
+                              <ul className="text-sm text-red-700 space-y-1">
                                 {formErrors[roomForm.id].map((error, errorIndex) => (
-                                  <li key={errorIndex} className="flex items-start space-x-3">
-                                    <div className="w-2 h-2 bg-red-600 rounded-full mt-2 flex-shrink-0"></div>
-                                    <span className="font-medium">{error}</span>
+                                  <li key={errorIndex} className="flex items-start space-x-1">
+                                    <span className="w-1 h-1 bg-red-600 rounded-full mt-2 flex-shrink-0"></span>
+                                    <span>{error}</span>
                                   </li>
                                 ))}
                               </ul>

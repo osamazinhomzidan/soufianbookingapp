@@ -4,6 +4,19 @@ import React, { useState, useEffect } from 'react';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
+import {
+  BuildingOfficeIcon,
+  HomeIcon,
+  DocumentTextIcon,
+  ChatBubbleLeftRightIcon,
+  HashtagIcon,
+  CurrencyDollarIcon,
+  CalendarDaysIcon,
+  Cog6ToothIcon,
+  PlusIcon,
+  MinusIcon,
+  XMarkIcon
+} from '@heroicons/react/24/outline';
 
 interface Room {
   id: string;
@@ -589,106 +602,134 @@ export default function Room() {
 
   return (
     <ProtectedRoute requiredRole="OWNER">
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden">
         {/* Background decorative elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-green-400/20 to-teal-400/20 rounded-full blur-3xl"></div>
         </div>
 
-        {/* Main content container */}
-        <div className="relative z-10 w-full max-w-7xl">
-          {/* Glassmorphism card */}
-          <div className="backdrop-blur-xl bg-white/70 border border-white/20 rounded-3xl shadow-2xl p-8 space-y-8">
+        {/* Main content container - Full width responsive */}
+        <div className="relative z-10 w-full">
+          <div className="max-w-none px-4 sm:px-6 lg:px-8 py-8 space-y-12">
             
-            {/* Add New Room Section */}
-            <div className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-2xl p-6 shadow-lg">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-blue-400 rounded-full animate-pulse"></div>
-                <h2 className="text-xl font-semibold text-gray-800">
-                  {t('rooms.addNewRoom')}
-                </h2>
+            {/* Add New Room Section - Redesigned with Hotel Page Style */}
+            <div className="backdrop-blur-sm bg-white/80 border border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 sm:p-8 lg:p-12">
+              <div className="mb-12">
+                <div className="flex items-center space-x-8">
+                  <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl flex items-center justify-center shadow-xl">
+                    <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-4xl font-black text-slate-900 tracking-tight leading-tight mb-3">
+                      {t('rooms.addNewRoom')}
+                    </h2>
+                    <p className="text-slate-700 text-xl font-bold mt-3 leading-relaxed">
+                      Create and manage room inventory for your hotels
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              {/* Message Display */}
+              {/* Message Display - Hotel Page Style */}
               {message && (
-                <div className={`mb-6 p-4 rounded-xl border ${
+                <div className={`mb-10 p-6 rounded-2xl border-2 shadow-lg backdrop-blur-md transition-all duration-300 ${
                   message.type === 'success'
-                    ? 'bg-green-50/80 border-green-200 text-green-800' 
-                    : 'bg-red-50/80 border-red-200 text-red-800'
-                } backdrop-blur-sm`}>
-                  <div className="flex items-center space-x-2">
-                    {message.type === 'success' ? (
-                      <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    ) : (
-                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    )}
-                    <span className="font-medium">{message.text}</span>
+                    ? 'bg-emerald-50/90 border-emerald-300/60 text-emerald-900' 
+                    : 'bg-red-50/90 border-red-300/60 text-red-900'
+                }`}>
+                  <div className="flex items-center space-x-4">
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-md ${
+                      message.type === 'success' ? 'bg-emerald-100' : 'bg-red-100'
+                    }`}>
+                      {message.type === 'success' ? (
+                        <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : (
+                        <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      )}
+                    </div>
+                    <span className="font-bold text-lg">{message.text}</span>
                   </div>
                 </div>
               )}
 
-              {/* Hotel Selection */}
-              <div className="bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-md rounded-2xl p-6 border border-white/30 shadow-lg mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('rooms.hotelSelection')}</h3>
-                <div className="flex items-center gap-4">
+              {/* Hotel Selection - Hotel Page Style */}
+              <div className="backdrop-blur-sm bg-gradient-to-br from-slate-50/90 to-white/80 border-2 border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-10 mb-10">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl flex items-center justify-center shadow-lg">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t('rooms.hotelSelection')}</h3>
+                    <p className="text-slate-600 font-bold mt-1">Choose the hotel for your room inventory</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-6">
                   <div className="flex-1">
-                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3">
-                      <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                      {t('rooms.selectHotel')}
+                    <label className="block text-base font-bold text-slate-700 mb-4">
+                      {t('rooms.selectHotel')} <span className="text-red-500">*</span>
                     </label>
-                    <select
-                      value={selectedHotelForMultiple}
-                      onChange={(e) => {
-                        setSelectedHotelForMultiple(e.target.value);
-                        if (e.target.value) {
-                          resetMultipleRoomForms();
-                        }
-                      }}
-                      className="w-full px-4 py-4 bg-white/70 border border-gray-200/60 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300 backdrop-blur-sm text-lg font-medium shadow-sm hover:shadow-md"
-                      required
-                    >
-                      <option value="">{t('rooms.selectHotel')}</option>
-                      {hotels.map((hotel) => (
-                        <option key={hotel.id} value={hotel.id}>
-                          {hotel.name} ({hotel.code})
-                        </option>
-                      ))}
-                    </select>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <svg className="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                      </div>
+                      <select
+                        value={selectedHotelForMultiple}
+                        onChange={(e) => {
+                          setSelectedHotelForMultiple(e.target.value);
+                          if (e.target.value) {
+                            resetMultipleRoomForms();
+                          }
+                        }}
+                        className="w-full pl-14 pr-4 py-4 bg-slate-50/50 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-indigo-600 focus:shadow-lg transition-all duration-200 placeholder-slate-400 text-slate-700 hover:border-slate-400 font-medium text-lg"
+                        required
+                      >
+                        <option value="">{t('rooms.selectHotel')}</option>
+                        {hotels.map((hotel) => (
+                          <option key={hotel.id} value={hotel.id}>
+                            {hotel.name} ({hotel.code})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                   
-                  {/* Plus/Minus Controls */}
+                  {/* Plus/Minus Controls - Hotel Page Style */}
                   {selectedHotelForMultiple && (
-                    <div className="flex items-center gap-2 mt-8">
+                    <div className="flex items-center gap-4 mt-8">
                       <button
                         type="button"
                         onClick={addRoomForm}
-                        className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                        className="w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300 focus:ring-4 focus:ring-blue-500/50 focus:ring-offset-2 hover:from-blue-700 hover:to-indigo-700"
                         title={t('rooms.addAnotherRoom')}
                       >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
+                        <PlusIcon className="w-7 h-7" />
                       </button>
                       {roomForms.length > 1 && (
                         <button
                           type="button"
                           onClick={() => removeRoomForm(roomForms[roomForms.length - 1].id)}
-                          className="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                          className="w-14 h-14 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300 focus:ring-4 focus:ring-slate-500/50 focus:ring-offset-2"
                           title={t('rooms.removeLastRoom')}
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 12H6" />
-                          </svg>
+                          <MinusIcon className="w-7 h-7" />
                         </button>
                       )}
-                      <span className="text-sm text-gray-600 ml-2">
-                        {roomForms.length} room{roomForms.length !== 1 ? 's' : ''}
-                      </span>
+                      <div className="bg-gradient-to-r from-slate-100 to-slate-200 px-6 py-3 rounded-2xl border border-slate-300 shadow-md">
+                        <span className="text-base font-black text-slate-700">
+                          {roomForms.length} room{roomForms.length !== 1 ? 's' : ''}
+                        </span>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -698,41 +739,52 @@ export default function Room() {
               {selectedHotelForMultiple && (
                 <form onSubmit={handleAddMultipleRooms} className="space-y-6">
                   {roomForms.map((roomForm, index) => (
-                    <div key={roomForm.id} className="bg-gradient-to-br from-blue-50/60 to-indigo-50/40 backdrop-blur-md rounded-2xl p-6 border border-blue-200/30 shadow-lg relative">
-                      {/* Room Header */}
-                      <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                          {tInterpolate('rooms.roomNumber', { number: index + 1 })}
-                        </h4>
+                    <div key={roomForm.id} className="backdrop-blur-sm bg-gradient-to-br from-slate-50/90 to-blue-50/80 border-2 border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-10 relative">
+                      {/* Room Header - Hotel Page Style */}
+                      <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-lg">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h4 className="text-2xl font-black text-slate-900 tracking-tight">
+                              {tInterpolate('rooms.roomNumber', { number: index + 1 })}
+                            </h4>
+                            <p className="text-slate-600 font-bold mt-1">Configure room details and pricing</p>
+                          </div>
+                        </div>
                         {roomForms.length > 1 && (
                           <button
                             type="button"
                             onClick={() => removeRoomForm(roomForm.id)}
-                            className="w-8 h-8 bg-red-100 hover:bg-red-200 text-red-600 rounded-full flex items-center justify-center transition-all duration-200"
+                            className="w-12 h-12 bg-gradient-to-br from-red-100 to-red-200 hover:from-red-200 hover:to-red-300 text-red-600 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 focus:ring-4 focus:ring-red-500/30"
                             title={t('rooms.removeThisRoom')}
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                           </button>
                         )}
                       </div>
 
-                      {/* Form Validation Errors */}
+                      {/* Form Validation Errors - Hotel Page Style */}
                       {formErrors[roomForm.id] && formErrors[roomForm.id].length > 0 && (
-                        <div className="mb-4 p-3 bg-red-50/80 border border-red-200 rounded-xl backdrop-blur-sm">
-                          <div className="flex items-start space-x-2">
-                            <svg className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+                        <div className="mb-8 p-6 bg-red-50/90 border-2 border-red-300/60 rounded-2xl backdrop-blur-md shadow-lg">
+                          <div className="flex items-start space-x-4">
+                            <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center shadow-md flex-shrink-0">
+                              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
                             <div className="flex-1">
-                              <h5 className="text-sm font-medium text-red-800 mb-1">{tInterpolate('rooms.roomValidationErrors', { number: index + 1 })}</h5>
-                              <ul className="text-sm text-red-700 space-y-1">
+                              <h5 className="text-lg font-black text-red-900 mb-3">{tInterpolate('rooms.roomValidationErrors', { number: index + 1 })}</h5>
+                              <ul className="text-base text-red-800 space-y-2">
                                 {formErrors[roomForm.id].map((error, errorIndex) => (
-                                  <li key={errorIndex} className="flex items-start space-x-1">
-                                    <span className="w-1 h-1 bg-red-600 rounded-full mt-2 flex-shrink-0"></span>
-                                    <span>{error}</span>
+                                  <li key={errorIndex} className="flex items-start space-x-3">
+                                    <div className="w-2 h-2 bg-red-600 rounded-full mt-2 flex-shrink-0"></div>
+                                    <span className="font-medium">{error}</span>
                                   </li>
                                 ))}
                               </ul>
@@ -741,206 +793,262 @@ export default function Room() {
                         </div>
                       )}
 
-                      {/* Room Form Fields */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {/* Room Form Fields - Two Row Layout */}
+                      <div className="space-y-8">
+                        {/* First Row - Basic Information */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                         {/* Room Type */}
-                        <div className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-700">
-                            {t('rooms.roomType')} <span className="text-red-500">*</span>
+                        <div className="space-y-3">
+                          <label className="block text-base font-black text-slate-900">
+                            {t('rooms.roomType')} <span className="text-red-600">*</span>
                           </label>
-                          <input
-                            type="text"
-                            value={roomForm.roomType}
-                            onChange={(e) => updateRoomForm(roomForm.id, 'roomType', e.target.value)}
-                            className={`w-full px-4 py-3 bg-white/50 border rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400 ${
-                              formErrors[roomForm.id]?.some(error => error.includes('room type') || error.includes('Room Type')) 
-                                ? 'border-red-300 focus:ring-red-400' 
-                                : 'border-gray-200/50 focus:ring-blue-400'
-                            }`}
-                            placeholder={t('rooms.enterRoomType')}
-                            maxLength={100}
-                            required
-                          />
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <HomeIcon className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <input
+                              type="text"
+                              value={roomForm.roomType}
+                              onChange={(e) => updateRoomForm(roomForm.id, 'roomType', e.target.value)}
+                              className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm placeholder-slate-400 text-base font-medium shadow-sm hover:shadow-md ${
+                                formErrors[roomForm.id]?.some(error => error.includes('room type') || error.includes('Room Type')) 
+                                  ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
+                                  : 'border-slate-300 focus:ring-blue-500/30'
+                              }`}
+                              placeholder={t('rooms.enterRoomType')}
+                              maxLength={100}
+                              required
+                            />
+                          </div>
                         </div>
 
                         {/* Board Type */}
-                        <div className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-700">
+                        <div className="space-y-3">
+                          <label className="block text-base font-black text-slate-900">
                             {t('rooms.boardType')}
                           </label>
-                          <select
-                            value={roomForm.boardType}
-                            onChange={(e) => updateRoomForm(roomForm.id, 'boardType', e.target.value as any)}
-                            className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200 backdrop-blur-sm"
-                          >
-                            <option value="Room only">{t('rooms.roomOnly')}</option>
-                            <option value="Bed & breakfast">{t('rooms.bedBreakfast')}</option>
-                            <option value="Half board">{t('rooms.halfBoard')}</option>
-                            <option value="Full board">{t('rooms.fullBoard')}</option>
-                          </select>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <Cog6ToothIcon className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <select
+                              value={roomForm.boardType}
+                              onChange={(e) => updateRoomForm(roomForm.id, 'boardType', e.target.value as any)}
+                              className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-300 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md"
+                            >
+                              <option value="Room only">{t('rooms.roomOnly')}</option>
+                              <option value="Bed & breakfast">{t('rooms.bedBreakfast')}</option>
+                              <option value="Half board">{t('rooms.halfBoard')}</option>
+                              <option value="Full board">{t('rooms.fullBoard')}</option>
+                            </select>
+                          </div>
                         </div>
 
                         {/* Room Description */}
-                        <div className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-700">
-                            {t('rooms.roomDescription')} <span className="text-red-500">*</span>
+                        <div className="space-y-3">
+                          <label className="block text-base font-black text-slate-900">
+                            {t('rooms.roomDescription')} <span className="text-red-600">*</span>
                           </label>
-                          <input
-                            type="text"
-                            value={roomForm.roomTypeDescription}
-                            onChange={(e) => updateRoomForm(roomForm.id, 'roomTypeDescription', e.target.value)}
-                            className={`w-full px-4 py-3 bg-white/50 border rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400 ${
-                              formErrors[roomForm.id]?.some(error => error.includes('description') || error.includes('Description')) 
-                                ? 'border-red-300 focus:ring-red-400' 
-                                : 'border-gray-200/50 focus:ring-blue-400'
-                            }`}
-                            placeholder={t('rooms.enterRoomDescription')}
-                            maxLength={500}
-                            required
-                          />
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <DocumentTextIcon className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <input
+                              type="text"
+                              value={roomForm.roomTypeDescription}
+                              onChange={(e) => updateRoomForm(roomForm.id, 'roomTypeDescription', e.target.value)}
+                              className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm placeholder-slate-400 text-base font-medium shadow-sm hover:shadow-md ${
+                                formErrors[roomForm.id]?.some(error => error.includes('description') || error.includes('Description')) 
+                                  ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
+                                  : 'border-slate-300 focus:ring-blue-500/30'
+                              }`}
+                              placeholder={t('rooms.enterRoomDescription')}
+                              maxLength={500}
+                              required
+                            />
+                          </div>
                         </div>
 
                         {/* Alt Description */}
-                        <div className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-700">
+                        <div className="space-y-3">
+                          <label className="block text-base font-black text-slate-900">
                             {t('rooms.altDescription')}
                           </label>
-                          <input
-                            type="text"
-                            value={roomForm.altDescription}
-                            onChange={(e) => updateRoomForm(roomForm.id, 'altDescription', e.target.value)}
-                            className="w-full px-4 py-3 bg-white/50 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400"
-                            placeholder={t('rooms.enterAltDescription')}
-                          />
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <ChatBubbleLeftRightIcon className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <input
+                              type="text"
+                              value={roomForm.altDescription}
+                              onChange={(e) => updateRoomForm(roomForm.id, 'altDescription', e.target.value)}
+                              className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-300 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm placeholder-slate-400 text-base font-medium shadow-sm hover:shadow-md"
+                              placeholder={t('rooms.enterAltDescription')}
+                            />
+                          </div>
                         </div>
                         
                         {/* Quantity */}
-                        <div className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-700">
-                            {t('rooms.numberOfRooms')} <span className="text-red-500">*</span>
+                        <div className="space-y-3">
+                          <label className="block text-base font-black text-slate-900">
+                            {t('rooms.numberOfRooms')} <span className="text-red-600">*</span>
                           </label>
-                          <input
-                            type="number"
-                            value={roomForm.quantity}
-                            onChange={(e) => updateRoomForm(roomForm.id, 'quantity', e.target.value)}
-                            className={`w-full px-4 py-3 bg-white/50 border rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400 ${
-                              formErrors[roomForm.id]?.some(error => error.includes('quantity') || error.includes('Quantity')) 
-                                ? 'border-red-300 focus:ring-red-400' 
-                                : 'border-gray-200/50 focus:ring-blue-400'
-                            }`}
-                            placeholder={t('rooms.roomQuantityPlaceholder')}
-                            min="1"
-                            required
-                          />
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <HashtagIcon className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <input
+                              type="number"
+                              value={roomForm.quantity}
+                              onChange={(e) => updateRoomForm(roomForm.id, 'quantity', e.target.value)}
+                              className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm placeholder-slate-400 text-base font-medium shadow-sm hover:shadow-md ${
+                                formErrors[roomForm.id]?.some(error => error.includes('quantity') || error.includes('Quantity')) 
+                                  ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
+                                  : 'border-slate-300 focus:ring-blue-500/30'
+                              }`}
+                              placeholder={t('rooms.roomQuantityPlaceholder')}
+                              min="1"
+                              required
+                            />
+                          </div>
+                        </div>
                         </div>
 
+                        {/* Second Row - Pricing and Dates */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                         {/* Purchase Price */}
-                        <div className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-700">
-                            Purchase Price <span className="text-red-500">*</span>
+                        <div className="space-y-3">
+                          <label className="block text-base font-black text-slate-900">
+                            Purchase Price <span className="text-red-600">*</span>
                           </label>
-                          <input
-                            type="number"
-                            value={roomForm.purchasePrice}
-                            onChange={(e) => updateRoomForm(roomForm.id, 'purchasePrice', e.target.value)}
-                            className={`w-full px-4 py-3 bg-white/50 border rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400 ${
-                              formErrors[roomForm.id]?.some(error => error.includes('purchase') || error.includes('Purchase')) 
-                                ? 'border-red-300 focus:ring-red-400' 
-                                : 'border-gray-200/50 focus:ring-blue-400'
-                            }`}
-                            placeholder="Enter purchase price"
-                            min="0"
-                            step="0.01"
-                            required
-                          />
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <CurrencyDollarIcon className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <input
+                              type="number"
+                              value={roomForm.purchasePrice}
+                              onChange={(e) => updateRoomForm(roomForm.id, 'purchasePrice', e.target.value)}
+                              className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm placeholder-slate-400 text-base font-medium shadow-sm hover:shadow-md ${
+                                formErrors[roomForm.id]?.some(error => error.includes('purchase') || error.includes('Purchase')) 
+                                  ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
+                                  : 'border-slate-300 focus:ring-blue-500/30'
+                              }`}
+                              placeholder="Enter purchase price"
+                              min="0"
+                              step="0.01"
+                              required
+                            />
+                          </div>
                         </div>
 
                         {/* Base Price */}
-                        <div className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-700">
-                            Base Price <span className="text-red-500">*</span>
+                        <div className="space-y-3">
+                          <label className="block text-base font-black text-slate-900">
+                            Base Price <span className="text-red-600">*</span>
                           </label>
-                          <input
-                            type="number"
-                            value={roomForm.basePrice}
-                            onChange={(e) => updateRoomForm(roomForm.id, 'basePrice', e.target.value)}
-                            className={`w-full px-4 py-3 bg-white/50 border rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400 ${
-                              formErrors[roomForm.id]?.some(error => error.includes('base') || error.includes('Base') || error.includes('higher')) 
-                                ? 'border-red-300 focus:ring-red-400' 
-                                : 'border-gray-200/50 focus:ring-blue-400'
-                            }`}
-                            placeholder="Enter base selling price"
-                            min="0"
-                            step="0.01"
-                            required
-                          />
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <CurrencyDollarIcon className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <input
+                              type="number"
+                              value={roomForm.basePrice}
+                              onChange={(e) => updateRoomForm(roomForm.id, 'basePrice', e.target.value)}
+                              className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm placeholder-slate-400 text-base font-medium shadow-sm hover:shadow-md ${
+                                formErrors[roomForm.id]?.some(error => error.includes('base') || error.includes('Base') || error.includes('higher')) 
+                                  ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
+                                  : 'border-slate-300 focus:ring-blue-500/30'
+                              }`}
+                              placeholder="Enter base selling price"
+                              min="0"
+                              step="0.01"
+                              required
+                            />
+                          </div>
                         </div>
 
                         {/* Alternative Price */}
-                        <div className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-700">
+                        <div className="space-y-3">
+                          <label className="block text-base font-black text-slate-900">
                             Alternative Price
                           </label>
-                          <input
-                            type="number"
-                            value={roomForm.alternativePrice}
-                            onChange={(e) => updateRoomForm(roomForm.id, 'alternativePrice', e.target.value)}
-                            className={`w-full px-4 py-3 bg-white/50 border rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 backdrop-blur-sm placeholder-gray-400 ${
-                              formErrors[roomForm.id]?.some(error => error.includes('alternative') || error.includes('Alternative')) 
-                                ? 'border-red-300 focus:ring-red-400' 
-                                : 'border-gray-200/50 focus:ring-blue-400'
-                            }`}
-                            placeholder="Enter alternative price (optional)"
-                            min="0"
-                            step="0.01"
-                          />
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <CurrencyDollarIcon className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <input
+                              type="number"
+                              value={roomForm.alternativePrice}
+                              onChange={(e) => updateRoomForm(roomForm.id, 'alternativePrice', e.target.value)}
+                              className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm placeholder-slate-400 text-base font-medium shadow-sm hover:shadow-md ${
+                                formErrors[roomForm.id]?.some(error => error.includes('alternative') || error.includes('Alternative')) 
+                                  ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
+                                  : 'border-slate-300 focus:ring-blue-500/30'
+                              }`}
+                              placeholder="Enter alternative price (optional)"
+                              min="0"
+                              step="0.01"
+                            />
+                          </div>
                         </div>
 
                         {/* Available From */}
-                        <div className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-700">
+                        <div className="space-y-3">
+                          <label className="block text-base font-black text-slate-900">
                             {t('rooms.availableFrom')}
                           </label>
-                          <input
-                            type="date"
-                            value={roomForm.availableFrom}
-                            onChange={(e) => updateRoomForm(roomForm.id, 'availableFrom', e.target.value)}
-                            className={`w-full px-4 py-3 bg-white/50 border rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 backdrop-blur-sm ${
-                              formErrors[roomForm.id]?.some(error => error.includes('date') || error.includes('Date') || error.includes('availability')) 
-                                ? 'border-red-300 focus:ring-red-400' 
-                                : 'border-gray-200/50 focus:ring-blue-400'
-                            }`}
-                          />
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <CalendarDaysIcon className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <input
+                              type="date"
+                              value={roomForm.availableFrom}
+                              onChange={(e) => updateRoomForm(roomForm.id, 'availableFrom', e.target.value)}
+                              className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                                formErrors[roomForm.id]?.some(error => error.includes('date') || error.includes('Date') || error.includes('availability')) 
+                                  ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
+                                  : 'border-slate-300 focus:ring-blue-500/30'
+                              }`}
+                            />
+                          </div>
                         </div>
 
                         {/* Available To */}
-                        <div className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-700">
+                        <div className="space-y-3">
+                          <label className="block text-base font-black text-slate-900">
                             {t('rooms.availableTo')}
                           </label>
-                          <input
-                            type="date"
-                            value={roomForm.availableTo}
-                            onChange={(e) => updateRoomForm(roomForm.id, 'availableTo', e.target.value)}
-                            className={`w-full px-4 py-3 bg-white/50 border rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 backdrop-blur-sm ${
-                              formErrors[roomForm.id]?.some(error => error.includes('date') || error.includes('Date') || error.includes('availability')) 
-                                ? 'border-red-300 focus:ring-red-400' 
-                                : 'border-gray-200/50 focus:ring-blue-400'
-                            }`}
-                          />
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <CalendarDaysIcon className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <input
+                              type="date"
+                              value={roomForm.availableTo}
+                              onChange={(e) => updateRoomForm(roomForm.id, 'availableTo', e.target.value)}
+                              className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                                formErrors[roomForm.id]?.some(error => error.includes('date') || error.includes('Date') || error.includes('availability')) 
+                                  ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
+                                  : 'border-slate-300 focus:ring-blue-500/30'
+                              }`}
+                            />
+                          </div>
+                        </div>
                         </div>
                       </div>
                     </div>
                   ))}
 
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap gap-3">
+                  {/* Action Buttons - Hotel Page Style */}
+                  <div className="flex flex-wrap gap-6 mt-8">
                     <button
                       type="submit"
-                      className={`flex-1 px-6 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 focus:ring-2 focus:ring-offset-2 ${
+                      className={`flex-1 px-8 py-4 font-black text-lg rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 focus:ring-4 focus:ring-offset-2 backdrop-blur-sm ${
                         !selectedHotelForMultiple || roomForms.length === 0 || loading || isValidating
-                          ? 'bg-gray-400 cursor-not-allowed'
-                          : 'bg-gradient-to-r from-green-500 to-green-600 text-white focus:ring-green-500'
+                          ? 'bg-gradient-to-br from-gray-400 to-gray-500 text-gray-200 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white focus:ring-blue-500/50 hover:from-blue-700 hover:to-indigo-700'
                       }`}
                       disabled={!selectedHotelForMultiple || roomForms.length === 0 || loading || isValidating}
                     >
@@ -949,9 +1057,12 @@ export default function Room() {
                     <button
                       type="button"
                       onClick={resetMultipleRoomForms}
-                      className="flex-1 px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                      className="flex-1 px-8 py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-lg rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 focus:ring-4 focus:ring-slate-500/50 focus:ring-offset-2 backdrop-blur-sm"
                     >
-                      {t('common.reset')}
+                      <div className="flex items-center justify-center space-x-2">
+                          <XMarkIcon className="w-5 h-5" />
+                          <span>{t('common.reset')}</span>
+                        </div>
                     </button>
                   </div>
                 </form>
@@ -959,22 +1070,39 @@ export default function Room() {
             </div>
 
             {/* View Rooms Section */}
-            <div className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-2xl p-6 shadow-lg">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse"></div>
-                <h2 className="text-xl font-semibold text-gray-800">
-                  {t('rooms.viewAddedRooms')}
-                </h2>
+            <div className="backdrop-blur-sm bg-white/80 border border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 sm:p-8 lg:p-12">
+              <div className="mb-12">
+                <div className="flex items-center space-x-8">
+                  <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-pink-700 rounded-3xl flex items-center justify-center shadow-xl">
+                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-3xl font-black text-slate-900 tracking-tight leading-tight mb-3">
+                      {t('rooms.viewAddedRooms')}
+                    </h2>
+                    <p className="text-slate-700 text-lg font-bold mt-3 leading-relaxed">
+                      Browse and manage your room inventory ({filteredRooms.length} {t('common.results')})
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {/* Modern Filter Section */}
-              <div className="mb-8">
+              <div className="mb-10">
                 {/* Filter Header */}
                 <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full"></div>
-                    <h3 className="text-lg font-semibold text-gray-800">{t('common.filters')}</h3>
-                    <span className="text-sm text-gray-500">({filteredRooms.length} {t('common.results')})</span>
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-lg">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t('common.filters')}</h3>
+                      <p className="text-slate-600 font-semibold mt-1">Refine your search results</p>
+                    </div>
                   </div>
                   <button
                     onClick={() => {
@@ -996,10 +1124,10 @@ export default function Room() {
                       setFloorFilter('');
                       setCreatedByFilter('');
                     }}
-                    className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200 flex items-center space-x-2"
+                    className="px-6 py-3 bg-gradient-to-br from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 focus:ring-4 focus:ring-slate-500/50 focus:ring-offset-2 backdrop-blur-sm flex items-center space-x-3"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                     <span>{t('common.clearAll')}</span>
                   </button>
@@ -1074,24 +1202,38 @@ export default function Room() {
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-2">{t('rooms.purchasePriceRange')}</label>
                       <div className="grid grid-cols-2 gap-2">
-                        <input
-                          type="number"
-                          value={minPurchasePriceFilter}
-                          onChange={(e) => setMinPurchasePriceFilter(e.target.value)}
-                          className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
-                          placeholder={t('common.min')}
-                          min="0"
-                          step="0.01"
-                        />
-                        <input
-                          type="number"
-                          value={maxPurchasePriceFilter}
-                          onChange={(e) => setMaxPurchasePriceFilter(e.target.value)}
-                          className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
-                          placeholder={t('common.max')}
-                          min="0"
-                          step="0.01"
-                        />
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                            <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                            </svg>
+                          </div>
+                          <input
+                            type="number"
+                            value={minPurchasePriceFilter}
+                            onChange={(e) => setMinPurchasePriceFilter(e.target.value)}
+                            className="w-full pl-8 pr-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                            placeholder={t('common.min')}
+                            min="0"
+                            step="0.01"
+                          />
+                        </div>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                            <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                            </svg>
+                          </div>
+                          <input
+                            type="number"
+                            value={maxPurchasePriceFilter}
+                            onChange={(e) => setMaxPurchasePriceFilter(e.target.value)}
+                            className="w-full pl-8 pr-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                            placeholder={t('common.max')}
+                            min="0"
+                            step="0.01"
+                          />
+                        </div>
                       </div>
                     </div>
 
@@ -1099,24 +1241,38 @@ export default function Room() {
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-2">{t('rooms.basePriceRange')}</label>
                       <div className="grid grid-cols-2 gap-2">
-                        <input
-                          type="number"
-                          value={minBasePriceFilter}
-                          onChange={(e) => setMinBasePriceFilter(e.target.value)}
-                          className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
-                          placeholder={t('common.min')}
-                          min="0"
-                          step="0.01"
-                        />
-                        <input
-                          type="number"
-                          value={maxBasePriceFilter}
-                          onChange={(e) => setMaxBasePriceFilter(e.target.value)}
-                          className="px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
-                          placeholder={t('common.max')}
-                          min="0"
-                          step="0.01"
-                        />
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                            <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                            </svg>
+                          </div>
+                          <input
+                            type="number"
+                            value={minBasePriceFilter}
+                            onChange={(e) => setMinBasePriceFilter(e.target.value)}
+                            className="w-full pl-8 pr-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                            placeholder={t('common.min')}
+                            min="0"
+                            step="0.01"
+                          />
+                        </div>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                            <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                            </svg>
+                          </div>
+                          <input
+                            type="number"
+                            value={maxBasePriceFilter}
+                            onChange={(e) => setMaxBasePriceFilter(e.target.value)}
+                            className="w-full pl-8 pr-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm"
+                            placeholder={t('common.max')}
+                            min="0"
+                            step="0.01"
+                          />
+                        </div>
                       </div>
                     </div>
 
@@ -1179,8 +1335,11 @@ export default function Room() {
                 </div>
               </div>
 
+              {/* Visual Separator */}
+              <div className="border-t border-slate-200/60 my-8"></div>
+
               {/* Rooms Table */}
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm shadow-lg">
                 {loading ? (
                   <div className="flex justify-center items-center py-12">
                     <div className="flex items-center space-x-3">
@@ -1192,54 +1351,54 @@ export default function Room() {
                     </div>
                   </div>
                 ) : filteredRooms.length > 0 ? (
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-200/50">
-                        <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                  <table className="w-full min-w-[800px] table-auto">
+                    <thead className="bg-gradient-to-r from-slate-50/80 to-white/60 backdrop-blur-sm">
+                      <tr className="border-b-2 border-slate-200/60">
+                        <th className="text-left py-4 px-4 font-black text-slate-800 text-sm uppercase tracking-wide">
                           {t('rooms.hotel')}
                         </th>
-                        <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                        <th className="text-left py-4 px-4 font-black text-slate-800 text-sm uppercase tracking-wide">
                           {t('rooms.roomType')}
                         </th>
-                        <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                        <th className="text-left py-4 px-4 font-black text-slate-800 text-sm uppercase tracking-wide">
                           {t('rooms.roomDescription')}
                         </th>
-                        <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                        <th className="text-left py-4 px-4 font-black text-slate-800 text-sm uppercase tracking-wide">
                           {t('rooms.boardType')}
                         </th>
-                        <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                        <th className="text-left py-4 px-4 font-black text-slate-800 text-sm uppercase tracking-wide">
                           {t('rooms.purchasePrice')}
                         </th>
-                        <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                        <th className="text-left py-4 px-4 font-black text-slate-800 text-sm uppercase tracking-wide">
                           {t('rooms.basePrice')}
                         </th>
-                        <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                        <th className="text-left py-4 px-4 font-black text-slate-800 text-sm uppercase tracking-wide">
                           {t('rooms.alternativePrice')}
                         </th>
-                        <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                        <th className="text-left py-4 px-4 font-black text-slate-800 text-sm uppercase tracking-wide">
                           {t('rooms.quantity')}
                         </th>
-                        <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                        <th className="text-left py-4 px-4 font-black text-slate-800 text-sm uppercase tracking-wide">
                           {t('rooms.availableFrom')}
                         </th>
-                        <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                        <th className="text-left py-4 px-4 font-black text-slate-800 text-sm uppercase tracking-wide">
                           {t('rooms.availableTo')}
                         </th>
-                        <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                        <th className="text-left py-4 px-4 font-black text-slate-800 text-sm uppercase tracking-wide">
                           {t('common.createdDate')}
                         </th>
-                        <th className="text-left py-3 px-2 font-semibold text-gray-700 text-sm">
+                        <th className="text-left py-4 px-4 font-black text-slate-800 text-sm uppercase tracking-wide">
                           {t('common.actions')}
                         </th>
                       </tr>
                     </thead>
                     <tbody>
                       {filteredRooms.map((room) => (
-                        <tr key={room.id} className="border-b border-gray-100/50 hover:bg-white/30 transition-colors">
-                          <td className="py-2 px-2 text-gray-600 text-sm max-w-[120px] truncate" title={room.hotelName || room.hotel?.name || t('rooms.unknownHotel')}>
+                        <tr key={room.id} className="border-b border-slate-100/50 hover:bg-white/40 transition-all duration-200">
+                          <td className="py-3 px-4 text-slate-700 text-sm font-medium max-w-[120px] truncate" title={room.hotelName || room.hotel?.name || t('rooms.unknownHotel')}>
                             {room.hotelName || room.hotel?.name || t('rooms.unknownHotel')}
                           </td>
-                          <td className="py-2 px-2 text-gray-600 text-sm max-w-[100px] truncate" title={room.roomType}>
+                          <td className="py-3 px-4 text-slate-700 text-sm font-medium max-w-[100px] truncate" title={room.roomType}>
                             {room.roomType}
                           </td>
                           <td className="py-2 px-2 text-gray-600 text-sm max-w-[120px] truncate" title={`${room.roomTypeDescription}${room.altDescription ? ` | ${room.altDescription}` : ''}`}>
