@@ -770,7 +770,9 @@ export default function Room() {
                       </div>
 
                       {/* Form Validation Errors - Hotel Page Style */}
-                      {formErrors[roomForm.id] && formErrors[roomForm.id].length > 0 && (
+                      {
+                        /*
+                          {formErrors[roomForm.id] && formErrors[roomForm.id].length > 0 && (
                         <div className="mb-8 p-6 bg-red-50/90 border-2 border-red-300/60 rounded-2xl backdrop-blur-md shadow-lg">
                           <div className="flex items-start space-x-4">
                             <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center shadow-md flex-shrink-0">
@@ -792,6 +794,8 @@ export default function Room() {
                           </div>
                         </div>
                       )}
+                        */
+                      }
 
                       {/* Room Form Fields - Two Row Layout */}
                       <div className="space-y-8">

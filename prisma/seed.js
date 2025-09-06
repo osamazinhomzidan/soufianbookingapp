@@ -7,12 +7,15 @@ async function main() {
   console.log('🌱 Starting database seeding...');
 
   // Clear existing data in correct order (respecting foreign key constraints)
+  await prisma.auditLog.deleteMany();
+  await prisma.systemSetting.deleteMany();
   await prisma.payment.deleteMany();
   await prisma.booking.deleteMany();
   await prisma.availabilitySlot.deleteMany();
   await prisma.seasonalPrice.deleteMany();
   await prisma.roomAmenity.deleteMany();
   await prisma.room.deleteMany();
+  await prisma.hotelAgreement.deleteMany();
   await prisma.hotelAmenity.deleteMany();
   await prisma.hotel.deleteMany();
   await prisma.emergencyContact.deleteMany();
@@ -20,7 +23,6 @@ async function main() {
   await prisma.guestPreference.deleteMany();
   await prisma.guest.deleteMany();
   await prisma.user.deleteMany();
-  await prisma.systemSetting.deleteMany();
 
   console.log('🗑️  Cleared existing data');
 
@@ -329,23 +331,59 @@ async function main() {
 
   // Create Room Amenities
   const roomAmenities = [
+    // Deluxe Suite amenities
     { roomId: deluxeSuite.id, name: 'King Bed', icon: '🛏️' },
     { roomId: deluxeSuite.id, name: 'Ocean View', icon: '🌊' },
     { roomId: deluxeSuite.id, name: 'Balcony', icon: '🏡' },
     { roomId: deluxeSuite.id, name: 'Marble Bathroom', icon: '🛁' },
     { roomId: deluxeSuite.id, name: 'Mini Bar', icon: '🍷' },
     { roomId: deluxeSuite.id, name: 'Safe', icon: '🔒' },
+    { roomId: deluxeSuite.id, name: 'Air Conditioning', icon: '❄️' },
+    { roomId: deluxeSuite.id, name: 'WiFi', icon: '📶' },
+    
+    // Family Room amenities
     { roomId: familyRoom.id, name: 'Two Double Beds', icon: '🛏️' },
     { roomId: familyRoom.id, name: 'Play Area', icon: '🎮' },
     { roomId: familyRoom.id, name: 'Refrigerator', icon: '❄️' },
     { roomId: familyRoom.id, name: 'Safe', icon: '🔒' },
     { roomId: familyRoom.id, name: 'City View', icon: '🏙️' },
+    { roomId: familyRoom.id, name: 'WiFi', icon: '📶' },
+    { roomId: familyRoom.id, name: 'Baby Crib Available', icon: '👶' },
+    
+    // Presidential Suite amenities
     { roomId: presidentialSuite.id, name: 'King Bed', icon: '🛏️' },
     { roomId: presidentialSuite.id, name: 'Living Room', icon: '🛋️' },
     { roomId: presidentialSuite.id, name: 'Dining Area', icon: '🍽️' },
     { roomId: presidentialSuite.id, name: 'Panoramic View', icon: '🌆' },
     { roomId: presidentialSuite.id, name: 'Jacuzzi', icon: '🛁' },
     { roomId: presidentialSuite.id, name: 'Butler Service', icon: '🤵' },
+    { roomId: presidentialSuite.id, name: 'Private Terrace', icon: '🌿' },
+    { roomId: presidentialSuite.id, name: 'Premium WiFi', icon: '📶' },
+    
+    // Ocean View Room amenities
+    { roomId: oceanViewRoom.id, name: 'Queen Bed', icon: '🛏️' },
+    { roomId: oceanViewRoom.id, name: 'Ocean View', icon: '🌊' },
+    { roomId: oceanViewRoom.id, name: 'Private Bathroom', icon: '🚿' },
+    { roomId: oceanViewRoom.id, name: 'Air Conditioning', icon: '❄️' },
+    { roomId: oceanViewRoom.id, name: 'WiFi', icon: '📶' },
+    { roomId: oceanViewRoom.id, name: 'Mini Fridge', icon: '🧊' },
+    
+    // Mountain View amenities
+    { roomId: mountainView.id, name: 'Double Bed', icon: '🛏️' },
+    { roomId: mountainView.id, name: 'Mountain View', icon: '🏔️' },
+    { roomId: mountainView.id, name: 'Fireplace', icon: '🔥' },
+    { roomId: mountainView.id, name: 'Wooden Furniture', icon: '🪵' },
+    { roomId: mountainView.id, name: 'WiFi', icon: '📶' },
+    { roomId: mountainView.id, name: 'Hiking Gear Storage', icon: '🎒' },
+    
+    // Business Room amenities
+    { roomId: businessRoom.id, name: 'Queen Bed', icon: '🛏️' },
+    { roomId: businessRoom.id, name: 'Work Desk', icon: '💻' },
+    { roomId: businessRoom.id, name: 'Ergonomic Chair', icon: '🪑' },
+    { roomId: businessRoom.id, name: 'High-Speed WiFi', icon: '📶' },
+    { roomId: businessRoom.id, name: 'Business Center Access', icon: '🏢' },
+    { roomId: businessRoom.id, name: 'Coffee Machine', icon: '☕' },
+    { roomId: businessRoom.id, name: 'City View', icon: '🏙️' },
   ];
 
   await prisma.roomAmenity.createMany({ data: roomAmenities });
@@ -705,18 +743,182 @@ async function main() {
 
   // Create System Settings
   const systemSettings = [
-    { key: 'default_currency', value: 'AED', category: 'system' },
-    { key: 'tax_rate', value: '5.0', category: 'payment' },
-    { key: 'cancellation_policy', value: '24 hours before check-in', category: 'booking' },
-    { key: 'check_in_time', value: '15:00', category: 'booking' },
-    { key: 'check_out_time', value: '12:00', category: 'booking' },
-    { key: 'loyalty_points_rate', value: '1', category: 'loyalty' }, // 1 point per AED spent
-    { key: 'vip_discount_rate', value: '10.0', category: 'pricing' }, // 10% discount for VIP
-    { key: 'seasonal_markup', value: '40.0', category: 'pricing' }, // 40% markup for peak season
+    {
+      key: 'default_currency',
+      value: 'AED',
+      category: 'system',
+      isActive: true,
+    },
+    {
+      key: 'tax_rate',
+      value: '5.0',
+      category: 'payment',
+      isActive: true,
+    },
+    {
+      key: 'cancellation_policy',
+      value: JSON.stringify({
+        freeCancel: 24,
+        partialRefund: 48,
+        noRefund: 72
+      }),
+      category: 'booking',
+      isActive: true,
+    },
+    {
+      key: 'check_in_time',
+      value: '15:00',
+      category: 'booking',
+      isActive: true,
+    },
+    {
+      key: 'check_out_time',
+      value: '12:00',
+      category: 'booking',
+      isActive: true,
+    },
+    {
+      key: 'loyalty_points_rate',
+      value: '1',
+      category: 'loyalty',
+      isActive: true,
+    },
+    {
+      key: 'vip_discount_rate',
+      value: '10.0',
+      category: 'pricing',
+      isActive: true,
+    },
+    {
+      key: 'seasonal_markup',
+      value: '40.0',
+      category: 'pricing',
+      isActive: true,
+    },
+    {
+      key: 'max_booking_days',
+      value: '365',
+      category: 'booking',
+      isActive: true,
+    },
+    {
+      key: 'system_language',
+      value: 'en',
+      category: 'system',
+      isActive: true,
+    },
+    {
+      key: 'date_format',
+      value: 'YYYY-MM-DD',
+      category: 'system',
+      isActive: true,
+    },
+    {
+      key: 'time_zone',
+      value: 'UTC+4',
+      category: 'system',
+      isActive: true,
+    },
+    {
+      key: 'email_notifications',
+      value: JSON.stringify({
+        booking_confirmation: true,
+        payment_received: true,
+        check_in_reminder: true,
+        cancellation_notice: true
+      }),
+      category: 'system',
+      isActive: true,
+    },
+    {
+      key: 'backup_frequency',
+      value: 'daily',
+      category: 'system',
+      isActive: true,
+    },
+    {
+      key: 'session_timeout',
+      value: '3600',
+      category: 'security',
+      isActive: true,
+    },
   ];
 
   await prisma.systemSetting.createMany({ data: systemSettings });
   console.log('⚙️ Created system settings');
+
+  // Create Audit Logs for demonstration
+  const auditLogs = [
+    {
+      userId: owner.id,
+      action: 'CREATE_HOTEL',
+      tableName: 'hotels',
+      recordId: grandPalace.id,
+      newValues: {
+        name: 'Grand Palace Hotel',
+        code: 'GPH001',
+        action: 'created'
+      },
+      ipAddress: '192.168.1.100',
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    },
+    {
+      userId: staff1.id,
+      action: 'CREATE_BOOKING',
+      tableName: 'bookings',
+      recordId: booking1.id,
+      newValues: {
+        resId: 'RES-2024-001',
+        guestName: 'Ahmed Al-Rashid',
+        action: 'created'
+      },
+      ipAddress: '192.168.1.101',
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    },
+    {
+      userId: owner.id,
+      action: 'CREATE_USER',
+      tableName: 'users',
+      recordId: staff2.id,
+      newValues: {
+        username: 'staff2',
+        role: 'STAFF',
+        action: 'created'
+      },
+      ipAddress: '192.168.1.100',
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    },
+    {
+      userId: staff2.id,
+      action: 'CREATE_BOOKING',
+      tableName: 'bookings',
+      recordId: booking2.id,
+      newValues: {
+        resId: 'RES-2024-002',
+        guestName: 'Sarah Johnson',
+        action: 'created'
+      },
+      ipAddress: '192.168.1.102',
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+    },
+    {
+      userId: owner.id,
+      action: 'UPDATE_SYSTEM_SETTING',
+      tableName: 'systemSettings',
+      recordId: 'tax_rate',
+      oldValues: {
+        value: '0.0'
+      },
+      newValues: {
+        value: '5.0'
+      },
+      ipAddress: '192.168.1.100',
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    },
+  ];
+
+  await prisma.auditLog.createMany({ data: auditLogs });
+  console.log('📋 Created audit logs');
 
   console.log('✅ Database seeding completed successfully!');
   console.log('\n📊 Summary:');
@@ -729,6 +931,7 @@ async function main() {
   console.log(`   📅 Availability Slots: ${await prisma.availabilitySlot.count()}`);
   console.log(`   📄 Agreements: ${await prisma.hotelAgreement.count()}`);
   console.log(`   ⚙️ System Settings: ${await prisma.systemSetting.count()}`);
+  console.log(`   📋 Audit Logs: ${await prisma.auditLog.count()}`);
 }
 
 main()
