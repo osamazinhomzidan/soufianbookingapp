@@ -1459,7 +1459,7 @@ export default function Room() {
                         <tr key={room.id} className={`hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-slate-50/50 transition-all duration-300 ${
                           index % 2 === 0 ? 'bg-white/40' : 'bg-slate-50/30'
                         }`}>
-                          <td className="py-5 px-6 text-slate-900 font-bold text-base max-w-[150px]" title={room.hotelName || room.hotel?.name || t('rooms.unknownHotel')}>
+                          <td className="py-5 px-6 text-slate-900 font-bold text-base max-w-[350px]" title={room.hotelName || room.hotel?.name || t('rooms.unknownHotel')}>
                             <div className="flex items-center space-x-3">
                               <div className="flex-shrink-0">
                                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
