@@ -166,6 +166,11 @@ export default function Room() {
   
   const [selectedRooms, setSelectedRooms] = useState<string[]>([]);
   const [selectedRoomDetails, setSelectedRoomDetails] = useState<Room | null>(null);
+  
+  // Edit room state
+  const [editingRoom, setEditingRoom] = useState<Room | null>(null);
+  const [editFormData, setEditFormData] = useState<RoomFormData | null>(null);
+  const [editFormErrors, setEditFormErrors] = useState<string[]>([]);
 
   // API Functions
   const fetchHotels = async () => {
@@ -569,6 +574,67 @@ export default function Room() {
     }
   };
 
+  const handleSelectRoom = (id: string) => {
+    setSelectedRooms(prev => 
+      prev.includes(id) 
+        ? prev.filter(selectedId => selectedId !== id)
+        : [...prev, id]
+    );
+  };
+
+  const handleSelectAllRooms = () => {
+    if (selectedRooms.length === (filteredRooms?.length || 0)) {
+      setSelectedRooms([]);
+    } else {
+      setSelectedRooms((filteredRooms || []).map(room => room.id));
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedRooms.length === 0) return;
+    
+    if (!confirm(tInterpolate('rooms.confirmDeleteSelectedRooms', { count: selectedRooms.length }))) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      // Delete rooms one by one (could be optimized with batch delete API)
+      const deletePromises = selectedRooms.map(id => 
+        fetch(`/api/rooms/${id}`, { method: 'DELETE' })
+      );
+      
+      const responses = await Promise.all(deletePromises);
+      const results = await Promise.all(
+        responses.map(response => response.json())
+      );
+      
+      // Check if all deletions were successful
+      const failedDeletions = results.filter(result => !result.success);
+      
+      if (failedDeletions.length === 0) {
+        setRooms(rooms.filter(room => !selectedRooms.includes(room.id)));
+        setSelectedRooms([]);
+        setMessage({ type: 'success', text: t('rooms.selectedRoomsDeletedSuccessfully') });
+      } else {
+        setMessage({ type: 'error', text: `Failed to delete ${failedDeletions.length} room(s)` });
+        // Refresh the list to get current state
+        fetchRooms();
+      }
+    } catch (err) {
+      setMessage({ type: 'error', text: t('rooms.errorDeletingRooms') });
+      console.error('Delete selected rooms error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePrintSelected = () => {
+    console.log('Print selected rooms:', selectedRooms);
+    // Implement print functionality for selected rooms
+  };
+
   const handleDeleteRoom = async (id: string) => {
     if (!confirm(t('rooms.confirmDeleteRoom'))) {
       return;
@@ -598,6 +664,126 @@ export default function Room() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEditRoom = async (id: string) => {
+    try {
+      const response = await fetch(`/api/rooms/${id}`);
+      const result: ApiResponse<Room> = await response.json();
+      
+      if (result.success && result.data) {
+        const room = result.data;
+        setEditingRoom(room);
+        
+        // Convert room data to form format
+        setEditFormData({
+          id: room.id,
+          roomType: room.roomType,
+          roomTypeDescription: room.roomTypeDescription,
+          altDescription: room.altDescription,
+          purchasePrice: room.purchasePrice.toString(),
+          basePrice: room.basePrice.toString(),
+          alternativePrice: room.alternativePrice?.toString() || '',
+          availableFrom: room.availableFrom ? new Date(room.availableFrom).toISOString().split('T')[0] : '',
+          availableTo: room.availableTo ? new Date(room.availableTo).toISOString().split('T')[0] : '',
+          quantity: room.quantity.toString(),
+          boardType: room.boardType,
+          hasAlternativePrice: !!room.alternativePrice
+        });
+        setEditFormErrors([]);
+      } else {
+        alert(result.message || t('rooms.errorFetchingRoom'));
+      }
+    } catch (error) {
+      console.error('Error fetching room for edit:', error);
+      alert(t('rooms.errorFetchingRoom'));
+    }
+  };
+
+  const handleUpdateRoom = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editFormData || !editingRoom) return;
+
+    // Validate form
+    const validation = validateRoomForm(editFormData);
+    setEditFormErrors(validation.errors);
+    
+    if (!validation.isValid) {
+      setMessage({ 
+        type: 'error', 
+        text: tInterpolate('validation.formHasErrors', { count: validation.errors.length })
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      const updateData = {
+        hotelId: editingRoom.hotelId, // Keep original hotel
+        roomType: editFormData.roomType,
+        roomTypeDescription: editFormData.roomTypeDescription,
+        altDescription: editFormData.altDescription,
+        purchasePrice: parseFloat(editFormData.purchasePrice),
+        basePrice: parseFloat(editFormData.basePrice),
+        alternativePrice: editFormData.alternativePrice ? parseFloat(editFormData.alternativePrice) : null,
+        availableFrom: editFormData.availableFrom || null,
+        availableTo: editFormData.availableTo || null,
+        quantity: parseInt(editFormData.quantity),
+        boardType: BOARD_TYPE_MAPPINGS.displayToApi[editFormData.boardType]
+      };
+
+      const response = await fetch(`/api/rooms/${editingRoom.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
+      
+      const result: ApiResponse<Room> = await response.json();
+      
+      if (result.success && result.data) {
+        // Update the room in the list
+        setRooms(rooms.map(room => 
+          room.id === editingRoom.id ? {
+            ...result.data!,
+            boardType: BOARD_TYPE_MAPPINGS.apiToDisplay[result.data!.boardType as keyof typeof BOARD_TYPE_MAPPINGS.apiToDisplay] || result.data!.boardType
+          } : room
+        ));
+        
+        // Close edit modal
+        setEditingRoom(null);
+        setEditFormData(null);
+        setEditFormErrors([]);
+        
+        setMessage({ type: 'success', text: t('rooms.roomUpdatedSuccessfully') });
+      } else {
+        setMessage({ type: 'error', text: result.message || t('rooms.errorUpdatingRoom') });
+      }
+    } catch (error) {
+      console.error('Error updating room:', error);
+      setMessage({ type: 'error', text: t('rooms.errorUpdatingRoom') });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateEditFormField = (field: keyof RoomFormData, value: any) => {
+    if (!editFormData) return;
+    
+    const updatedForm = { ...editFormData, [field]: value };
+    setEditFormData(updatedForm);
+    
+    // Real-time validation
+    const validation = validateRoomForm(updatedForm);
+    setEditFormErrors(validation.errors);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingRoom(null);
+    setEditFormData(null);
+    setEditFormErrors([]);
   };
 
   return (
@@ -1400,6 +1586,36 @@ export default function Room() {
               {/* Visual Separator */}
               <div className="border-t border-slate-200/60 my-8"></div>
 
+              {/* Selected Rooms Actions */}
+              {selectedRooms.length > 0 && (
+                <div className="flex flex-wrap gap-3 p-4 bg-blue-50/50 border border-blue-200/50 rounded-xl mb-6">
+                  <div className="flex items-center space-x-2 text-blue-700 font-medium">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{selectedRooms.length} selected</span>
+                  </div>
+                  <button
+                    onClick={handleDeleteSelected}
+                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg transition-all duration-200 flex items-center space-x-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    <span>{t('rooms.deleteSelected')}</span>
+                  </button>
+                  <button
+                    onClick={handlePrintSelected}
+                    className="px-4 py-2 bg-slate-500 hover:bg-slate-600 text-white text-sm rounded-lg transition-all duration-200 flex items-center space-x-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    <span>{t('rooms.printSelected')}</span>
+                  </button>
+                </div>
+              )}
+
               {/* Rooms Table */}
               <div className="overflow-x-auto rounded-2xl border border-slate-200/60 bg-white/90 backdrop-blur-sm shadow-xl">
                 {loading ? (
@@ -1416,6 +1632,14 @@ export default function Room() {
                   <table className="w-full min-w-[1200px] table-auto">
                     <thead className="bg-gradient-to-r from-slate-100/80 to-slate-50/60 backdrop-blur-sm">
                       <tr className="border-b-2 border-slate-200/60">
+                        <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide w-16">
+                          <input
+                            type="checkbox"
+                            checked={selectedRooms.length === filteredRooms.length && filteredRooms.length > 0}
+                            onChange={handleSelectAllRooms}
+                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                          />
+                        </th>
                         <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
                           {t('rooms.hotel')}
                         </th>
@@ -1459,6 +1683,14 @@ export default function Room() {
                         <tr key={room.id} className={`hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-slate-50/50 transition-all duration-300 ${
                           index % 2 === 0 ? 'bg-white/40' : 'bg-slate-50/30'
                         }`}>
+                          <td className="py-5 px-6 w-16">
+                            <input
+                              type="checkbox"
+                              checked={selectedRooms.includes(room.id)}
+                              onChange={() => handleSelectRoom(room.id)}
+                              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                            />
+                          </td>
                           <td className="py-5 px-6 text-slate-900 font-bold text-base max-w-[350px]" title={room.hotelName || room.hotel?.name || t('rooms.unknownHotel')}>
                             <div className="flex items-center space-x-3">
                               <div className="flex-shrink-0">
@@ -1746,6 +1978,311 @@ export default function Room() {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Room Modal */}
+        {editingRoom && editFormData && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="backdrop-blur-xl bg-white/90 border border-white/20 rounded-3xl shadow-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-semibold text-gray-900">
+                  {t('rooms.editRoom')}
+                </h3>
+                <button
+                  onClick={handleCancelEdit}
+                  className="p-2 hover:bg-gray-100/50 rounded-xl transition-colors"
+                >
+                  <XMarkIcon className="w-6 h-6 text-gray-500" />
+                </button>
+              </div>
+              
+              <form onSubmit={handleUpdateRoom} className="space-y-6">
+                {/* Form Validation Errors */}
+                {editFormErrors.length > 0 && (
+                  <div className="bg-red-50/90 border-2 border-red-300/60 rounded-2xl p-6 shadow-lg">
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center shadow-md">
+                        <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <h4 className="font-bold text-lg text-red-900">{t('validation.pleaseFixErrors')}</h4>
+                    </div>
+                    <ul className="list-disc list-inside space-y-2 text-red-800 font-medium">
+                      {editFormErrors.map((error, index) => (
+                        <li key={index}>{error}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Room Type */}
+                  <div>
+                    <label className="block text-base font-bold text-slate-700 mb-4">
+                      {t('rooms.roomType')} <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <HomeIcon className="w-6 h-6 text-blue-500" />
+                      </div>
+                      <input
+                        type="text"
+                        value={editFormData.roomType}
+                        onChange={(e) => updateEditFormField('roomType', e.target.value)}
+                        className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                          editFormErrors.some(error => error.includes('room type') || error.includes('Room type')) 
+                            ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
+                            : 'border-slate-300 focus:ring-blue-500/30'
+                        }`}
+                        placeholder={t('rooms.roomTypePlaceholder')}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Room Description */}
+                  <div>
+                    <label className="block text-base font-bold text-slate-700 mb-4">
+                      {t('rooms.roomDescription')} <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <DocumentTextIcon className="w-6 h-6 text-green-500" />
+                      </div>
+                      <input
+                        type="text"
+                        value={editFormData.roomTypeDescription}
+                        onChange={(e) => updateEditFormField('roomTypeDescription', e.target.value)}
+                        className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                          editFormErrors.some(error => error.includes('description') || error.includes('Description')) 
+                            ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
+                            : 'border-slate-300 focus:ring-blue-500/30'
+                        }`}
+                        placeholder={t('rooms.roomDescriptionPlaceholder')}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Purchase Price */}
+                  <div>
+                    <label className="block text-base font-bold text-slate-700 mb-4">
+                      {t('rooms.purchasePrice')} <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <CurrencyDollarIcon className="w-6 h-6 text-green-500" />
+                      </div>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={editFormData.purchasePrice}
+                        onChange={(e) => updateEditFormField('purchasePrice', e.target.value)}
+                        className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                          editFormErrors.some(error => error.includes('purchase') || error.includes('Purchase')) 
+                            ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
+                            : 'border-slate-300 focus:ring-blue-500/30'
+                        }`}
+                        placeholder="0.00"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Base Price */}
+                  <div>
+                    <label className="block text-base font-bold text-slate-700 mb-4">
+                      {t('rooms.basePrice')} <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <CurrencyDollarIcon className="w-6 h-6 text-blue-500" />
+                      </div>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={editFormData.basePrice}
+                        onChange={(e) => updateEditFormField('basePrice', e.target.value)}
+                        className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                          editFormErrors.some(error => error.includes('base') || error.includes('Base')) 
+                            ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
+                            : 'border-slate-300 focus:ring-blue-500/30'
+                        }`}
+                        placeholder="0.00"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Alternative Price */}
+                  <div>
+                    <label className="block text-base font-bold text-slate-700 mb-4">
+                      {t('rooms.alternativePrice')}
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <CurrencyDollarIcon className="w-6 h-6 text-orange-500" />
+                      </div>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={editFormData.alternativePrice}
+                        onChange={(e) => updateEditFormField('alternativePrice', e.target.value)}
+                        className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-300 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md"
+                        placeholder="0.00"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Quantity */}
+                  <div>
+                    <label className="block text-base font-bold text-slate-700 mb-4">
+                      {t('rooms.quantity')} <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <HashtagIcon className="w-6 h-6 text-purple-500" />
+                      </div>
+                      <input
+                        type="number"
+                        min="1"
+                        value={editFormData.quantity}
+                        onChange={(e) => updateEditFormField('quantity', e.target.value)}
+                        className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                          editFormErrors.some(error => error.includes('quantity') || error.includes('Quantity')) 
+                            ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
+                            : 'border-slate-300 focus:ring-blue-500/30'
+                        }`}
+                        placeholder="1"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Board Type */}
+                <div>
+                  <label className="block text-base font-bold text-slate-700 mb-4">
+                    {t('rooms.boardType')} <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <Cog6ToothIcon className="w-6 h-6 text-indigo-500" />
+                    </div>
+                    <select
+                      value={editFormData.boardType}
+                      onChange={(e) => updateEditFormField('boardType', e.target.value as RoomFormData['boardType'])}
+                      className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-300 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md"
+                    >
+                      <option value="Room only">{t('rooms.roomOnly')}</option>
+                      <option value="Bed & breakfast">{t('rooms.bedBreakfast')}</option>
+                      <option value="Half board">{t('rooms.halfBoard')}</option>
+                      <option value="Full board">{t('rooms.fullBoard')}</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Availability Dates */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-base font-bold text-slate-700 mb-4">
+                      {t('rooms.availableFrom')}
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <CalendarDaysIcon className="w-6 h-6 text-emerald-500" />
+                      </div>
+                      <input
+                        type="date"
+                        value={editFormData.availableFrom}
+                        onChange={(e) => updateEditFormField('availableFrom', e.target.value)}
+                        className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                          editFormErrors.some(error => error.includes('date') || error.includes('Date') || error.includes('availability')) 
+                            ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
+                            : 'border-slate-300 focus:ring-blue-500/30'
+                        }`}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-base font-bold text-slate-700 mb-4">
+                      {t('rooms.availableTo')}
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <CalendarDaysIcon className="w-6 h-6 text-red-500" />
+                      </div>
+                      <input
+                        type="date"
+                        value={editFormData.availableTo}
+                        onChange={(e) => updateEditFormField('availableTo', e.target.value)}
+                        className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                          editFormErrors.some(error => error.includes('date') || error.includes('Date') || error.includes('availability')) 
+                            ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
+                            : 'border-slate-300 focus:ring-blue-500/30'
+                        }`}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Alternative Description */}
+                <div>
+                  <label className="block text-base font-bold text-slate-700 mb-4">
+                    {t('rooms.altDescription')}
+                  </label>
+                  <div className="relative">
+                    <div className="absolute top-4 left-0 pl-4 flex items-start pointer-events-none">
+                      <ChatBubbleLeftRightIcon className="w-6 h-6 text-slate-500" />
+                    </div>
+                    <textarea
+                      value={editFormData.altDescription}
+                      onChange={(e) => updateEditFormField('altDescription', e.target.value)}
+                      rows={4}
+                      className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-300 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md resize-none"
+                      placeholder={t('rooms.altDescriptionPlaceholder')}
+                    />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-4 pt-6">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className={`flex-1 px-8 py-4 font-black text-lg rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 focus:ring-4 focus:ring-offset-2 backdrop-blur-sm ${
+                      loading
+                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white focus:ring-blue-500/50'
+                    }`}
+                  >
+                    {loading ? (
+                      <div className="flex items-center justify-center space-x-3">
+                        <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        <span>{t('common.updating')}</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center space-x-3">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>{t('rooms.updateRoom')}</span>
+                      </div>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCancelEdit}
+                    className="px-8 py-4 bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white font-black text-lg rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 focus:ring-4 focus:ring-slate-500/50 focus:ring-offset-2 backdrop-blur-sm"
+                  >
+                    <div className="flex items-center justify-center space-x-3">
+                      <XMarkIcon className="w-6 h-6" />
+                      <span>{t('common.cancel')}</span>
+                    </div>
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

@@ -406,6 +406,9 @@ export interface Translations {
     filterByFloor: string;
     filterByCreatedBy: string;
     confirmDeleteRoom: string;
+    confirmDeleteSelectedRooms: string;
+    selectedRoomsDeletedSuccessfully: string;
+    errorDeletingRooms: string;
   };
   
   // Layout and navigation
@@ -1011,6 +1014,9 @@ const en: Translations = {
     filterByFloor: 'Filter by Floor',
     filterByCreatedBy: 'Filter by Created By',
     confirmDeleteRoom: 'Are you sure you want to delete this room?',
+    confirmDeleteSelectedRooms: 'Are you sure you want to delete {{count}} selected room(s)?',
+    selectedRoomsDeletedSuccessfully: 'Selected rooms deleted successfully',
+    errorDeletingRooms: 'Error deleting selected rooms',
   },
   
   layout: {
@@ -1590,6 +1596,9 @@ const ar: Translations = {
     filterByFloor: 'تصفية بالطابق',
     filterByCreatedBy: 'تصفية بالمنشئ',
     confirmDeleteRoom: 'هل أنت متأكد من حذف هذه الغرفة؟',
+    confirmDeleteSelectedRooms: 'هل أنت متأكد من حذف {{count}} غرفة محددة؟',
+    selectedRoomsDeletedSuccessfully: 'تم حذف الغرف المحددة بنجاح',
+    errorDeletingRooms: 'خطأ في حذف الغرف المحددة',
     roomTypePlaceholder: 'أدخل نوع الغرفة',
     roomDescriptionPlaceholder: 'وصف مفصل للغرفة',
     altDescriptionPlaceholder: 'الوصف بلغة أخرى',
