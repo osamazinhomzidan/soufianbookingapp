@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useTheme } from '@/hooks/useTheme';
 import {
   BuildingOfficeIcon,
   HomeIcon,
@@ -87,6 +88,7 @@ interface ApiResponse<T> {
 export default function Room() {
   const { language } = useLanguage();
   const { t, tInterpolate } = useTranslation();
+  const { isDark } = useTheme();
   
   // Board type mappings
   const BOARD_TYPE_MAPPINGS = {
@@ -788,11 +790,23 @@ export default function Room() {
 
   return (
     <ProtectedRoute requiredRole="OWNER">
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden">
+      <div className={`min-h-screen relative overflow-hidden transition-colors duration-300 ${
+        isDark 
+          ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' 
+          : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
+      }`}>
         {/* Background decorative elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-green-400/20 to-teal-400/20 rounded-full blur-3xl"></div>
+          <div className={`absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl transition-colors duration-300 ${
+            isDark 
+              ? 'bg-gradient-to-br from-blue-600/10 to-purple-600/10' 
+              : 'bg-gradient-to-br from-blue-400/20 to-purple-400/20'
+          }`}></div>
+          <div className={`absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl transition-colors duration-300 ${
+            isDark 
+              ? 'bg-gradient-to-tr from-green-600/10 to-teal-600/10' 
+              : 'bg-gradient-to-tr from-green-400/20 to-teal-400/20'
+          }`}></div>
         </div>
 
         {/* Main content container - Full width responsive */}
@@ -800,19 +814,31 @@ export default function Room() {
           <div className="max-w-none px-4 sm:px-6 lg:px-8 py-8 space-y-12">
             
             {/* Add New Room Section - Redesigned with Hotel Page Style */}
-            <div className="backdrop-blur-sm bg-white/80 border border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 sm:p-8 lg:p-12">
+            <div className={`backdrop-blur-sm border rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 sm:p-8 lg:p-12 ${
+              isDark 
+                ? 'bg-gray-800/80 border-gray-700/60 hover:bg-gray-800/90' 
+                : 'bg-white/80 border-slate-200/60 hover:bg-white/90'
+            }`}>
               <div className="mb-12">
                 <div className="flex items-center space-x-8">
-                  <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl flex items-center justify-center shadow-xl">
+                  <div className={`w-24 h-24 rounded-3xl flex items-center justify-center shadow-xl transition-colors duration-300 ${
+                    isDark 
+                      ? 'bg-gradient-to-br from-blue-500 to-indigo-600' 
+                      : 'bg-gradient-to-br from-blue-600 to-indigo-700'
+                  }`}>
                     <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-4xl font-black text-slate-900 tracking-tight leading-tight mb-3">
+                    <h2 className={`text-4xl font-black tracking-tight leading-tight mb-3 transition-colors duration-300 ${
+                      isDark ? 'text-white' : 'text-slate-900'
+                    }`}>
                       {t('rooms.addNewRoom')}
                     </h2>
-                    <p className="text-slate-700 text-xl font-bold mt-3 leading-relaxed">
+                    <p className={`text-xl font-bold mt-3 leading-relaxed transition-colors duration-300 ${
+                      isDark ? 'text-gray-300' : 'text-slate-700'
+                    }`}>
                       Create and manage room inventory for your hotels
                     </p>
                   </div>
@@ -823,19 +849,29 @@ export default function Room() {
               {message && (
                 <div className={`mb-10 p-6 rounded-2xl border-2 shadow-lg backdrop-blur-md transition-all duration-300 ${
                   message.type === 'success'
-                    ? 'bg-emerald-50/90 border-emerald-300/60 text-emerald-900' 
-                    : 'bg-red-50/90 border-red-300/60 text-red-900'
+                    ? isDark 
+                      ? 'bg-emerald-900/90 border-emerald-600/60 text-emerald-100' 
+                      : 'bg-emerald-50/90 border-emerald-300/60 text-emerald-900'
+                    : isDark 
+                      ? 'bg-red-900/90 border-red-600/60 text-red-100' 
+                      : 'bg-red-50/90 border-red-300/60 text-red-900'
                 }`}>
                   <div className="flex items-center space-x-4">
                     <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-md ${
-                      message.type === 'success' ? 'bg-emerald-100' : 'bg-red-100'
+                      message.type === 'success' 
+                        ? isDark ? 'bg-emerald-800' : 'bg-emerald-100'
+                        : isDark ? 'bg-red-800' : 'bg-red-100'
                     }`}>
                       {message.type === 'success' ? (
-                        <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className={`w-6 h-6 ${
+                          isDark ? 'text-emerald-300' : 'text-emerald-600'
+                        }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                         </svg>
                       ) : (
-                        <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className={`w-6 h-6 ${
+                          isDark ? 'text-red-300' : 'text-red-600'
+                        }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       )}
@@ -846,26 +882,42 @@ export default function Room() {
               )}
 
               {/* Hotel Selection - Hotel Page Style */}
-              <div className="backdrop-blur-sm bg-gradient-to-br from-slate-50/90 to-white/80 border-2 border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-10 mb-10">
+              <div className={`backdrop-blur-sm border-2 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-10 mb-10 ${
+                isDark 
+                  ? 'bg-gradient-to-br from-gray-800/90 to-gray-700/80 border-gray-600/60 hover:bg-gradient-to-br hover:from-gray-800/95 hover:to-gray-700/85' 
+                  : 'bg-gradient-to-br from-slate-50/90 to-white/80 border-slate-200/60 hover:bg-gradient-to-br hover:from-slate-50/95 hover:to-white/85'
+              }`}>
                 <div className="flex items-center space-x-4 mb-8">
-                  <div className="w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl flex items-center justify-center shadow-lg">
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg transition-colors duration-300 ${
+                    isDark 
+                      ? 'bg-gradient-to-br from-indigo-500 to-purple-600' 
+                      : 'bg-gradient-to-br from-indigo-600 to-purple-700'
+                  }`}>
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t('rooms.hotelSelection')}</h3>
-                    <p className="text-slate-600 font-bold mt-1">Choose the hotel for your room inventory</p>
+                    <h3 className={`text-2xl font-black tracking-tight transition-colors duration-300 ${
+                      isDark ? 'text-white' : 'text-slate-900'
+                    }`}>{t('rooms.hotelSelection')}</h3>
+                    <p className={`font-bold mt-1 transition-colors duration-300 ${
+                      isDark ? 'text-gray-300' : 'text-slate-600'
+                    }`}>Choose the hotel for your room inventory</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-6">
                   <div className="flex-1">
-                    <label className="block text-base font-bold text-slate-700 mb-4">
+                    <label className={`block text-base font-bold mb-4 transition-colors duration-300 ${
+                      isDark ? 'text-gray-200' : 'text-slate-700'
+                    }`}>
                       {t('rooms.selectHotel')} <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <svg className="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className={`w-6 h-6 transition-colors duration-300 ${
+                          isDark ? 'text-indigo-400' : 'text-indigo-500'
+                        }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                       </div>
@@ -877,7 +929,11 @@ export default function Room() {
                             resetMultipleRoomForms();
                           }
                         }}
-                        className="w-full pl-14 pr-4 py-4 bg-slate-50/50 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-indigo-600 focus:shadow-lg transition-all duration-200 placeholder-slate-400 text-slate-700 hover:border-slate-400 font-medium text-lg"
+                        className={`w-full pl-14 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:shadow-lg transition-all duration-200 font-medium text-lg ${
+                          isDark 
+                            ? 'bg-gray-700/50 border-gray-600 text-gray-100 placeholder-gray-400 hover:border-gray-500 focus:border-indigo-500' 
+                            : 'bg-slate-50/50 border-slate-300 text-slate-700 placeholder-slate-400 hover:border-slate-400 focus:border-indigo-600'
+                        }`}
                         required
                       >
                         <option value="">{t('rooms.selectHotel')}</option>
@@ -896,7 +952,11 @@ export default function Room() {
                       <button
                         type="button"
                         onClick={addRoomForm}
-                        className="w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300 focus:ring-4 focus:ring-blue-500/50 focus:ring-offset-2 hover:from-blue-700 hover:to-indigo-700"
+                        className={`w-14 h-14 text-white rounded-2xl flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300 focus:ring-4 focus:ring-offset-2 ${
+                          isDark 
+                            ? 'bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 focus:ring-blue-400/50' 
+                            : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:ring-blue-500/50'
+                        }`}
                         title={t('rooms.addAnotherRoom')}
                       >
                         <PlusIcon className="w-7 h-7" />
@@ -905,14 +965,24 @@ export default function Room() {
                         <button
                           type="button"
                           onClick={() => removeRoomForm(roomForms[roomForms.length - 1].id)}
-                          className="w-14 h-14 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300 focus:ring-4 focus:ring-slate-500/50 focus:ring-offset-2"
+                          className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300 focus:ring-4 focus:ring-offset-2 ${
+                            isDark 
+                              ? 'bg-gray-700 hover:bg-gray-600 text-gray-200 focus:ring-gray-500/50' 
+                              : 'bg-slate-100 hover:bg-slate-200 text-slate-700 focus:ring-slate-500/50'
+                          }`}
                           title={t('rooms.removeLastRoom')}
                         >
                           <MinusIcon className="w-7 h-7" />
                         </button>
                       )}
-                      <div className="bg-gradient-to-r from-slate-100 to-slate-200 px-6 py-3 rounded-2xl border border-slate-300 shadow-md">
-                        <span className="text-base font-black text-slate-700">
+                      <div className={`px-6 py-3 rounded-2xl border shadow-md transition-colors duration-300 ${
+                        isDark 
+                          ? 'bg-gradient-to-r from-gray-700 to-gray-600 border-gray-600' 
+                          : 'bg-gradient-to-r from-slate-100 to-slate-200 border-slate-300'
+                      }`}>
+                        <span className={`text-base font-black transition-colors duration-300 ${
+                          isDark ? 'text-gray-200' : 'text-slate-700'
+                        }`}>
                           {roomForms.length} room{roomForms.length !== 1 ? 's' : ''}
                         </span>
                       </div>
@@ -925,20 +995,32 @@ export default function Room() {
               {selectedHotelForMultiple && (
                 <form onSubmit={handleAddMultipleRooms} className="space-y-6">
                   {roomForms.map((roomForm, index) => (
-                    <div key={roomForm.id} className="backdrop-blur-sm bg-gradient-to-br from-slate-50/90 to-blue-50/80 border-2 border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-10 relative">
+                    <div key={roomForm.id} className={`backdrop-blur-sm border-2 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-10 relative ${
+                      isDark 
+                        ? 'bg-gradient-to-br from-gray-800/90 to-gray-700/80 border-gray-600/60 hover:bg-gradient-to-br hover:from-gray-800/95 hover:to-gray-700/85' 
+                        : 'bg-gradient-to-br from-slate-50/90 to-blue-50/80 border-slate-200/60 hover:bg-gradient-to-br hover:from-slate-50/95 hover:to-blue-50/85'
+                    }`}>
                       {/* Room Header - Hotel Page Style */}
                       <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-lg">
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-colors duration-300 ${
+                            isDark 
+                              ? 'bg-gradient-to-br from-blue-500 to-indigo-600' 
+                              : 'bg-gradient-to-br from-blue-600 to-indigo-700'
+                          }`}>
                             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                             </svg>
                           </div>
                           <div>
-                            <h4 className="text-2xl font-black text-slate-900 tracking-tight">
+                            <h4 className={`text-2xl font-black tracking-tight transition-colors duration-300 ${
+                              isDark ? 'text-white' : 'text-slate-900'
+                            }`}>
                               {tInterpolate('rooms.roomNumber', { number: index + 1 })}
                             </h4>
-                            <p className="text-slate-600 font-bold mt-1">Configure room details and pricing</p>
+                            <p className={`font-bold mt-1 transition-colors duration-300 ${
+                              isDark ? 'text-gray-300' : 'text-slate-600'
+                            }`}>Configure room details and pricing</p>
                           </div>
                         </div>
                         {roomForms.length > 1 && (
@@ -989,21 +1071,29 @@ export default function Room() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                         {/* Room Type */}
                         <div className="space-y-3">
-                          <label className="block text-base font-black text-slate-900">
+                          <label className={`block text-base font-black transition-colors duration-300 ${
+                            isDark ? 'text-white' : 'text-slate-900'
+                          }`}>
                             {t('rooms.roomType')} <span className="text-red-600">*</span>
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                              <HomeIcon className="w-5 h-5 text-blue-600" />
+                              <HomeIcon className={`w-5 h-5 transition-colors duration-300 ${
+                                isDark ? 'text-blue-400' : 'text-blue-600'
+                              }`} />
                             </div>
                             <input
                               type="text"
                               value={roomForm.roomType}
                               onChange={(e) => updateRoomForm(roomForm.id, 'roomType', e.target.value)}
-                              className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm placeholder-slate-400 text-base font-medium shadow-sm hover:shadow-md ${
+                              className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
                                 formErrors[roomForm.id]?.some(error => error.includes('room type') || error.includes('Room Type')) 
-                                  ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
-                                  : 'border-slate-300 focus:ring-blue-500/30'
+                                  ? `border-red-500 focus:ring-red-500/30 ${
+                                      isDark ? 'bg-red-900/20 text-white placeholder-red-300' : 'bg-red-50/80 text-slate-900 placeholder-slate-400'
+                                    }` 
+                                  : `border-slate-300 focus:ring-blue-500/30 ${
+                                      isDark ? 'bg-gray-800/50 text-white placeholder-gray-400 border-gray-600' : 'bg-white text-slate-900 placeholder-slate-400'
+                                    }`
                               }`}
                               placeholder={t('rooms.enterRoomType')}
                               maxLength={100}
@@ -1014,17 +1104,23 @@ export default function Room() {
 
                         {/* Board Type */}
                         <div className="space-y-3">
-                          <label className="block text-base font-black text-slate-900">
+                          <label className={`block text-base font-black transition-colors duration-300 ${
+                            isDark ? 'text-white' : 'text-slate-900'
+                          }`}>
                             {t('rooms.boardType')}
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                              <Cog6ToothIcon className="w-5 h-5 text-blue-600" />
+                              <Cog6ToothIcon className={`w-5 h-5 transition-colors duration-300 ${
+                                isDark ? 'text-blue-400' : 'text-blue-600'
+                              }`} />
                             </div>
                             <select
                               value={roomForm.boardType}
                               onChange={(e) => updateRoomForm(roomForm.id, 'boardType', e.target.value as any)}
-                              className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-300 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md"
+                              className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                                isDark ? 'bg-gray-800/50 text-white border-gray-600' : 'bg-white text-slate-900 border-slate-300'
+                              }`}
                             >
                               <option value="Room only">{t('rooms.roomOnly')}</option>
                               <option value="Bed & breakfast">{t('rooms.bedBreakfast')}</option>
@@ -1036,21 +1132,29 @@ export default function Room() {
 
                         {/* Room Description */}
                         <div className="space-y-3">
-                          <label className="block text-base font-black text-slate-900">
+                          <label className={`block text-base font-black transition-colors duration-300 ${
+                            isDark ? 'text-white' : 'text-slate-900'
+                          }`}>
                             {t('rooms.roomDescription')} <span className="text-red-600">*</span>
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                              <DocumentTextIcon className="w-5 h-5 text-blue-600" />
+                              <DocumentTextIcon className={`w-5 h-5 transition-colors duration-300 ${
+                                isDark ? 'text-blue-400' : 'text-blue-600'
+                              }`} />
                             </div>
                             <input
                               type="text"
                               value={roomForm.roomTypeDescription}
                               onChange={(e) => updateRoomForm(roomForm.id, 'roomTypeDescription', e.target.value)}
-                              className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm placeholder-slate-400 text-base font-medium shadow-sm hover:shadow-md ${
+                              className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
                                 formErrors[roomForm.id]?.some(error => error.includes('description') || error.includes('Description')) 
-                                  ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
-                                  : 'border-slate-300 focus:ring-blue-500/30'
+                                  ? `border-red-500 focus:ring-red-500/30 ${
+                                      isDark ? 'bg-red-900/20 text-white placeholder-red-300' : 'bg-red-50/80 text-slate-900 placeholder-slate-400'
+                                    }` 
+                                  : `border-slate-300 focus:ring-blue-500/30 ${
+                                      isDark ? 'bg-gray-800/50 text-white placeholder-gray-400 border-gray-600' : 'bg-white text-slate-900 placeholder-slate-400'
+                                    }`
                               }`}
                               placeholder={t('rooms.enterRoomDescription')}
                               maxLength={500}
@@ -1061,18 +1165,24 @@ export default function Room() {
 
                         {/* Alt Description */}
                         <div className="space-y-3">
-                          <label className="block text-base font-black text-slate-900">
+                          <label className={`block text-base font-black transition-colors duration-300 ${
+                            isDark ? 'text-white' : 'text-slate-900'
+                          }`}>
                             {t('rooms.altDescription')}
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                              <ChatBubbleLeftRightIcon className="w-5 h-5 text-blue-600" />
+                              <ChatBubbleLeftRightIcon className={`w-5 h-5 transition-colors duration-300 ${
+                                isDark ? 'text-blue-400' : 'text-blue-600'
+                              }`} />
                             </div>
                             <input
                               type="text"
                               value={roomForm.altDescription}
                               onChange={(e) => updateRoomForm(roomForm.id, 'altDescription', e.target.value)}
-                              className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-300 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm placeholder-slate-400 text-base font-medium shadow-sm hover:shadow-md"
+                              className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                                isDark ? 'bg-gray-800/50 text-white placeholder-gray-400 border-gray-600' : 'bg-white text-slate-900 placeholder-slate-400 border-slate-300'
+                              }`}
                               placeholder={t('rooms.enterAltDescription')}
                             />
                           </div>
@@ -1080,21 +1190,29 @@ export default function Room() {
                         
                         {/* Quantity */}
                         <div className="space-y-3">
-                          <label className="block text-base font-black text-slate-900">
+                          <label className={`block text-base font-black transition-colors duration-300 ${
+                            isDark ? 'text-white' : 'text-slate-900'
+                          }`}>
                             {t('rooms.numberOfRooms')} <span className="text-red-600">*</span>
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                              <HashtagIcon className="w-5 h-5 text-blue-600" />
+                              <HashtagIcon className={`w-5 h-5 transition-colors duration-300 ${
+                                isDark ? 'text-blue-400' : 'text-blue-600'
+                              }`} />
                             </div>
                             <input
                               type="number"
                               value={roomForm.quantity}
                               onChange={(e) => updateRoomForm(roomForm.id, 'quantity', e.target.value)}
-                              className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm placeholder-slate-400 text-base font-medium shadow-sm hover:shadow-md ${
+                              className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
                                 formErrors[roomForm.id]?.some(error => error.includes('quantity') || error.includes('Quantity')) 
-                                  ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
-                                  : 'border-slate-300 focus:ring-blue-500/30'
+                                  ? `border-red-500 focus:ring-red-500/30 ${
+                                      isDark ? 'bg-red-900/20 text-white placeholder-red-300' : 'bg-red-50/80 text-slate-900 placeholder-slate-400'
+                                    }` 
+                                  : `border-slate-300 focus:ring-blue-500/30 ${
+                                      isDark ? 'bg-gray-800/50 text-white placeholder-gray-400 border-gray-600' : 'bg-white text-slate-900 placeholder-slate-400'
+                                    }`
                               }`}
                               placeholder={t('rooms.roomQuantityPlaceholder')}
                               min="1"
@@ -1108,21 +1226,29 @@ export default function Room() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                         {/* Purchase Price */}
                         <div className="space-y-3">
-                          <label className="block text-base font-black text-slate-900">
+                          <label className={`block text-base font-black transition-colors duration-300 ${
+                            isDark ? 'text-white' : 'text-slate-900'
+                          }`}>
                             Purchase Price <span className="text-red-600">*</span>
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                              <CurrencyDollarIcon className="w-5 h-5 text-blue-600" />
+                              <CurrencyDollarIcon className={`w-5 h-5 transition-colors duration-300 ${
+                                isDark ? 'text-blue-400' : 'text-blue-600'
+                              }`} />
                             </div>
                             <input
                               type="number"
                               value={roomForm.purchasePrice}
                               onChange={(e) => updateRoomForm(roomForm.id, 'purchasePrice', e.target.value)}
-                              className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm placeholder-slate-400 text-base font-medium shadow-sm hover:shadow-md ${
+                              className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
                                 formErrors[roomForm.id]?.some(error => error.includes('purchase') || error.includes('Purchase')) 
-                                  ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
-                                  : 'border-slate-300 focus:ring-blue-500/30'
+                                  ? `border-red-500 focus:ring-red-500/30 ${
+                                      isDark ? 'bg-red-900/20 text-white placeholder-red-300' : 'bg-red-50/80 text-slate-900 placeholder-slate-400'
+                                    }` 
+                                  : `border-slate-300 focus:ring-blue-500/30 ${
+                                      isDark ? 'bg-gray-800/50 text-white placeholder-gray-400 border-gray-600' : 'bg-white text-slate-900 placeholder-slate-400'
+                                    }`
                               }`}
                               placeholder="Enter purchase price"
                               min="0"
@@ -1134,21 +1260,29 @@ export default function Room() {
 
                         {/* Base Price */}
                         <div className="space-y-3">
-                          <label className="block text-base font-black text-slate-900">
+                          <label className={`block text-base font-black transition-colors duration-300 ${
+                            isDark ? 'text-white' : 'text-slate-900'
+                          }`}>
                             Base Price <span className="text-red-600">*</span>
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                              <CurrencyDollarIcon className="w-5 h-5 text-blue-600" />
+                              <CurrencyDollarIcon className={`w-5 h-5 transition-colors duration-300 ${
+                                isDark ? 'text-blue-400' : 'text-blue-600'
+                              }`} />
                             </div>
                             <input
                               type="number"
                               value={roomForm.basePrice}
                               onChange={(e) => updateRoomForm(roomForm.id, 'basePrice', e.target.value)}
-                              className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm placeholder-slate-400 text-base font-medium shadow-sm hover:shadow-md ${
+                              className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
                                 formErrors[roomForm.id]?.some(error => error.includes('base') || error.includes('Base') || error.includes('higher')) 
-                                  ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
-                                  : 'border-slate-300 focus:ring-blue-500/30'
+                                  ? `border-red-500 focus:ring-red-500/30 ${
+                                      isDark ? 'bg-red-900/20 text-white placeholder-red-300' : 'bg-red-50/80 text-slate-900 placeholder-slate-400'
+                                    }` 
+                                  : `border-slate-300 focus:ring-blue-500/30 ${
+                                      isDark ? 'bg-gray-800/50 text-white placeholder-gray-400 border-gray-600' : 'bg-white text-slate-900 placeholder-slate-400'
+                                    }`
                               }`}
                               placeholder="Enter base selling price"
                               min="0"
@@ -1160,21 +1294,29 @@ export default function Room() {
 
                         {/* Alternative Price */}
                         <div className="space-y-3">
-                          <label className="block text-base font-black text-slate-900">
+                          <label className={`block text-base font-black transition-colors duration-300 ${
+                            isDark ? 'text-white' : 'text-slate-900'
+                          }`}>
                             Alternative Price
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                              <CurrencyDollarIcon className="w-5 h-5 text-blue-600" />
+                              <CurrencyDollarIcon className={`w-5 h-5 transition-colors duration-300 ${
+                                isDark ? 'text-blue-400' : 'text-blue-600'
+                              }`} />
                             </div>
                             <input
                               type="number"
                               value={roomForm.alternativePrice}
                               onChange={(e) => updateRoomForm(roomForm.id, 'alternativePrice', e.target.value)}
-                              className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm placeholder-slate-400 text-base font-medium shadow-sm hover:shadow-md ${
+                              className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
                                 formErrors[roomForm.id]?.some(error => error.includes('alternative') || error.includes('Alternative')) 
-                                  ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
-                                  : 'border-slate-300 focus:ring-blue-500/30'
+                                  ? `border-red-500 focus:ring-red-500/30 ${
+                                      isDark ? 'bg-red-900/20 text-white placeholder-red-300' : 'bg-red-50/80 text-slate-900 placeholder-slate-400'
+                                    }` 
+                                  : `border-slate-300 focus:ring-blue-500/30 ${
+                                      isDark ? 'bg-gray-800/50 text-white placeholder-gray-400 border-gray-600' : 'bg-white text-slate-900 placeholder-slate-400'
+                                    }`
                               }`}
                               placeholder="Enter alternative price (optional)"
                               min="0"
@@ -1185,21 +1327,29 @@ export default function Room() {
 
                         {/* Available From */}
                         <div className="space-y-3">
-                          <label className="block text-base font-black text-slate-900">
+                          <label className={`block text-base font-black transition-colors duration-300 ${
+                            isDark ? 'text-white' : 'text-slate-900'
+                          }`}>
                             {t('rooms.availableFrom')}
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                              <CalendarDaysIcon className="w-5 h-5 text-blue-600" />
+                              <CalendarDaysIcon className={`w-5 h-5 transition-colors duration-300 ${
+                                isDark ? 'text-blue-400' : 'text-blue-600'
+                              }`} />
                             </div>
                             <input
                               type="date"
                               value={roomForm.availableFrom}
                               onChange={(e) => updateRoomForm(roomForm.id, 'availableFrom', e.target.value)}
-                              className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                              className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
                                 formErrors[roomForm.id]?.some(error => error.includes('date') || error.includes('Date') || error.includes('availability')) 
-                                  ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
-                                  : 'border-slate-300 focus:ring-blue-500/30'
+                                  ? `border-red-500 focus:ring-red-500/30 ${
+                                      isDark ? 'bg-red-900/20 text-white' : 'bg-red-50/80 text-slate-900'
+                                    }` 
+                                  : `border-slate-300 focus:ring-blue-500/30 ${
+                                      isDark ? 'bg-gray-800/50 text-white border-gray-600' : 'bg-white text-slate-900'
+                                    }`
                               }`}
                             />
                           </div>
@@ -1207,21 +1357,29 @@ export default function Room() {
 
                         {/* Available To */}
                         <div className="space-y-3">
-                          <label className="block text-base font-black text-slate-900">
+                          <label className={`block text-base font-black transition-colors duration-300 ${
+                            isDark ? 'text-white' : 'text-slate-900'
+                          }`}>
                             {t('rooms.availableTo')}
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                              <CalendarDaysIcon className="w-5 h-5 text-blue-600" />
+                              <CalendarDaysIcon className={`w-5 h-5 transition-colors duration-300 ${
+                                isDark ? 'text-blue-400' : 'text-blue-600'
+                              }`} />
                             </div>
                             <input
                               type="date"
                               value={roomForm.availableTo}
                               onChange={(e) => updateRoomForm(roomForm.id, 'availableTo', e.target.value)}
-                              className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                              className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
                                 formErrors[roomForm.id]?.some(error => error.includes('date') || error.includes('Date') || error.includes('availability')) 
-                                  ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
-                                  : 'border-slate-300 focus:ring-blue-500/30'
+                                  ? `border-red-500 focus:ring-red-500/30 ${
+                                      isDark ? 'bg-red-900/20 text-white' : 'bg-red-50/80 text-slate-900'
+                                    }` 
+                                  : `border-slate-300 focus:ring-blue-500/30 ${
+                                      isDark ? 'bg-gray-800/50 text-white border-gray-600' : 'bg-white text-slate-900'
+                                    }`
                               }`}
                             />
                           </div>
@@ -1247,7 +1405,11 @@ export default function Room() {
                     <button
                       type="button"
                       onClick={resetMultipleRoomForms}
-                      className="flex-1 px-8 py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-lg rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 focus:ring-4 focus:ring-slate-500/50 focus:ring-offset-2 backdrop-blur-sm"
+                      className={`flex-1 px-8 py-4 font-black text-lg rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 focus:ring-4 focus:ring-offset-2 backdrop-blur-sm ${
+                        isDark 
+                          ? 'bg-gray-700 hover:bg-gray-600 text-gray-200 focus:ring-gray-500/50' 
+                          : 'bg-slate-100 hover:bg-slate-200 text-slate-700 focus:ring-slate-500/50'
+                      }`}
                     >
                       <div className="flex items-center justify-center space-x-2">
                           <XMarkIcon className="w-5 h-5" />
@@ -1260,7 +1422,11 @@ export default function Room() {
             </div>
 
             {/* View Rooms Section */}
-            <div className="backdrop-blur-sm bg-white/80 border border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 sm:p-8 lg:p-12">
+            <div className={`backdrop-blur-sm border rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 sm:p-8 lg:p-12 ${
+              isDark 
+                ? 'bg-gray-800/80 border-gray-700/60' 
+                : 'bg-white/80 border-slate-200/60'
+            }`}>
               <div className="mb-12">
                 <div className="flex items-center space-x-8">
                   <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-pink-700 rounded-3xl flex items-center justify-center shadow-xl">
@@ -1269,10 +1435,14 @@ export default function Room() {
                     </svg>
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-3xl font-black text-slate-900 tracking-tight leading-tight mb-3">
+                    <h2 className={`text-3xl font-black tracking-tight leading-tight mb-3 transition-colors duration-300 ${
+                      isDark ? 'text-white' : 'text-slate-900'
+                    }`}>
                       {t('rooms.viewAddedRooms')}
                     </h2>
-                    <p className="text-slate-700 text-lg font-bold mt-3 leading-relaxed">
+                    <p className={`text-lg font-bold mt-3 leading-relaxed transition-colors duration-300 ${
+                      isDark ? 'text-gray-300' : 'text-slate-700'
+                    }`}>
                       Browse and manage your room inventory ({filteredRooms.length} {t('common.results')})
                     </p>
                   </div>
@@ -1282,7 +1452,7 @@ export default function Room() {
               {/* Enhanced Modern Filter Section */}
               <div className="mb-12">
                 {/* Filter Header with Enhanced Styling */}
-                <div className="bg-gradient-to-r from-slate-50 via-blue-50 to-indigo-50 rounded-3xl p-8 mb-8 border border-slate-200/60 shadow-xl shadow-slate-200/40">
+                <div className={`rounded-3xl p-8 mb-8  shadow-xl transition-colors duration-300 `}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-6">
                       <div className="relative">
@@ -1298,12 +1468,12 @@ export default function Room() {
                         </div>
                       </div>
                       <div>
-                        <h3 className="text-3xl font-black text-slate-900 tracking-tight bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent">{t('common.filters')}</h3>
-                        <p className="text-slate-600 font-semibold mt-2 text-lg">Refine and customize your search results</p>
-                        <div className="flex items-center space-x-2 mt-2">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                          <span className="text-sm text-slate-500 font-medium">Advanced filtering enabled</span>
-                        </div>
+                        <h3 className={`text-3xl font-black tracking-tight transition-colors duration-300 ${
+                          isDark 
+                            ? 'text-white' 
+                            : 'bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent'
+                        }`}>{t('common.filters')}</h3>
+                        
                       </div>
                     </div>
                     <button
@@ -1326,7 +1496,11 @@ export default function Room() {
                         setFloorFilter('');
                         setCreatedByFilter('');
                       }}
-                      className="group px-8 py-4 bg-gradient-to-br from-slate-600 via-slate-700 to-slate-800 hover:from-slate-700 hover:via-slate-800 hover:to-slate-900 text-white font-bold rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-[1.05] hover:-translate-y-1 transition-all duration-300 focus:ring-4 focus:ring-slate-500/50 focus:ring-offset-2 backdrop-blur-sm flex items-center space-x-4 border border-slate-500/20"
+                      className={`group px-8 py-4 font-bold rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-[1.05] hover:-translate-y-1 transition-all duration-300 focus:ring-4 focus:ring-offset-2 backdrop-blur-sm flex items-center space-x-4 border ${
+                        isDark 
+                          ? 'bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 text-white focus:ring-gray-500/50 border-gray-500/20' 
+                          : 'bg-gradient-to-br from-slate-600 via-slate-700 to-slate-800 hover:from-slate-700 hover:via-slate-800 hover:to-slate-900 text-white focus:ring-slate-500/50 border-slate-500/20'
+                      }`}
                     >
                       <div className="relative">
                         <svg className="w-6 h-6 group-hover:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1343,32 +1517,44 @@ export default function Room() {
               {/* First Row - Basic Filters */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
                     {/* Global Search */}
-                    <div className="relative group bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                    <div className={`relative group rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-300 ${
+                      isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
+                    }`}>
                       <div className="flex items-center mb-4">
                         <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
                           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                           </svg>
                         </div>
-                        <label className="block text-lg font-bold text-slate-800">{t('rooms.searchRoomOrHotel')}</label>
+                        <label className={`block text-lg font-bold transition-colors duration-300 ${
+                          isDark ? 'text-white' : 'text-slate-800'
+                        }`}>{t('rooms.searchRoomOrHotel')}</label>
                       </div>
                       <div className="relative">
                         <input
                           type="text"
                           value={nameFilter}
                           onChange={(e) => setNameFilter(e.target.value)}
-                          className="w-full px-5 py-4 pl-12 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold placeholder-slate-400"
+                          className={`w-full px-5 py-4 pl-12 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-base font-semibold ${
+                            isDark 
+                              ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white placeholder-gray-400' 
+                              : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900 placeholder-slate-400'
+                          }`}
                           placeholder={t('rooms.searchRoomOrHotel')}
                         />
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                          <svg className="w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className={`w-5 h-5 group-focus-within:text-blue-500 transition-colors duration-300 ${
+                            isDark ? 'text-gray-400' : 'text-slate-400'
+                          }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                           </svg>
                         </div>
                         {nameFilter && (
                           <button
                             onClick={() => setNameFilter('')}
-                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-red-500 transition-colors duration-200"
+                            className={`absolute inset-y-0 right-0 pr-4 flex items-center hover:text-red-500 transition-colors duration-200 ${
+                              isDark ? 'text-gray-400' : 'text-slate-400'
+                            }`}
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1379,20 +1565,28 @@ export default function Room() {
                     </div>
 
                     {/* Hotel Selection */}
-                    <div className="relative group bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                    <div className={`relative group rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-300 ${
+                      isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
+                    }`}>
                       <div className="flex items-center mb-4">
                         <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
                           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                           </svg>
                         </div>
-                        <label className="block text-lg font-bold text-slate-800">{t('rooms.hotel')}</label>
+                        <label className={`block text-lg font-bold transition-colors duration-300 ${
+                          isDark ? 'text-white' : 'text-slate-800'
+                        }`}>{t('rooms.hotel')}</label>
                       </div>
                       <div className="relative">
                         <select
                           value={hotelFilter}
                           onChange={(e) => setHotelFilter(e.target.value)}
-                          className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold appearance-none cursor-pointer"
+                          className={`w-full px-5 py-4 border-2 rounded-xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 text-base font-semibold appearance-none cursor-pointer ${
+                            isDark 
+                              ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white' 
+                              : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900'
+                          }`}
                         >
                           <option value="">{t('rooms.allHotels')}</option>
                           {hotels.map((hotel) => (
@@ -1402,7 +1596,9 @@ export default function Room() {
                           ))}
                         </select>
                         <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                          <svg className="w-5 h-5 text-slate-400 group-focus-within:text-emerald-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className={`w-5 h-5 group-focus-within:text-emerald-500 transition-colors duration-300 ${
+                            isDark ? 'text-gray-400' : 'text-slate-400'
+                          }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                           </svg>
                         </div>
@@ -1410,20 +1606,28 @@ export default function Room() {
                     </div>
 
                     {/* Board Type */}
-                    <div className="relative group bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                    <div className={`relative group rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-300 ${
+                      isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
+                    }`}>
                       <div className="flex items-center mb-4">
                         <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
                           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h2m0-8h10a2 2 0 012 2v6a2 2 0 01-2 2H9m0-8v8" />
                           </svg>
                         </div>
-                        <label className="block text-lg font-bold text-slate-800">{t('rooms.boardType')}</label>
+                        <label className={`block text-lg font-bold transition-colors duration-300 ${
+                          isDark ? 'text-white' : 'text-slate-800'
+                        }`}>{t('rooms.boardType')}</label>
                       </div>
                       <div className="relative">
                         <select
                           value={boardTypeFilter}
                           onChange={(e) => setBoardTypeFilter(e.target.value)}
-                          className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold appearance-none cursor-pointer"
+                          className={`w-full px-5 py-4 border-2 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 text-base font-semibold appearance-none cursor-pointer ${
+                            isDark 
+                              ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white' 
+                              : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900'
+                          }`}
                         >
                           <option value="">{t('rooms.allBoardTypes')}</option>
                           <option value="Room only">{t('rooms.roomOnly')}</option>
@@ -1432,7 +1636,9 @@ export default function Room() {
                           <option value="Full board">{t('rooms.fullBoard')}</option>
                         </select>
                         <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                          <svg className="w-5 h-5 text-slate-400 group-focus-within:text-purple-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className={`w-5 h-5 group-focus-within:text-purple-500 transition-colors duration-300 ${
+                            isDark ? 'text-gray-400' : 'text-slate-400'
+                          }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                           </svg>
                         </div>
@@ -1443,21 +1649,29 @@ export default function Room() {
                 {/* Second Row - Price & Date Filters */}
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
                       {/* Purchase Price Range */}
-                      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                      <div className={`rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-300 ${
+                        isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
+                      }`}>
                         <div className="flex items-center mb-4">
                           <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
                             <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                             </svg>
                           </div>
-                          <label className="block text-base font-bold text-slate-800">{t('rooms.purchasePriceRange')}</label>
+                          <label className={`block text-base font-bold transition-colors duration-300 ${
+                            isDark ? 'text-white' : 'text-slate-800'
+                          }`}>{t('rooms.purchasePriceRange')}</label>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <input
                             type="number"
                             value={minPurchasePriceFilter}
                             onChange={(e) => setMinPurchasePriceFilter(e.target.value)}
-                            className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold placeholder-slate-400"
+                            className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 text-base font-semibold ${
+                              isDark 
+                                ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white placeholder-gray-400' 
+                                : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900 placeholder-slate-400'
+                            }`}
                             placeholder={t('common.min')}
                             min="0"
                             step="0.01"
@@ -1466,7 +1680,11 @@ export default function Room() {
                             type="number"
                             value={maxPurchasePriceFilter}
                             onChange={(e) => setMaxPurchasePriceFilter(e.target.value)}
-                            className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold placeholder-slate-400"
+                            className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 text-base font-semibold ${
+                              isDark 
+                                ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white placeholder-gray-400' 
+                                : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900 placeholder-slate-400'
+                            }`}
                             placeholder={t('common.max')}
                             min="0"
                             step="0.01"
@@ -1475,21 +1693,29 @@ export default function Room() {
                       </div>
 
                       {/* Base Price Range */}
-                      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                      <div className={`rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-300 ${
+                        isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
+                      }`}>
                         <div className="flex items-center mb-4">
                           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
                             <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                             </svg>
                           </div>
-                          <label className="block text-base font-bold text-slate-800">Selling / {t('rooms.basePriceRange')}</label>
+                          <label className={`block text-base font-bold transition-colors duration-300 ${
+                            isDark ? 'text-white' : 'text-slate-800'
+                          }`}>Selling / {t('rooms.basePriceRange')}</label>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <input
                             type="number"
                             value={minBasePriceFilter}
                             onChange={(e) => setMinBasePriceFilter(e.target.value)}
-                            className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold placeholder-slate-400"
+                            className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-base font-semibold ${
+                              isDark 
+                                ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white placeholder-gray-400' 
+                                : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900 placeholder-slate-400'
+                            }`}
                             placeholder={t('common.min')}
                             min="0"
                             step="0.01"
@@ -1498,7 +1724,11 @@ export default function Room() {
                             type="number"
                             value={maxBasePriceFilter}
                             onChange={(e) => setMaxBasePriceFilter(e.target.value)}
-                            className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold placeholder-slate-400"
+                            className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-base font-semibold ${
+                              isDark 
+                                ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white placeholder-gray-400' 
+                                : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900 placeholder-slate-400'
+                            }`}
                             placeholder={t('common.max')}
                             min="0"
                             step="0.01"
@@ -1507,66 +1737,94 @@ export default function Room() {
                       </div>
 
                       {/* Availability Dates */}
-                      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                      <div className={`rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-300 ${
+                        isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
+                      }`}>
                         <div className="flex items-center mb-4">
                           <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
                             <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                           </div>
-                          <label className="block text-base font-bold text-slate-800">{t('rooms.availabilityRange')}</label>
+                          <label className={`block text-base font-bold transition-colors duration-300 ${
+                            isDark ? 'text-white' : 'text-slate-800'
+                          }`}>{t('rooms.availabilityRange')}</label>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <input
                             type="date"
                             value={availableFromFilter}
                             onChange={(e) => setAvailableFromFilter(e.target.value)}
-                            className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold"
+                            className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 text-base font-semibold ${
+                              isDark 
+                                ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white' 
+                                : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900'
+                            }`}
                           />
                           <input
                             type="date"
                             value={availableToFilter}
                             onChange={(e) => setAvailableToFilter(e.target.value)}
-                            className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold"
+                            className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 text-base font-semibold ${
+                              isDark 
+                                ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white' 
+                                : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900'
+                            }`}
                           />
                         </div>
                       </div>
 
                     {/* Room Details Group - Enhanced Layout */}
-                    <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                    <div className={`rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-300 ${
+                      isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
+                    }`}>
                       <div className="flex items-center mb-4">
                         <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
                           <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
                           </svg>
                         </div>
-                        <label className="block text-base font-bold text-slate-800">{t('rooms.roomType')}</label>
+                        <label className={`block text-base font-bold transition-colors duration-300 ${
+                          isDark ? 'text-white' : 'text-slate-800'
+                        }`}>{t('rooms.roomType')}</label>
                       </div>
                       <input
                         type="text"
                         value={typeFilter}
                         onChange={(e) => setTypeFilter(e.target.value)}
-                        className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold placeholder-slate-400"
+                        className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-300 text-base font-semibold ${
+                          isDark 
+                            ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white placeholder-gray-400' 
+                            : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900 placeholder-slate-400'
+                        }`}
                         placeholder={t('rooms.searchRoomType')}
                       />
                     </div>
 
                     {/* Quantity Range */}
-                    <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                    <div className={`rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-300 ${
+                      isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
+                    }`}>
                       <div className="flex items-center mb-4">
                         <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center mr-3">
                           <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
                           </svg>
                         </div>
-                        <label className="block text-base font-bold text-slate-800">{t('rooms.quantityRange')}</label>
+                        <label className={`block text-base font-bold transition-colors duration-300 ${
+                          isDark ? 'text-white' : 'text-slate-800'
+                        }`}>{t('rooms.quantityRange')}</label>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <input
                           type="number"
                           value={minQuantityFilter}
                           onChange={(e) => setMinQuantityFilter(e.target.value)}
-                          className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold placeholder-slate-400"
+                          className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-300 text-base font-semibold ${
+                            isDark 
+                              ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white placeholder-gray-400' 
+                              : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900 placeholder-slate-400'
+                          }`}
                           placeholder={t('common.min')}
                           min="0"
                         />
@@ -1574,7 +1832,11 @@ export default function Room() {
                           type="number"
                           value={maxQuantityFilter}
                           onChange={(e) => setMaxQuantityFilter(e.target.value)}
-                          className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 hover:border-slate-300 transition-all duration-300 text-base font-semibold placeholder-slate-400"
+                          className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-300 text-base font-semibold ${
+                            isDark 
+                              ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white placeholder-gray-400' 
+                              : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900 placeholder-slate-400'
+                          }`}
                           placeholder={t('common.max')}
                           min="0"
                         />
@@ -1584,12 +1846,18 @@ export default function Room() {
               </div>
 
               {/* Visual Separator */}
-              <div className="border-t border-slate-200/60 my-8"></div>
+              <div className={`border-t my-8 transition-colors duration-300 ${
+                isDark ? 'border-gray-700/60' : 'border-slate-200/60'
+              }`}></div>
 
               {/* Selected Rooms Actions */}
               {selectedRooms.length > 0 && (
-                <div className="flex flex-wrap gap-3 p-4 bg-blue-50/50 border border-blue-200/50 rounded-xl mb-6">
-                  <div className="flex items-center space-x-2 text-blue-700 font-medium">
+                <div className={`flex flex-wrap gap-3 p-4 border rounded-xl mb-6 transition-colors duration-300 ${
+                  isDark ? 'bg-blue-900/30 border-blue-800/50' : 'bg-blue-50/50 border-blue-200/50'
+                }`}>
+                  <div className={`flex items-center space-x-2 font-medium transition-colors duration-300 ${
+                    isDark ? 'text-blue-300' : 'text-blue-700'
+                  }`}>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -1617,7 +1885,9 @@ export default function Room() {
               )}
 
               {/* Rooms Table */}
-              <div className="overflow-x-auto rounded-2xl border border-slate-200/60 bg-white/90 backdrop-blur-sm shadow-xl">
+              <div className={`overflow-x-auto rounded-2xl border backdrop-blur-sm shadow-xl transition-colors duration-300 ${
+                isDark ? 'border-gray-700/60 bg-gray-800/90' : 'border-slate-200/60 bg-white/90'
+              }`}>
                 {loading ? (
                   <div className="flex justify-center items-center py-16">
                     <div className="flex items-center space-x-4">
@@ -1625,73 +1895,115 @@ export default function Room() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
-                      <span className="text-slate-700 font-bold text-lg">{t('common.loading')}</span>
+                      <span className={`font-bold text-lg transition-colors duration-300 ${
+                        isDark ? 'text-gray-300' : 'text-slate-700'
+                      }`}>{t('common.loading')}</span>
                     </div>
                   </div>
                 ) : filteredRooms.length > 0 ? (
                   <table className="w-full min-w-[1200px] table-auto">
-                    <thead className="bg-gradient-to-r from-slate-100/80 to-slate-50/60 backdrop-blur-sm">
-                      <tr className="border-b-2 border-slate-200/60">
-                        <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide w-16">
+                    <thead className={`backdrop-blur-sm transition-colors duration-300 ${
+                      isDark ? 'bg-gradient-to-r from-gray-700/80 to-gray-800/60' : 'bg-gradient-to-r from-slate-100/80 to-slate-50/60'
+                    }`}>
+                      <tr className={`border-b-2 transition-colors duration-300 ${
+                        isDark ? 'border-gray-700/60' : 'border-slate-200/60'
+                      }`}>
+                        <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide w-16 transition-colors duration-300 ${
+                          isDark ? 'text-gray-200' : 'text-slate-800'
+                        }`}>
                           <input
                             type="checkbox"
                             checked={selectedRooms.length === filteredRooms.length && filteredRooms.length > 0}
                             onChange={handleSelectAllRooms}
-                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                            className={`w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2 transition-colors duration-300 ${
+                              isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
+                            }`}
                           />
                         </th>
-                        <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                        <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide transition-colors duration-300 ${
+                          isDark ? 'text-gray-200' : 'text-slate-800'
+                        }`}>
                           {t('rooms.hotel')}
                         </th>
-                        <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                        <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide transition-colors duration-300 ${
+                          isDark ? 'text-gray-200' : 'text-slate-800'
+                        }`}>
                           {t('rooms.roomType')}
                         </th>
-                        <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                        <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide transition-colors duration-300 ${
+                          isDark ? 'text-gray-200' : 'text-slate-800'
+                        }`}>
                           {t('rooms.roomDescription')}
                         </th>
-                        <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                        <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide transition-colors duration-300 ${
+                          isDark ? 'text-gray-200' : 'text-slate-800'
+                        }`}>
                           {t('rooms.boardType')}
                         </th>
-                        <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                        <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide transition-colors duration-300 ${
+                          isDark ? 'text-gray-200' : 'text-slate-800'
+                        }`}>
                           {t('rooms.purchasePrice')}
                         </th>
-                        <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                        <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide transition-colors duration-300 ${
+                          isDark ? 'text-gray-200' : 'text-slate-800'
+                        }`}>
                           {t('rooms.basePrice')}
                         </th>
-                        <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                        <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide transition-colors duration-300 ${
+                          isDark ? 'text-gray-200' : 'text-slate-800'
+                        }`}>
                           {t('rooms.alternativePrice')}
                         </th>
-                        <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                        <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide transition-colors duration-300 ${
+                          isDark ? 'text-gray-200' : 'text-slate-800'
+                        }`}>
                           {t('rooms.quantity')}
                         </th>
-                        <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                        <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide transition-colors duration-300 ${
+                          isDark ? 'text-gray-200' : 'text-slate-800'
+                        }`}>
                           {t('rooms.availableFrom')}
                         </th>
-                        <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                        <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide transition-colors duration-300 ${
+                          isDark ? 'text-gray-200' : 'text-slate-800'
+                        }`}>
                           {t('rooms.availableTo')}
                         </th>
-                        <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                        <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide transition-colors duration-300 ${
+                          isDark ? 'text-gray-200' : 'text-slate-800'
+                        }`}>
                           {t('common.createdDate')}
                         </th>
-                        <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                        <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide transition-colors duration-300 ${
+                          isDark ? 'text-gray-200' : 'text-slate-800'
+                        }`}>
                           {t('common.actions')}
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y-2 divide-slate-200/40">
+                    <tbody className={`divide-y-2 transition-colors duration-300 ${
+                      isDark ? 'divide-gray-700/40' : 'divide-slate-200/40'
+                    }`}>
                       {filteredRooms.map((room, index) => (
-                        <tr key={room.id} className={`hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-slate-50/50 transition-all duration-300 ${
-                          index % 2 === 0 ? 'bg-white/40' : 'bg-slate-50/30'
+                        <tr key={room.id} className={`transition-all duration-300 ${
+                          isDark 
+                            ? `hover:bg-gradient-to-r hover:from-gray-700/50 hover:to-gray-600/50 ${index % 2 === 0 ? 'bg-gray-800/40' : 'bg-gray-700/30'}` 
+                            : `hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-slate-50/50 ${index % 2 === 0 ? 'bg-white/40' : 'bg-slate-50/30'}`
                         }`}>
                           <td className="py-5 px-6 w-16">
                             <input
                               type="checkbox"
                               checked={selectedRooms.includes(room.id)}
                               onChange={() => handleSelectRoom(room.id)}
-                              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                              className={`w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2 transition-colors duration-300 ${
+                                isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
+                              }`}
                             />
                           </td>
-                          <td className="py-5 px-6 text-slate-900 font-bold text-base max-w-[350px]" title={room.hotelName || room.hotel?.name || t('rooms.unknownHotel')}>
+                          <td className={`py-5 px-6 font-bold text-base max-w-[350px] transition-colors duration-300 ${
+                            isDark ? 'text-gray-100' : 'text-slate-900'
+                          }`} title={room.hotelName || room.hotel?.name || t('rooms.unknownHotel')}>
                             <div className="flex items-center space-x-3">
                               <div className="flex-shrink-0">
                                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
@@ -1699,90 +2011,168 @@ export default function Room() {
                                 </div>
                               </div>
                               <div className="min-w-0 flex-1">
-                                <div className="font-bold text-slate-900 truncate">{room.hotelName || room.hotel?.name || t('rooms.unknownHotel')}</div>
+                                <div className={`font-bold truncate transition-colors duration-300 ${
+                                  isDark ? 'text-gray-100' : 'text-slate-900'
+                                }`}>{room.hotelName || room.hotel?.name || t('rooms.unknownHotel')}</div>
                                 {room.hotel?.code && (
-                                  <div className="text-xs text-slate-500 font-mono bg-slate-100 px-2 py-1 rounded inline-block mt-1">{room.hotel.code}</div>
+                                  <div className={`text-xs font-mono px-2 py-1 rounded inline-block mt-1 transition-colors duration-300 ${
+                                    isDark ? 'text-gray-400 bg-gray-700' : 'text-slate-500 bg-slate-100'
+                                  }`}>{room.hotel.code}</div>
                                 )}
                               </div>
                             </div>
                           </td>
-                          <td className="py-5 px-6 text-slate-700 font-semibold max-w-[120px] truncate" title={room.roomType}>
+                          <td className={`py-5 px-6 font-semibold max-w-[120px] truncate transition-colors duration-300 ${
+                            isDark ? 'text-gray-300' : 'text-slate-700'
+                          }`} title={room.roomType}>
                             {room.roomType}
                           </td>
-                          <td className="py-5 px-6 text-slate-600 font-medium max-w-[150px] truncate" title={`${room.roomTypeDescription}${room.altDescription ? ` | ${room.altDescription}` : ''}`}>
+                          <td className={`py-5 px-6 font-medium max-w-[150px] truncate transition-colors duration-300 ${
+                            isDark ? 'text-gray-400' : 'text-slate-600'
+                          }`} title={`${room.roomTypeDescription}${room.altDescription ? ` | ${room.altDescription}` : ''}`}>
                             <div className="flex flex-col">
-                              <span className="font-semibold">{room.roomTypeDescription}</span>
+                              <span className={`font-semibold transition-colors duration-300 ${
+                                isDark ? 'text-gray-300' : 'text-slate-700'
+                              }`}>{room.roomTypeDescription}</span>
                               {room.altDescription && (
-                                <span className="text-sm text-slate-500 italic truncate">{room.altDescription}</span>
+                                <span className={`text-sm italic truncate transition-colors duration-300 ${
+                                  isDark ? 'text-gray-500' : 'text-slate-500'
+                                }`}>{room.altDescription}</span>
                               )}
                             </div>
                           </td>
-                          <td className="py-5 px-6 text-slate-600">
-                            <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900 border border-blue-300/50 shadow-sm">
+                          <td className={`py-5 px-6 transition-colors duration-300 ${
+                            isDark ? 'text-gray-400' : 'text-slate-600'
+                          }`}>
+                            <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold shadow-sm transition-colors duration-300 ${
+                              isDark 
+                                ? 'bg-gradient-to-r from-blue-800 to-blue-900 text-blue-200 border border-blue-700/50' 
+                                : 'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900 border border-blue-300/50'
+                            }`}>
                               {BOARD_TYPE_MAPPINGS.apiToTranslated(room.boardType)}
                             </span>
                           </td>
-                          <td className="py-5 px-6 text-slate-600 font-semibold">
+                          <td className={`py-5 px-6 font-semibold transition-colors duration-300 ${
+                            isDark ? 'text-gray-400' : 'text-slate-600'
+                          }`}>
                             {room.purchasePrice ? (
-                              <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold bg-gradient-to-r from-green-100 to-green-200 text-green-900 border border-green-300/50 shadow-sm">
+                              <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold shadow-sm transition-colors duration-300 ${
+                                isDark 
+                                  ? 'bg-gradient-to-r from-green-800 to-green-900 text-green-200 border border-green-700/50' 
+                                  : 'bg-gradient-to-r from-green-100 to-green-200 text-green-900 border border-green-300/50'
+                              }`}>
                                 SAR {room.purchasePrice}
                               </span>
                             ) : (
-                              <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border border-gray-300/50 shadow-sm">-</span>
+                              <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold shadow-sm transition-colors duration-300 ${
+                                isDark 
+                                  ? 'bg-gradient-to-r from-gray-700 to-gray-800 text-gray-300 border border-gray-600/50' 
+                                  : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border border-gray-300/50'
+                              }`}>-</span>
                             )}
                           </td>
-                          <td className="py-5 px-6 text-slate-600 font-semibold">
-                            <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold bg-gradient-to-r from-indigo-100 to-indigo-200 text-indigo-900 border border-indigo-300/50 shadow-sm">
+                          <td className={`py-5 px-6 font-semibold transition-colors duration-300 ${
+                            isDark ? 'text-gray-400' : 'text-slate-600'
+                          }`}>
+                            <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold shadow-sm transition-colors duration-300 ${
+                              isDark 
+                                ? 'bg-gradient-to-r from-indigo-800 to-indigo-900 text-indigo-200 border border-indigo-700/50' 
+                                : 'bg-gradient-to-r from-indigo-100 to-indigo-200 text-indigo-900 border border-indigo-300/50'
+                            }`}>
                               SAR {room.basePrice}
                             </span>
                           </td>
-                          <td className="py-5 px-6 text-slate-600 font-semibold">
+                          <td className={`py-5 px-6 font-semibold transition-colors duration-300 ${
+                            isDark ? 'text-gray-400' : 'text-slate-600'
+                          }`}>
                             {room.alternativePrice ? (
-                              <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold bg-gradient-to-r from-orange-100 to-orange-200 text-orange-900 border border-orange-300/50 shadow-sm">
+                              <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold shadow-sm transition-colors duration-300 ${
+                                isDark 
+                                  ? 'bg-gradient-to-r from-orange-800 to-orange-900 text-orange-200 border border-orange-700/50' 
+                                  : 'bg-gradient-to-r from-orange-100 to-orange-200 text-orange-900 border border-orange-300/50'
+                              }`}>
                                 SAR {room.alternativePrice}
                               </span>
                             ) : (
-                              <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border border-gray-300/50 shadow-sm">-</span>
+                              <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold shadow-sm transition-colors duration-300 ${
+                                isDark 
+                                  ? 'bg-gradient-to-r from-gray-700 to-gray-800 text-gray-300 border border-gray-600/50' 
+                                  : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border border-gray-300/50'
+                              }`}>-</span>
                             )}
                           </td>
-                          <td className="py-5 px-6 text-slate-600">
-                            <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold bg-gradient-to-r from-purple-100 to-purple-200 text-purple-900 border border-purple-300/50 shadow-sm">
+                          <td className={`py-5 px-6 transition-colors duration-300 ${
+                            isDark ? 'text-gray-400' : 'text-slate-600'
+                          }`}>
+                            <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold shadow-sm transition-colors duration-300 ${
+                              isDark 
+                                ? 'bg-gradient-to-r from-purple-800 to-purple-900 text-purple-200 border border-purple-700/50' 
+                                : 'bg-gradient-to-r from-purple-100 to-purple-200 text-purple-900 border border-purple-300/50'
+                            }`}>
                               {room.quantity}
                             </span>
                           </td>
-                          <td className="py-5 px-6 text-slate-600 font-medium">
+                          <td className={`py-5 px-6 font-medium transition-colors duration-300 ${
+                            isDark ? 'text-gray-400' : 'text-slate-600'
+                          }`}>
                             {room.availableFrom ? (
-                              <div className="flex items-center space-x-2 bg-gradient-to-r from-emerald-50 to-teal-50 p-2 rounded-lg border border-emerald-200">
-                                <CalendarDaysIcon className="w-4 h-4 text-emerald-600" />
-                                <span className="font-semibold text-emerald-800">{new Date(room.availableFrom).toLocaleDateString()}</span>
+                              <div className={`flex items-center space-x-2 p-2 rounded-lg border transition-colors duration-300 ${
+                                isDark 
+                                  ? 'bg-gradient-to-r from-emerald-900/50 to-teal-900/50 border-emerald-700' 
+                                  : 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200'
+                              }`}>
+                                <CalendarDaysIcon className={`w-4 h-4 transition-colors duration-300 ${
+                                  isDark ? 'text-emerald-400' : 'text-emerald-600'
+                                }`} />
+                                <span className={`font-semibold transition-colors duration-300 ${
+                                  isDark ? 'text-emerald-300' : 'text-emerald-800'
+                                }`}>{new Date(room.availableFrom).toLocaleDateString()}</span>
                               </div>
                             ) : (
-                              <span className="text-slate-400 italic">-</span>
+                              <span className={`italic transition-colors duration-300 ${
+                                isDark ? 'text-gray-500' : 'text-slate-400'
+                              }`}>-</span>
                             )}
                           </td>
-                          <td className="py-5 px-6 text-slate-600 font-medium">
+                          <td className={`py-5 px-6 font-medium transition-colors duration-300 ${
+                            isDark ? 'text-gray-400' : 'text-slate-600'
+                          }`}>
                             {room.availableTo ? (
-                              <div className="flex items-center space-x-2 bg-gradient-to-r from-red-50 to-pink-50 p-2 rounded-lg border border-red-200">
-                                <CalendarDaysIcon className="w-4 h-4 text-red-600" />
-                                <span className="font-semibold text-red-800">{new Date(room.availableTo).toLocaleDateString()}</span>
+                              <div className={`flex items-center space-x-2 p-2 rounded-lg border transition-colors duration-300 ${
+                                isDark 
+                                  ? 'bg-gradient-to-r from-red-900/50 to-pink-900/50 border-red-700' 
+                                  : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-200'
+                              }`}>
+                                <CalendarDaysIcon className={`w-4 h-4 transition-colors duration-300 ${
+                                  isDark ? 'text-red-400' : 'text-red-600'
+                                }`} />
+                                <span className={`font-semibold transition-colors duration-300 ${
+                                  isDark ? 'text-red-300' : 'text-red-800'
+                                }`}>{new Date(room.availableTo).toLocaleDateString()}</span>
                               </div>
                             ) : (
-                              <span className="text-slate-400 italic">-</span>
+                              <span className={`italic transition-colors duration-300 ${
+                                isDark ? 'text-gray-500' : 'text-slate-400'
+                              }`}>-</span>
                             )}
                           </td>
-                          <td className="py-5 px-6 text-slate-600 font-medium">
+                          <td className={`py-5 px-6 font-medium ${isDark ? 'text-gray-300' : 'text-slate-600'}`}>
                             <div className="flex items-center space-x-2">
-                              <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className={`w-4 h-4 ${isDark ? 'text-gray-400' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
-                              <span className="font-semibold text-slate-700">{new Date(room.createdAt).toLocaleDateString()}</span>
+                              <span className={`font-semibold ${isDark ? 'text-gray-200' : 'text-slate-700'}`}>{new Date(room.createdAt).toLocaleDateString()}</span>
                             </div>
                           </td>
                           <td className="py-5 px-6">
                             <div className="flex flex-wrap gap-2">
                               <button
                                 onClick={() => handleViewRoom(room.id)}
-                                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border border-blue-500/30"
+                                className={`px-4 py-2 bg-gradient-to-r text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border ${
+                                  isDark 
+                                    ? 'from-blue-500 to-blue-600 border-blue-400/30 hover:from-blue-400 hover:to-blue-500' 
+                                    : 'from-blue-600 to-blue-700 border-blue-500/30'
+                                }`}
                               >
                                 <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -1792,7 +2182,11 @@ export default function Room() {
                               </button>
                               <button
                                 onClick={() => handleEditRoom && handleEditRoom(room.id)}
-                                className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border border-amber-400/30"
+                                className={`px-4 py-2 bg-gradient-to-r text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border ${
+                                  isDark 
+                                    ? 'from-amber-400 to-amber-500 border-amber-300/30 hover:from-amber-300 hover:to-amber-400' 
+                                    : 'from-amber-500 to-amber-600 border-amber-400/30'
+                                }`}
                               >
                                 <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -1801,7 +2195,11 @@ export default function Room() {
                               </button>
                               <button
                                 onClick={() => handleDeleteRoom(room.id)}
-                                className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border border-red-400/30"
+                                className={`px-4 py-2 bg-gradient-to-r text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border ${
+                                  isDark 
+                                    ? 'from-red-400 to-red-500 border-red-300/30 hover:from-red-300 hover:to-red-400' 
+                                    : 'from-red-500 to-red-600 border-red-400/30'
+                                }`}
                               >
                                 <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -1810,7 +2208,11 @@ export default function Room() {
                               </button>
                               <button
                                 onClick={() => handlePrintRoom && handlePrintRoom(room.id)}
-                                className="px-4 py-2 bg-gradient-to-r from-slate-600 to-slate-700 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border border-slate-500/30"
+                                className={`px-4 py-2 bg-gradient-to-r text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border ${
+                                  isDark 
+                                    ? 'from-slate-500 to-slate-600 border-slate-400/30 hover:from-slate-400 hover:to-slate-500' 
+                                    : 'from-slate-600 to-slate-700 border-slate-500/30'
+                                }`}
                               >
                                 <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -1845,17 +2247,29 @@ export default function Room() {
 
         {/* Room Details Modal */}
         {selectedRoomDetails && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="backdrop-blur-xl bg-white/90 border border-white/20 rounded-3xl shadow-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className={`fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4 ${
+            isDark ? 'bg-black/70' : 'bg-black/50'
+          }`}>
+            <div className={`backdrop-blur-xl border rounded-3xl shadow-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto ${
+              isDark 
+                ? 'bg-gray-800/95 border-gray-600/30' 
+                : 'bg-white/90 border-white/20'
+            }`}>
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-semibold text-gray-900">
+                <h3 className={`text-2xl font-semibold ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                }`}>
                   {t('rooms.roomDetails')}
                 </h3>
                 <button
                   onClick={() => setSelectedRoomDetails(null)}
-                  className="p-2 hover:bg-gray-100/50 rounded-xl transition-colors"
+                  className={`p-2 rounded-xl transition-colors ${
+                    isDark ? 'hover:bg-gray-700/50' : 'hover:bg-gray-100/50'
+                  }`}
                 >
-                  <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className={`w-6 h-6 ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -1864,83 +2278,139 @@ export default function Room() {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className={`block text-sm font-medium ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
                       {t('rooms.hotel')}
                     </label>
-                    <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800">
+                    <div className={`px-4 py-3 border rounded-xl ${
+                      isDark 
+                        ? 'bg-gray-700/50 border-gray-600/50 text-gray-200' 
+                        : 'bg-gray-50/50 border-gray-200/50 text-gray-800'
+                    }`}>
                       {selectedRoomDetails.hotelName || selectedRoomDetails.hotel?.name || t('rooms.unknownHotel')}
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className={`block text-sm font-medium ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
                       {t('rooms.roomType')}
                     </label>
-                    <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800">
+                    <div className={`px-4 py-3 border rounded-xl ${
+                      isDark 
+                        ? 'bg-gray-700/50 border-gray-600/50 text-gray-200' 
+                        : 'bg-gray-50/50 border-gray-200/50 text-gray-800'
+                    }`}>
                       {selectedRoomDetails.roomType}
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className={`block text-sm font-medium ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
                       {t('rooms.boardType')}
                     </label>
-                    <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800">
-                      <span className="px-3 py-1 bg-blue-100/50 text-blue-800 text-sm rounded-full">
+                    <div className={`px-4 py-3 border rounded-xl ${
+                      isDark 
+                        ? 'bg-gray-700/50 border-gray-600/50 text-gray-200' 
+                        : 'bg-gray-50/50 border-gray-200/50 text-gray-800'
+                    }`}>
+                      <span className={`px-3 py-1 text-sm rounded-full ${
+                        isDark 
+                          ? 'bg-blue-800/50 text-blue-200' 
+                          : 'bg-blue-100/50 text-blue-800'
+                      }`}>
                         {BOARD_TYPE_MAPPINGS.apiToTranslated(selectedRoomDetails.boardType)}
                       </span>
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className={`block text-sm font-medium ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
                       Purchase Price
                     </label>
-                    <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800 font-semibold">
+                    <div className={`px-4 py-3 border rounded-xl font-semibold ${
+                      isDark 
+                        ? 'bg-gray-700/50 border-gray-600/50 text-gray-200' 
+                        : 'bg-gray-50/50 border-gray-200/50 text-gray-800'
+                    }`}>
                       {selectedRoomDetails.purchasePrice ? (
-                        <span className="text-green-600 font-semibold">SAR {selectedRoomDetails.purchasePrice}</span>
+                        <span className={`font-semibold ${
+                          isDark ? 'text-green-400' : 'text-green-600'
+                        }`}>SAR {selectedRoomDetails.purchasePrice}</span>
                       ) : (
-                        <span className="text-gray-400">-</span>
+                        <span className={isDark ? 'text-gray-500' : 'text-gray-400'}>-</span>
                       )}
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className={`block text-sm font-medium ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
                       Base Price
                     </label>
-                    <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800 font-semibold">
+                    <div className={`px-4 py-3 border rounded-xl font-semibold ${
+                      isDark 
+                        ? 'bg-gray-700/50 border-gray-600/50 text-gray-200' 
+                        : 'bg-gray-50/50 border-gray-200/50 text-gray-800'
+                    }`}>
                       SAR {selectedRoomDetails.basePrice}
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className={`block text-sm font-medium ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
                       Alternative Price
                     </label>
-                    <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800">
+                    <div className={`px-4 py-3 border rounded-xl ${
+                      isDark 
+                        ? 'bg-gray-700/50 border-gray-600/50 text-gray-200' 
+                        : 'bg-gray-50/50 border-gray-200/50 text-gray-800'
+                    }`}>
                       {selectedRoomDetails.alternativePrice ? (
-                        <span className="text-orange-600 font-semibold">SAR {selectedRoomDetails.alternativePrice}</span>
+                        <span className={`font-semibold ${
+                          isDark ? 'text-orange-400' : 'text-orange-600'
+                        }`}>SAR {selectedRoomDetails.alternativePrice}</span>
                       ) : (
-                        <span className="text-gray-400">-</span>
+                        <span className={isDark ? 'text-gray-500' : 'text-gray-400'}>-</span>
                       )}
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className={`block text-sm font-medium ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
                       {t('rooms.quantity')}
                     </label>
-                    <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800 font-semibold">
+                    <div className={`px-4 py-3 border rounded-xl font-semibold ${
+                      isDark 
+                        ? 'bg-gray-700/50 border-gray-600/50 text-gray-200' 
+                        : 'bg-gray-50/50 border-gray-200/50 text-gray-800'
+                    }`}>
                       {selectedRoomDetails.quantity}
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className={`block text-sm font-medium ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
                       {t('common.createdDate')}
                     </label>
-                    <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800">
+                    <div className={`px-4 py-3 border rounded-xl ${
+                      isDark 
+                        ? 'bg-gray-700/50 border-gray-600/50 text-gray-200' 
+                        : 'bg-gray-50/50 border-gray-200/50 text-gray-800'
+                    }`}>
                       {new Date(selectedRoomDetails.createdAt).toLocaleDateString()}
                     </div>
                   </div>
@@ -1948,19 +2418,31 @@ export default function Room() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className={`block text-sm font-medium ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
                       {t('rooms.roomDescription')}
                     </label>
-                    <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800 min-h-[80px]">
+                    <div className={`px-4 py-3 border rounded-xl min-h-[80px] ${
+                      isDark 
+                        ? 'bg-gray-700/50 border-gray-600/50 text-gray-200' 
+                        : 'bg-gray-50/50 border-gray-200/50 text-gray-800'
+                    }`}>
                       {selectedRoomDetails.roomTypeDescription || '-'}
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className={`block text-sm font-medium ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
                       {t('rooms.altDescription')}
                     </label>
-                    <div className="px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-gray-800 min-h-[80px]">
+                    <div className={`px-4 py-3 border rounded-xl min-h-[80px] ${
+                      isDark 
+                        ? 'bg-gray-700/50 border-gray-600/50 text-gray-200' 
+                        : 'bg-gray-50/50 border-gray-200/50 text-gray-800'
+                    }`}>
                       {selectedRoomDetails.altDescription || '-'}
                     </div>
                   </div>
@@ -1972,7 +2454,11 @@ export default function Room() {
                       handleDeleteRoom(selectedRoomDetails.id);
                       setSelectedRoomDetails(null);
                     }}
-                    className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
+                    className={`px-6 py-3 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 ${
+                      isDark 
+                        ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800' 
+                        : 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
+                    }`}
                   >
                     {t('common.delete')}
                   </button>
@@ -1984,33 +2470,57 @@ export default function Room() {
 
         {/* Edit Room Modal */}
         {editingRoom && editFormData && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="backdrop-blur-xl bg-white/90 border border-white/20 rounded-3xl shadow-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className={`fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4 ${
+            isDark ? 'bg-black/70' : 'bg-black/50'
+          }`}>
+            <div className={`backdrop-blur-xl border rounded-3xl shadow-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto ${
+              isDark 
+                ? 'bg-gray-800/95 border-gray-700/50' 
+                : 'bg-white/90 border-white/20'
+            }`}>
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-semibold text-gray-900">
+                <h3 className={`text-2xl font-semibold ${
+                  isDark ? 'text-gray-100' : 'text-gray-900'
+                }`}>
                   {t('rooms.editRoom')}
                 </h3>
                 <button
                   onClick={handleCancelEdit}
-                  className="p-2 hover:bg-gray-100/50 rounded-xl transition-colors"
+                  className={`p-2 rounded-xl transition-colors ${
+                    isDark 
+                      ? 'hover:bg-gray-700/50 text-gray-400 hover:text-gray-200' 
+                      : 'hover:bg-gray-100/50 text-gray-500 hover:text-gray-700'
+                  }`}
                 >
-                  <XMarkIcon className="w-6 h-6 text-gray-500" />
+                  <XMarkIcon className="w-6 h-6" />
                 </button>
               </div>
               
               <form onSubmit={handleUpdateRoom} className="space-y-6">
                 {/* Form Validation Errors */}
                 {editFormErrors.length > 0 && (
-                  <div className="bg-red-50/90 border-2 border-red-300/60 rounded-2xl p-6 shadow-lg">
+                  <div className={`border-2 rounded-2xl p-6 shadow-lg ${
+                    isDark 
+                      ? 'bg-red-900/20 border-red-700/60' 
+                      : 'bg-red-50/90 border-red-300/60'
+                  }`}>
                     <div className="flex items-center space-x-4 mb-4">
-                      <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center shadow-md">
-                        <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-md ${
+                        isDark ? 'bg-red-800/50' : 'bg-red-100'
+                      }`}>
+                        <svg className={`w-6 h-6 ${
+                          isDark ? 'text-red-400' : 'text-red-600'
+                        }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       </div>
-                      <h4 className="font-bold text-lg text-red-900">{t('validation.pleaseFixErrors')}</h4>
+                      <h4 className={`font-bold text-lg ${
+                        isDark ? 'text-red-300' : 'text-red-900'
+                      }`}>{t('validation.pleaseFixErrors')}</h4>
                     </div>
-                    <ul className="list-disc list-inside space-y-2 text-red-800 font-medium">
+                    <ul className={`list-disc list-inside space-y-2 font-medium ${
+                      isDark ? 'text-red-400' : 'text-red-800'
+                    }`}>
                       {editFormErrors.map((error, index) => (
                         <li key={index}>{error}</li>
                       ))}
@@ -2021,7 +2531,9 @@ export default function Room() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Room Type */}
                   <div>
-                    <label className="block text-base font-bold text-slate-700 mb-4">
+                    <label className={`block text-base font-bold mb-4 ${
+                      isDark ? 'text-gray-200' : 'text-slate-700'
+                    }`}>
                       {t('rooms.roomType')} <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
@@ -2032,10 +2544,14 @@ export default function Room() {
                         type="text"
                         value={editFormData.roomType}
                         onChange={(e) => updateEditFormField('roomType', e.target.value)}
-                        className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
                           editFormErrors.some(error => error.includes('room type') || error.includes('Room type')) 
-                            ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
-                            : 'border-slate-300 focus:ring-blue-500/30'
+                            ? `border-red-500 focus:ring-red-500/30 ${
+                                isDark ? 'bg-red-900/20 text-gray-200' : 'bg-red-50/80 text-slate-900'
+                              }` 
+                            : `border-slate-300 focus:ring-blue-500/30 ${
+                                isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900'
+                              }`
                         }`}
                         placeholder={t('rooms.roomTypePlaceholder')}
                       />
@@ -2044,7 +2560,9 @@ export default function Room() {
 
                   {/* Room Description */}
                   <div>
-                    <label className="block text-base font-bold text-slate-700 mb-4">
+                    <label className={`block text-base font-bold mb-4 ${
+                      isDark ? 'text-gray-200' : 'text-slate-700'
+                    }`}>
                       {t('rooms.roomDescription')} <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
@@ -2055,10 +2573,14 @@ export default function Room() {
                         type="text"
                         value={editFormData.roomTypeDescription}
                         onChange={(e) => updateEditFormField('roomTypeDescription', e.target.value)}
-                        className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
                           editFormErrors.some(error => error.includes('description') || error.includes('Description')) 
-                            ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
-                            : 'border-slate-300 focus:ring-blue-500/30'
+                            ? `border-red-500 focus:ring-red-500/30 ${
+                                isDark ? 'bg-red-900/20 text-gray-200' : 'bg-red-50/80 text-slate-900'
+                              }` 
+                            : `border-slate-300 focus:ring-blue-500/30 ${
+                                isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900'
+                              }`
                         }`}
                         placeholder={t('rooms.roomDescriptionPlaceholder')}
                       />
@@ -2067,7 +2589,9 @@ export default function Room() {
 
                   {/* Purchase Price */}
                   <div>
-                    <label className="block text-base font-bold text-slate-700 mb-4">
+                    <label className={`block text-base font-bold mb-4 ${
+                      isDark ? 'text-gray-200' : 'text-slate-700'
+                    }`}>
                       {t('rooms.purchasePrice')} <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
@@ -2080,10 +2604,14 @@ export default function Room() {
                         min="0"
                         value={editFormData.purchasePrice}
                         onChange={(e) => updateEditFormField('purchasePrice', e.target.value)}
-                        className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
                           editFormErrors.some(error => error.includes('purchase') || error.includes('Purchase')) 
-                            ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
-                            : 'border-slate-300 focus:ring-blue-500/30'
+                            ? `border-red-500 focus:ring-red-500/30 ${
+                                isDark ? 'bg-red-900/20 text-gray-200' : 'bg-red-50/80 text-slate-900'
+                              }` 
+                            : `border-slate-300 focus:ring-blue-500/30 ${
+                                isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900'
+                              }`
                         }`}
                         placeholder="0.00"
                       />
@@ -2092,7 +2620,9 @@ export default function Room() {
 
                   {/* Base Price */}
                   <div>
-                    <label className="block text-base font-bold text-slate-700 mb-4">
+                    <label className={`block text-base font-bold mb-4 ${
+                      isDark ? 'text-gray-200' : 'text-slate-700'
+                    }`}>
                       {t('rooms.basePrice')} <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
@@ -2105,10 +2635,14 @@ export default function Room() {
                         min="0"
                         value={editFormData.basePrice}
                         onChange={(e) => updateEditFormField('basePrice', e.target.value)}
-                        className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
                           editFormErrors.some(error => error.includes('base') || error.includes('Base')) 
-                            ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
-                            : 'border-slate-300 focus:ring-blue-500/30'
+                            ? `border-red-500 focus:ring-red-500/30 ${
+                                isDark ? 'bg-red-900/20 text-gray-200' : 'bg-red-50/80 text-slate-900'
+                              }` 
+                            : `border-slate-300 focus:ring-blue-500/30 ${
+                                isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900'
+                              }`
                         }`}
                         placeholder="0.00"
                       />
@@ -2117,7 +2651,9 @@ export default function Room() {
 
                   {/* Alternative Price */}
                   <div>
-                    <label className="block text-base font-bold text-slate-700 mb-4">
+                    <label className={`block text-base font-bold mb-4 ${
+                      isDark ? 'text-gray-200' : 'text-slate-700'
+                    }`}>
                       {t('rooms.alternativePrice')}
                     </label>
                     <div className="relative">
@@ -2130,7 +2666,9 @@ export default function Room() {
                         min="0"
                         value={editFormData.alternativePrice}
                         onChange={(e) => updateEditFormField('alternativePrice', e.target.value)}
-                        className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-300 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md"
+                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                          isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900 border-slate-300'
+                        }`}
                         placeholder="0.00"
                       />
                     </div>
@@ -2138,7 +2676,9 @@ export default function Room() {
 
                   {/* Quantity */}
                   <div>
-                    <label className="block text-base font-bold text-slate-700 mb-4">
+                    <label className={`block text-base font-bold mb-4 ${
+                      isDark ? 'text-gray-200' : 'text-slate-700'
+                    }`}>
                       {t('rooms.quantity')} <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
@@ -2150,10 +2690,14 @@ export default function Room() {
                         min="1"
                         value={editFormData.quantity}
                         onChange={(e) => updateEditFormField('quantity', e.target.value)}
-                        className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
                           editFormErrors.some(error => error.includes('quantity') || error.includes('Quantity')) 
-                            ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
-                            : 'border-slate-300 focus:ring-blue-500/30'
+                            ? `border-red-500 focus:ring-red-500/30 ${
+                                isDark ? 'bg-red-900/20 text-gray-200' : 'bg-red-50/80 text-slate-900'
+                              }` 
+                            : `border-slate-300 focus:ring-blue-500/30 ${
+                                isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900'
+                              }`
                         }`}
                         placeholder="1"
                       />
@@ -2163,7 +2707,9 @@ export default function Room() {
 
                 {/* Board Type */}
                 <div>
-                  <label className="block text-base font-bold text-slate-700 mb-4">
+                  <label className={`block text-base font-bold mb-4 ${
+                    isDark ? 'text-gray-200' : 'text-slate-700'
+                  }`}>
                     {t('rooms.boardType')} <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -2173,7 +2719,9 @@ export default function Room() {
                     <select
                       value={editFormData.boardType}
                       onChange={(e) => updateEditFormField('boardType', e.target.value as RoomFormData['boardType'])}
-                      className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-300 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md"
+                      className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                        isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900 border-slate-300'
+                      }`}
                     >
                       <option value="Room only">{t('rooms.roomOnly')}</option>
                       <option value="Bed & breakfast">{t('rooms.bedBreakfast')}</option>
@@ -2186,7 +2734,9 @@ export default function Room() {
                 {/* Availability Dates */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-base font-bold text-slate-700 mb-4">
+                    <label className={`block text-base font-bold mb-4 ${
+                      isDark ? 'text-gray-200' : 'text-slate-700'
+                    }`}>
                       {t('rooms.availableFrom')}
                     </label>
                     <div className="relative">
@@ -2197,16 +2747,22 @@ export default function Room() {
                         type="date"
                         value={editFormData.availableFrom}
                         onChange={(e) => updateEditFormField('availableFrom', e.target.value)}
-                        className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
                           editFormErrors.some(error => error.includes('date') || error.includes('Date') || error.includes('availability')) 
-                            ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
-                            : 'border-slate-300 focus:ring-blue-500/30'
+                            ? `border-red-500 focus:ring-red-500/30 ${
+                                isDark ? 'bg-red-900/20 text-gray-200' : 'bg-red-50/80 text-slate-900'
+                              }` 
+                            : `border-slate-300 focus:ring-blue-500/30 ${
+                                isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900'
+                              }`
                         }`}
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-base font-bold text-slate-700 mb-4">
+                    <label className={`block text-base font-bold mb-4 ${
+                      isDark ? 'text-gray-200' : 'text-slate-700'
+                    }`}>
                       {t('rooms.availableTo')}
                     </label>
                     <div className="relative">
@@ -2217,10 +2773,14 @@ export default function Room() {
                         type="date"
                         value={editFormData.availableTo}
                         onChange={(e) => updateEditFormField('availableTo', e.target.value)}
-                        className={`w-full pl-12 pr-4 py-4 bg-white border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
+                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
                           editFormErrors.some(error => error.includes('date') || error.includes('Date') || error.includes('availability')) 
-                            ? 'border-red-500 focus:ring-red-500/30 bg-red-50/80' 
-                            : 'border-slate-300 focus:ring-blue-500/30'
+                            ? `border-red-500 focus:ring-red-500/30 ${
+                                isDark ? 'bg-red-900/20 text-gray-200' : 'bg-red-50/80 text-slate-900'
+                              }` 
+                            : `border-slate-300 focus:ring-blue-500/30 ${
+                                isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900'
+                              }`
                         }`}
                       />
                     </div>
@@ -2229,18 +2789,24 @@ export default function Room() {
 
                 {/* Alternative Description */}
                 <div>
-                  <label className="block text-base font-bold text-slate-700 mb-4">
+                  <label className={`block text-base font-bold mb-4 ${
+                    isDark ? 'text-gray-200' : 'text-slate-700'
+                  }`}>
                     {t('rooms.altDescription')}
                   </label>
                   <div className="relative">
                     <div className="absolute top-4 left-0 pl-4 flex items-start pointer-events-none">
-                      <ChatBubbleLeftRightIcon className="w-6 h-6 text-slate-500" />
+                      <ChatBubbleLeftRightIcon className={`w-6 h-6 ${
+                        isDark ? 'text-gray-400' : 'text-slate-500'
+                      }`} />
                     </div>
                     <textarea
                       value={editFormData.altDescription}
                       onChange={(e) => updateEditFormField('altDescription', e.target.value)}
                       rows={4}
-                      className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-300 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md resize-none"
+                      className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md resize-none ${
+                        isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900 border-slate-300'
+                      }`}
                       placeholder={t('rooms.altDescriptionPlaceholder')}
                     />
                   </div>
@@ -2253,8 +2819,14 @@ export default function Room() {
                     disabled={loading}
                     className={`flex-1 px-8 py-4 font-black text-lg rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 focus:ring-4 focus:ring-offset-2 backdrop-blur-sm ${
                       loading
-                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white focus:ring-blue-500/50'
+                        ? `cursor-not-allowed ${
+                            isDark ? 'bg-gray-600 text-gray-400' : 'bg-gray-400 text-gray-200'
+                          }`
+                        : `text-white focus:ring-blue-500/50 ${
+                            isDark 
+                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700' 
+                              : 'bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800'
+                          }`
                     }`}
                   >
                     {loading ? (
@@ -2274,7 +2846,11 @@ export default function Room() {
                   <button
                     type="button"
                     onClick={handleCancelEdit}
-                    className="px-8 py-4 bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white font-black text-lg rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 focus:ring-4 focus:ring-slate-500/50 focus:ring-offset-2 backdrop-blur-sm"
+                    className={`px-8 py-4 text-white font-black text-lg rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 focus:ring-4 focus:ring-offset-2 backdrop-blur-sm ${
+                      isDark 
+                        ? 'bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 focus:ring-gray-500/50' 
+                        : 'bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 focus:ring-slate-500/50'
+                    }`}
                   >
                     <div className="flex items-center justify-center space-x-3">
                       <XMarkIcon className="w-6 h-6" />

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useTheme } from '@/hooks/useTheme';
 
 interface HotelAgreement {
   id: string;
@@ -51,6 +52,7 @@ interface ApiResponse<T> {
 export default function Hotel() {
   const { language } = useLanguage();
   const { t } = useTranslation();
+  const { isDark } = useTheme();
   const [hotelName, setHotelName] = useState('');
   const [hotelCode, setHotelCode] = useState('');
   const [altHotelName, setAltHotelName] = useState('');
@@ -475,17 +477,25 @@ export default function Hotel() {
 
   return (
     <ProtectedRoute requiredRole="OWNER">
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 px-4 py-8 relative overflow-hidden">
+      <div className={`min-h-screen px-4 py-8 relative overflow-hidden transition-colors duration-300 ${
+        isDark 
+          ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' 
+          : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
+      }`}>
         {/* Error Display */}
         {error && (
-          <div className="backdrop-blur-xl bg-red-50/70 border border-red-200/50 rounded-3xl shadow-2xl p-6">
+          <div className={`backdrop-blur-xl rounded-3xl shadow-2xl p-6 ${
+            isDark 
+              ? 'bg-red-900/70 border border-red-700/50' 
+              : 'bg-red-50/70 border border-red-200/50'
+          }`}>
             <div className="flex items-center space-x-3">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
               </div>
-              <div className="text-red-800">
+              <div className={isDark ? 'text-red-200' : 'text-red-800'}>
                 <p className="font-medium">{error}</p>
               </div>
               <div className="ml-auto">
@@ -504,7 +514,11 @@ export default function Hotel() {
         )}
 
         {/* Add/Edit Hotel Section - Enhanced */}
-        <div className="backdrop-blur-sm bg-white/85 border-2 border-slate-200/70 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-16 mx-4 mb-16">
+        <div className={`backdrop-blur-sm border-2 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-16 mx-4 mb-16 ${
+          isDark 
+            ? 'bg-gray-800/85 border-gray-600/70' 
+            : 'bg-white/85 border-slate-200/70'
+        }`}>
           <div className="mb-16">
             <div className="flex items-center space-x-12 mb-16">
               <div className="w-32 h-32 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl flex items-center justify-center shadow-xl">
@@ -513,10 +527,14 @@ export default function Hotel() {
                 </svg>
               </div>
               <div className="flex-1">
-                <h2 className="text-4xl font-black text-slate-900 tracking-tight leading-tight mb-6">
+                <h2 className={`text-4xl font-black tracking-tight leading-tight mb-6 ${
+                  isDark ? 'text-white' : 'text-slate-900'
+                }`}>
                   {editingHotel ? t('hotels.editHotel') : t('hotels.addNewHotel')}
                 </h2>
-                <p className="text-slate-700 text-xl font-bold mt-6 leading-relaxed">
+                <p className={`text-xl font-bold mt-6 leading-relaxed ${
+                  isDark ? 'text-gray-300' : 'text-slate-700'
+                }`}>
                   {editingHotel ? t('hotels.updateHotelDetails') : t('hotels.enterHotelDetails')}
                 </p>
               </div>
@@ -532,7 +550,9 @@ export default function Hotel() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
                 {/* Hotel Name */}
                 <div className="space-y-8">
-                  <label className="block text-2xl font-black text-slate-900 tracking-wide mb-4">
+                  <label className={`block text-2xl font-black tracking-wide mb-4 ${
+                    isDark ? 'text-white' : 'text-slate-900'
+                  }`}>
                     {t('hotels.hotelName')}
                   </label>
                   <div className="relative">
@@ -545,7 +565,11 @@ export default function Hotel() {
                       type="text"
                       value={hotelName}
                       onChange={(e) => setHotelName(e.target.value)}
-                      className="w-full pl-14 pr-6 py-5 bg-slate-50/70 border-2 border-slate-300 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-800 font-semibold text-lg shadow-sm hover:shadow-md hover:border-slate-400"
+                      className={`w-full pl-14 pr-6 py-5 border-2 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 font-semibold text-lg shadow-sm hover:shadow-md ${
+                        isDark 
+                          ? 'bg-gray-700/70 border-gray-600 placeholder-gray-400 text-white hover:border-gray-500' 
+                          : 'bg-slate-50/70 border-slate-300 placeholder-slate-400 text-slate-800 hover:border-slate-400'
+                      }`}
                       placeholder={t('hotels.enterHotelName')}
                       required
                     />
@@ -554,7 +578,9 @@ export default function Hotel() {
 
                 {/* Alt Hotel Name */}
                 <div className="space-y-8">
-                  <label className="block text-2xl font-black text-slate-900 tracking-wide mb-4">
+                  <label className={`block text-2xl font-black tracking-wide mb-4 ${
+                    isDark ? 'text-white' : 'text-slate-900'
+                  }`}>
                     {t('hotels.altHotelName')}
                   </label>
                   <div className="relative">
@@ -567,7 +593,11 @@ export default function Hotel() {
                       type="text"
                       value={altHotelName}
                       onChange={(e) => setAltHotelName(e.target.value)}
-                      className="w-full pl-14 pr-6 py-5 bg-slate-50/70 border-2 border-slate-300 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-800 font-semibold text-lg shadow-sm hover:shadow-md hover:border-slate-400"
+                      className={`w-full pl-14 pr-6 py-5 border-2 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 font-semibold text-lg shadow-sm hover:shadow-md ${
+                        isDark 
+                          ? 'bg-gray-700/70 border-gray-600 placeholder-gray-400 text-white hover:border-gray-500' 
+                          : 'bg-slate-50/70 border-slate-300 placeholder-slate-400 text-slate-800 hover:border-slate-400'
+                      }`}
                       placeholder={t('hotels.enterAltName')}
                       required
                     />
@@ -576,7 +606,9 @@ export default function Hotel() {
 
                 {/* Hotel Code */}
                 <div className="space-y-8">
-                  <label className="block text-2xl font-black text-slate-900 tracking-wide mb-4">
+                  <label className={`block text-2xl font-black tracking-wide mb-4 ${
+                    isDark ? 'text-white' : 'text-slate-900'
+                  }`}>
                     {t('hotels.hotelCode')}
                   </label>
                   <div className="relative">
@@ -589,7 +621,11 @@ export default function Hotel() {
                       type="text"
                       value={hotelCode}
                       onChange={(e) => setHotelCode(e.target.value)}
-                      className="w-full pl-14 pr-6 py-5 bg-slate-50/70 border-2 border-slate-300 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-800 font-semibold text-lg shadow-sm hover:shadow-md hover:border-slate-400"
+                      className={`w-full pl-14 pr-6 py-5 border-2 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 font-semibold text-lg shadow-sm hover:shadow-md ${
+                        isDark 
+                          ? 'bg-gray-700/70 border-gray-600 placeholder-gray-400 text-white hover:border-gray-500' 
+                          : 'bg-slate-50/70 border-slate-300 placeholder-slate-400 text-slate-800 hover:border-slate-400'
+                      }`}
                       placeholder={t('hotels.enterHotelCode')}
                       required
                     />
@@ -601,7 +637,9 @@ export default function Hotel() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
                 {/* Hotel Address */}
                 <div className="space-y-8">
-                  <label className="block text-2xl font-black text-slate-900 tracking-wide mb-4">
+                  <label className={`block text-2xl font-black tracking-wide mb-4 ${
+                    isDark ? 'text-white' : 'text-slate-900'
+                  }`}>
                     {t('hotels.hotelAddress')}
                   </label>
                   <div className="relative">
@@ -614,7 +652,11 @@ export default function Hotel() {
                       type="text"
                       value={hotelAddress}
                       onChange={(e) => setHotelAddress(e.target.value)}
-                      className="w-full pl-14 pr-6 py-5 bg-slate-50/70 border-2 border-slate-300 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-800 font-semibold text-lg shadow-sm hover:shadow-md hover:border-slate-400"
+                      className={`w-full pl-14 pr-6 py-5 border-2 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 font-semibold text-lg shadow-sm hover:shadow-md ${
+                        isDark 
+                          ? 'bg-gray-700/70 border-gray-600 placeholder-gray-400 text-white hover:border-gray-500' 
+                          : 'bg-slate-50/70 border-slate-300 placeholder-slate-400 text-slate-800 hover:border-slate-400'
+                      }`}
                       placeholder={t('hotels.enterHotelAddress')}
                       required
                     />
@@ -623,7 +665,9 @@ export default function Hotel() {
 
                 {/* Location Field */}
                 <div className="space-y-8">
-                  <label className="block text-2xl font-black text-slate-900 tracking-wide mb-4">
+                  <label className={`block text-2xl font-black tracking-wide mb-4 ${
+                    isDark ? 'text-white' : 'text-slate-900'
+                  }`}>
                     {t('hotels.location')}
                   </label>
                   <div className="relative">
@@ -637,7 +681,11 @@ export default function Hotel() {
                       type="text"
                       value={hotelLocation}
                       onChange={(e) => setHotelLocation(e.target.value)}
-                      className="w-full pl-14 pr-6 py-5 bg-slate-50/70 border-2 border-slate-300 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-800 font-semibold text-lg shadow-sm hover:shadow-md hover:border-slate-400"
+                      className={`w-full pl-14 pr-6 py-5 border-2 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 font-semibold text-lg shadow-sm hover:shadow-md ${
+                        isDark 
+                          ? 'bg-gray-700/70 border-gray-600 placeholder-gray-400 text-white hover:border-gray-500' 
+                          : 'bg-slate-50/70 border-slate-300 placeholder-slate-400 text-slate-800 hover:border-slate-400'
+                      }`}
                       placeholder={t('hotels.enterLocation')}
                     />
                   </div>
@@ -652,7 +700,9 @@ export default function Hotel() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
                 {/* Hotel Description */}
                 <div className="space-y-8">
-                  <label className="block text-2xl font-black text-slate-900 tracking-wide mb-4">
+                  <label className={`block text-2xl font-black tracking-wide mb-4 ${
+                    isDark ? 'text-white' : 'text-slate-900'
+                  }`}>
                     {t('hotels.hotelDescription')}
                   </label>
                   <div className="relative">
@@ -665,7 +715,11 @@ export default function Hotel() {
                       value={hotelDescription}
                       onChange={(e) => setHotelDescription(e.target.value)}
                       rows={6}
-                      className="w-full pl-14 pr-6 py-5 bg-slate-50/70 border-2 border-slate-300 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-800 font-semibold text-lg resize-none shadow-sm hover:shadow-md hover:border-slate-400"
+                      className={`w-full pl-14 pr-6 py-5 border-2 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 font-semibold text-lg resize-none shadow-sm hover:shadow-md ${
+                        isDark 
+                          ? 'bg-gray-700/70 border-gray-600 placeholder-gray-400 text-white hover:border-gray-500' 
+                          : 'bg-slate-50/70 border-slate-300 placeholder-slate-400 text-slate-800 hover:border-slate-400'
+                      }`}
                       placeholder={t('hotels.enterHotelDescription')}
                     />
                   </div>
@@ -673,7 +727,9 @@ export default function Hotel() {
 
                 {/* Alt Hotel Description */}
                 <div className="space-y-8">
-                  <label className="block text-2xl font-black text-slate-900 tracking-wide mb-4">
+                  <label className={`block text-2xl font-black tracking-wide mb-4 ${
+                    isDark ? 'text-white' : 'text-slate-900'
+                  }`}>
                     {t('hotels.altHotelDescription')}
                   </label>
                   <div className="relative">
@@ -686,7 +742,11 @@ export default function Hotel() {
                       value={altHotelDescription}
                       onChange={(e) => setAltHotelDescription(e.target.value)}
                       rows={6}
-                      className="w-full pl-14 pr-6 py-5 bg-slate-50/70 border-2 border-slate-300 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-800 font-semibold text-lg resize-none shadow-sm hover:shadow-md hover:border-slate-400"
+                      className={`w-full pl-14 pr-6 py-5 border-2 rounded-2xl focus:outline-none focus:border-blue-600 focus:shadow-lg transition-all duration-300 font-semibold text-lg resize-none shadow-sm hover:shadow-md ${
+                        isDark 
+                          ? 'bg-gray-700/70 border-gray-600 placeholder-gray-400 text-white hover:border-gray-500' 
+                          : 'bg-slate-50/70 border-slate-300 placeholder-slate-400 text-slate-800 hover:border-slate-400'
+                      }`}
                       placeholder={t('hotels.enterAltHotelDescription')}
                     />
                   </div>
@@ -722,13 +782,13 @@ export default function Hotel() {
                           </svg>
                         </div>
                         <div className="text-center">
-                          <span className="text-xl font-bold text-slate-700 group-hover:text-blue-600 transition-colors duration-300">
+                          <span className="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition-colors duration-300">
                             {agreementFiles.length > 0
                               ? `${agreementFiles.length} ${t('hotels.filesSelected')}`
                               : t('hotels.clickToUploadFiles')
                             }
                           </span>
-                          <p className="text-lg font-semibold text-slate-500 mt-3">
+                          <p className="text-lg font-semibold text-slate-800 mt-3">
                             {t('hotels.supportedFormats')}: PDF, DOC, DOCX, TXT
                           </p>
                         </div>
@@ -738,21 +798,31 @@ export default function Hotel() {
                   {agreementFiles.length > 0 && (
                     <div className="mt-3 space-y-2">
                       {agreementFiles.map((file, index) => (
-                        <div key={index} className="flex items-center justify-between bg-slate-50 border border-slate-200 px-4 py-3 rounded-lg hover:bg-slate-100 transition-colors duration-200">
+                        <div key={index} className={`flex items-center justify-between px-4 py-3 rounded-lg transition-colors duration-200 ${
+                          isDark 
+                            ? 'bg-gray-700 border border-gray-600 hover:bg-gray-600' 
+                            : 'bg-slate-50 border border-slate-200 hover:bg-slate-100'
+                        }`}>
                           <div className="flex items-center space-x-3">
                             <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                               <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                               </svg>
                             </div>
-                            <span className="text-sm font-medium text-slate-700 truncate">{file.name}</span>
+                            <span className={`text-sm font-medium truncate ${
+                              isDark ? 'text-gray-300' : 'text-slate-700'
+                            }`}>{file.name}</span>
                           </div>
                           <button
                             type="button"
                             onClick={() => {
                               setAgreementFiles(prev => prev.filter((_, i) => i !== index));
                             }}
-                            className="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-lg flex items-center justify-center transition-colors duration-200 group"
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 group ${
+                              isDark 
+                                ? 'bg-red-900/50 hover:bg-red-800/70' 
+                                : 'bg-red-100 hover:bg-red-200'
+                            }`}
                           >
                             <svg className="w-4 h-4 text-red-500 group-hover:text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -792,7 +862,11 @@ export default function Hotel() {
                  
                  <button
                    type="button"
-                   className="flex-1 px-8 py-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl transition-all duration-300 font-black text-xl flex items-center justify-center space-x-3 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 min-h-[140px]"
+                   className={`flex-1 px-8 py-10 rounded-2xl transition-all duration-300 font-black text-xl flex items-center justify-center space-x-3 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 min-h-[140px] ${
+                     isDark 
+                       ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
+                       : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                   }`}
                    onClick={editingHotel ? handleCancelEdit : () => {
                      setHotelName('');
                      setHotelCode('');
@@ -815,7 +889,11 @@ export default function Hotel() {
         </div>
 
         {/* Hotels List Section - Redesigned */}
-        <div className="backdrop-blur-sm bg-white/80 border border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-12 mx-4 mb-12">
+        <div className={`backdrop-blur-sm border-2 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-16 mx-4 mb-16 ${
+          isDark 
+            ? 'bg-gray-800/85 border-gray-600/70' 
+            : 'bg-white/85 border-slate-200/70'
+        }`}>
           <div className="mb-12">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-8">
@@ -825,26 +903,42 @@ export default function Hotel() {
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-4xl font-black text-slate-900 tracking-tight leading-tight mb-3">
+                  <h2 className={`text-4xl font-black tracking-tight leading-tight mb-3 ${
+                    isDark ? 'text-white' : 'text-slate-900'
+                  }`}>
                     {t('hotels.hotelsList')}
                   </h2>
-                  <p className="text-slate-700 text-xl font-bold mt-3 leading-relaxed">
+                  <p className={`text-xl font-bold mt-3 leading-relaxed ${
+                    isDark ? 'text-gray-300' : 'text-slate-700'
+                  }`}>
                     {t('hotels.viewManageHotels')}
                   </p>
                 </div>
               </div>
-              <div className="text-xl text-slate-700 font-black bg-gradient-to-r from-blue-100 to-indigo-100 px-6 py-3 rounded-2xl border border-blue-200">
+              <div className={`text-xl font-black px-6 py-3 rounded-2xl border ${
+                isDark 
+                  ? 'text-gray-300 bg-gradient-to-r from-blue-900/50 to-indigo-900/50 border-blue-700' 
+                  : 'text-slate-700 bg-gradient-to-r from-blue-100 to-indigo-100 border-blue-200'
+              }`}>
                 {filteredHotels?.length || 0} {filteredHotels?.length === 1 ? 'hotel' : 'hotels'}
               </div>
             </div>
           </div>
 
           {/* Search and Filter Section */}
-          <div className="mb-12 bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-slate-200/50">
+          <div className={`mb-12 backdrop-blur-sm rounded-2xl p-8 shadow-lg border ${
+            isDark 
+              ? 'bg-gray-800/80 border-gray-700/50' 
+              : 'bg-white/80 border-slate-200/50'
+          }`}>
             {/* Enhanced Filter Section Header */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-slate-800 mb-2">Hotel Filters</h2>
-              <p className="text-slate-600">Search and filter hotels by various criteria</p>
+              <h2 className={`text-2xl font-bold mb-2 ${
+                isDark ? 'text-white' : 'text-slate-800'
+              }`}>Hotel Filters</h2>
+              <p className={`${
+                isDark ? 'text-gray-400' : 'text-slate-600'
+              }`}>Search and filter hotels by various criteria</p>
             </div>
 
             {/* Primary Search Row */}
@@ -857,7 +951,9 @@ export default function Hotel() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </div>
-                  <label className="block text-lg font-bold text-slate-800">
+                  <label className={`block text-lg font-bold ${
+                    isDark ? 'text-white' : 'text-slate-800'
+                  }`}>
                     {t('hotels.filterByName')}
                   </label>
                 </div>
@@ -866,7 +962,11 @@ export default function Hotel() {
                     type="text"
                     value={nameFilter}
                     onChange={(e) => setNameFilter(e.target.value)}
-                    className="w-full px-4 py-4 bg-slate-50/70 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 focus:bg-white focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-700 text-lg hover:border-slate-300 hover:bg-white/80"
+                    className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:border-blue-500 focus:shadow-lg transition-all duration-300 text-lg ${
+                      isDark 
+                        ? 'bg-gray-700/70 border-gray-600 placeholder-gray-400 text-white hover:border-gray-500 focus:bg-gray-700' 
+                        : 'bg-slate-50/70 border-slate-200 placeholder-slate-400 text-slate-700 hover:border-slate-300 focus:bg-white hover:bg-white/80'
+                    }`}
                     placeholder={t('hotels.searchByName')}
                   />
                 </div>
@@ -880,7 +980,9 @@ export default function Hotel() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                     </svg>
                   </div>
-                  <label className="block text-lg font-bold text-slate-800">
+                  <label className={`block text-lg font-bold ${
+                    isDark ? 'text-white' : 'text-slate-800'
+                  }`}>
                     {t('hotels.filterByCode')}
                   </label>
                 </div>
@@ -889,7 +991,11 @@ export default function Hotel() {
                     type="text"
                     value={codeFilter}
                     onChange={(e) => setCodeFilter(e.target.value)}
-                    className="w-full px-4 py-4 bg-slate-50/70 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-purple-500 focus:bg-white focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-700 text-lg hover:border-slate-300 hover:bg-white/80"
+                    className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:border-purple-500 focus:shadow-lg transition-all duration-300 text-lg ${
+                      isDark 
+                        ? 'bg-gray-700/70 border-gray-600 placeholder-gray-400 text-white hover:border-gray-500 focus:bg-gray-700' 
+                        : 'bg-slate-50/70 border-slate-200 placeholder-slate-400 text-slate-700 hover:border-slate-300 focus:bg-white hover:bg-white/80'
+                    }`}
                     placeholder={t('hotels.searchByCode')}
                   />
                 </div>
@@ -904,7 +1010,9 @@ export default function Hotel() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </div>
-                  <label className="block text-lg font-bold text-slate-800">
+                  <label className={`block text-lg font-bold ${
+                    isDark ? 'text-white' : 'text-slate-800'
+                  }`}>
                     {t('hotels.filterByLocation')}
                   </label>
                 </div>
@@ -913,7 +1021,11 @@ export default function Hotel() {
                     type="text"
                     value={locationFilter}
                     onChange={(e) => setLocationFilter(e.target.value)}
-                    className="w-full px-4 py-4 bg-slate-50/70 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-700 text-lg hover:border-slate-300 hover:bg-white/80"
+                    className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:border-green-500 focus:shadow-lg transition-all duration-300 text-lg ${
+                      isDark 
+                        ? 'bg-gray-700/70 border-gray-600 placeholder-gray-400 text-white hover:border-gray-500 focus:bg-gray-700' 
+                        : 'bg-slate-50/70 border-slate-200 placeholder-slate-400 text-slate-700 hover:border-slate-300 focus:bg-white hover:bg-white/80'
+                    }`}
                     placeholder={t('hotels.searchByLocation')}
                   />
                 </div>
@@ -927,7 +1039,9 @@ export default function Hotel() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
                   </div>
-                  <label className="block text-lg font-bold text-slate-800">
+                  <label className={`block text-lg font-bold ${
+                    isDark ? 'text-white' : 'text-slate-800'
+                  }`}>
                     Filter by Address
                   </label>
                 </div>
@@ -936,7 +1050,11 @@ export default function Hotel() {
                     type="text"
                     value={addressFilter}
                     onChange={(e) => setAddressFilter(e.target.value)}
-                    className="w-full px-4 py-4 bg-slate-50/70 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-orange-500 focus:bg-white focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-700 text-lg hover:border-slate-300 hover:bg-white/80"
+                    className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:border-orange-500 focus:shadow-lg transition-all duration-300 text-lg ${
+                      isDark 
+                        ? 'bg-gray-700/70 border-gray-600 placeholder-gray-400 text-white hover:border-gray-500 focus:bg-gray-700' 
+                        : 'bg-slate-50/70 border-slate-200 placeholder-slate-400 text-slate-700 hover:border-slate-300 focus:bg-white hover:bg-white/80'
+                    }`}
                     placeholder="Search by address"
                   />
                 </div>
@@ -953,14 +1071,20 @@ export default function Hotel() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                   </div>
-                  <label className="block text-lg font-bold text-slate-800">
+                  <label className={`block text-lg font-bold ${
+                    isDark ? 'text-white' : 'text-slate-800'
+                  }`}>
                     {t('hotels.roomsFilter')}
                   </label>
                 </div>
                 <select
                   value={hasRoomsFilter}
                   onChange={(e) => setHasRoomsFilter(e.target.value)}
-                  className="w-full px-4 py-4 bg-slate-50/70 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:bg-white focus:shadow-lg transition-all duration-300 text-slate-700 text-lg hover:border-slate-300 hover:bg-white/80"
+                  className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:border-indigo-500 focus:shadow-lg transition-all duration-300 text-lg ${
+                    isDark 
+                      ? 'bg-gray-700/70 border-gray-600 text-white hover:border-gray-500 focus:bg-gray-700' 
+                      : 'bg-slate-50/70 border-slate-200 text-slate-700 hover:border-slate-300 focus:bg-white hover:bg-white/80'
+                  }`}
                 >
                   <option value="">{t('hotels.allHotels')}</option>
                   <option value="true">{t('hotels.hotelsWithRooms')}</option>
@@ -980,7 +1104,9 @@ export default function Hotel() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
                         </svg>
                       </div>
-                      <label className="block text-lg font-bold text-slate-800">
+                      <label className={`block text-lg font-bold ${
+                        isDark ? 'text-white' : 'text-slate-800'
+                      }`}>
                         {t('hotels.minimumRoomCount')}
                       </label>
                     </div>
@@ -989,8 +1115,11 @@ export default function Hotel() {
                       min="0"
                       value={minRoomCountFilter}
                       onChange={(e) => setMinRoomCountFilter(e.target.value)}
-                      className="w-full px-4 py-4 bg-slate-50/70 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-teal-500 focus:bg-white focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-700 text-lg hover:border-slate-300 hover:bg-white/80"
-                      placeholder={t('hotels.enterMinimumRooms')}
+                      className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:border-orange-500 focus:shadow-lg transition-all duration-300 text-lg ${
+                      isDark 
+                        ? 'bg-gray-700/70 border-gray-600 placeholder-gray-400 text-white hover:border-gray-500 focus:bg-gray-700' 
+                        : 'bg-slate-50/70 border-slate-200 placeholder-slate-400 text-slate-700 hover:border-slate-300 focus:bg-white hover:bg-white/80'
+                    }`}                      placeholder={t('hotels.enterMinimumRooms')}
                     />
                   </div>
                   <div className="space-y-4">
@@ -1000,7 +1129,9 @@ export default function Hotel() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
                         </svg>
                       </div>
-                      <label className="block text-lg font-bold text-slate-800">
+                      <label className={`block text-lg font-bold ${
+                        isDark ? 'text-white' : 'text-slate-800'
+                      }`}>  
                         {t('hotels.maximumRoomCount')}
                       </label>
                     </div>
@@ -1009,8 +1140,12 @@ export default function Hotel() {
                       min="0"
                       value={maxRoomCountFilter}
                       onChange={(e) => setMaxRoomCountFilter(e.target.value)}
-                      className="w-full px-4 py-4 bg-slate-50/70 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-cyan-500 focus:bg-white focus:shadow-lg transition-all duration-300 placeholder-slate-400 text-slate-700 text-lg hover:border-slate-300 hover:bg-white/80"
-                      placeholder={t('hotels.enterMaximumRooms')}
+                      className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:border-purple-500 focus:shadow-lg transition-all duration-300 text-lg ${
+                      isDark 
+                        ? 'bg-gray-700/70 border-gray-600 placeholder-gray-400 text-white hover:border-gray-500 focus:bg-gray-700' 
+                        : 'bg-slate-50/70 border-slate-200 placeholder-slate-400 text-slate-700 hover:border-slate-300 focus:bg-white hover:bg-white/80'
+                    }`}
+                    placeholder={t('hotels.enterMaximumRooms')}
                     />
                   </div>
                 </>
@@ -1024,15 +1159,20 @@ export default function Hotel() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
-                  <label className="block text-lg font-bold text-slate-800">
+                  <label className={`block text-lg font-bold ${
+                    isDark ? 'text-white' : 'text-slate-800'
+                  }`}>
                     Files Filter
                   </label>
                 </div>
                 <select
                   value={hasFilesFilter}
                   onChange={(e) => setHasFilesFilter(e.target.value)}
-                  className="w-full px-4 py-4 bg-slate-50/70 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-pink-500 focus:bg-white focus:shadow-lg transition-all duration-300 text-slate-700 text-lg hover:border-slate-300 hover:bg-white/80"
-                >
+                  className={`w-full px-4 py-4 border-2 rounded-xl focus:outline-none focus:border-indigo-500 focus:shadow-lg transition-all duration-300 text-lg ${
+                    isDark 
+                      ? 'bg-gray-700/70 border-gray-600 text-white hover:border-gray-500 focus:bg-gray-700' 
+                      : 'bg-slate-50/70 border-slate-200 text-slate-700 hover:border-slate-300 focus:bg-white hover:bg-white/80'
+                  }`}                >
                   <option value="">All Hotels</option>
                   <option value="true">Hotels with Files</option>
                   <option value="false">Hotels without Files</option>
@@ -1096,7 +1236,11 @@ export default function Hotel() {
           </div>
 
           {/* Hotels Table */}
-           <div className="overflow-x-auto bg-white/60 backdrop-blur-sm rounded-2xl border-2 border-slate-200/50 shadow-lg">
+           <div className={`overflow-x-auto backdrop-blur-sm rounded-2xl border-2 shadow-lg ${
+             isDark 
+               ? 'bg-gray-800/60 border-gray-700/50' 
+               : 'bg-white/60 border-slate-200/50'
+           }`}>
              {loading ? (
                <div className="flex justify-center items-center py-16">
                  <div className="flex items-center space-x-4">
@@ -1104,14 +1248,24 @@ export default function Hotel() {
                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                    </svg>
-                   <span className="text-slate-700 font-semibold text-lg">{t('common.loading')}</span>
+                   <span className={`font-semibold text-lg ${
+                     isDark ? 'text-gray-300' : 'text-slate-700'
+                   }`}>{t('common.loading')}</span>
                  </div>
                </div>
              ) : (
                <table className="w-full">
-                 <thead className="bg-gradient-to-r from-slate-50 to-slate-100/80">
-                   <tr className="border-b-2 border-slate-300/60">
-                     <th className="text-left py-5 px-6 font-bold text-slate-800 w-12 text-sm uppercase tracking-wide">
+                 <thead className={`${
+                   isDark 
+                     ? 'bg-gradient-to-r from-gray-700 to-gray-800/80' 
+                     : 'bg-gradient-to-r from-slate-50 to-slate-100/80'
+                 }`}>
+                   <tr className={`border-b-2 ${
+                     isDark ? 'border-gray-600/60' : 'border-slate-300/60'
+                   }`}>
+                     <th className={`text-left py-5 px-6 font-bold w-12 text-sm uppercase tracking-wide ${
+                       isDark ? 'text-gray-200' : 'text-slate-800'
+                     }`}>
                        <input
                          type="checkbox"
                          checked={selectedHotels.length === (filteredHotels?.length || 0) && (filteredHotels?.length || 0) > 0}
@@ -1119,36 +1273,64 @@ export default function Hotel() {
                          className="w-5 h-5 text-blue-600 bg-white border-2 border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-200 cursor-pointer"
                        />
                      </th>
-                     <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                     <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
+                       isDark ? 'text-gray-200' : 'text-slate-800'
+                     }`}>
                        {t('hotels.hotelName')}
                      </th>
-                     <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                     <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
+                       isDark ? 'text-gray-200' : 'text-slate-800'
+                     }`}>
                        {t('hotels.hotelCode')}
                      </th>
-                     <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                     <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
+                       isDark ? 'text-gray-200' : 'text-slate-800'
+                     }`}>
                        {t('hotels.altHotelName')}
                      </th>
-                     <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                     <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
+                       isDark ? 'text-gray-200' : 'text-slate-800'
+                     }`}>
                        {t('hotels.hotelAddress')}
                      </th>
-                     <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                     <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
+                       isDark ? 'text-gray-200' : 'text-slate-800'
+                     }`}>
                        {t('hotels.location')}
                      </th>
-                     <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                     <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
+                       isDark ? 'text-gray-200' : 'text-slate-800'
+                     }`}>
                        {t('hotels.roomCount')}
                      </th>
-                     <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                     <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
+                       isDark ? 'text-gray-200' : 'text-slate-800'
+                     }`}>
                        {t('hotels.agreementCount')}
                      </th>
-                     <th className="text-left py-5 px-6 font-bold text-slate-800 text-sm uppercase tracking-wide">
+                     <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
+                       isDark ? 'text-gray-200' : 'text-slate-800'
+                     }`}>
                        {t('common.actions')}
                      </th>
                    </tr>
                  </thead>
-                 <tbody className="divide-y-2 divide-slate-200/40">
+                 <tbody className={`divide-y-2 ${
+                   isDark ? 'divide-gray-600/40' : 'divide-slate-200/40'
+                 }`}>
                  {(filteredHotels || []).map((hotel, index) => (
-                   <tr key={hotel.id} className={`hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-slate-50/50 transition-all duration-300 ${
-                     selectedHotels.includes(hotel.id) ? 'bg-gradient-to-r from-blue-100/60 to-slate-100/60 shadow-sm' : index % 2 === 0 ? 'bg-white/40' : 'bg-slate-50/30'
+                   <tr key={hotel.id} className={`transition-all duration-300 ${
+                     isDark 
+                       ? `hover:bg-gradient-to-r hover:from-blue-900/30 hover:to-gray-800/30 ${
+                           selectedHotels.includes(hotel.id) 
+                             ? 'bg-gradient-to-r from-blue-900/40 to-gray-800/40 shadow-sm' 
+                             : index % 2 === 0 ? 'bg-gray-800/40' : 'bg-gray-700/30'
+                         }` 
+                       : `hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-slate-50/50 ${
+                           selectedHotels.includes(hotel.id) 
+                             ? 'bg-gradient-to-r from-blue-100/60 to-slate-100/60 shadow-sm' 
+                             : index % 2 === 0 ? 'bg-white/40' : 'bg-slate-50/30'
+                         }`
                    }`}>
                      <td className="py-5 px-6">
                        <input
@@ -1158,11 +1340,21 @@ export default function Hotel() {
                          className="w-5 h-5 text-blue-600 bg-white border-2 border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-200 cursor-pointer"
                        />
                      </td>
-                     <td className="py-5 px-6 text-slate-900 font-bold text-base">{hotel.name}</td>
-                     <td className="py-5 px-6 text-slate-700 font-semibold">{hotel.code}</td>
-                     <td className="py-5 px-6 text-slate-600 font-medium">{hotel.altName || '-'}</td>
-                     <td className="py-5 px-6 text-slate-600 font-medium">{hotel.address || '-'}</td>
-                     <td className="py-5 px-6 text-slate-600 font-medium">{hotel.location || '-'}</td>
+                     <td className={`py-5 px-6 font-bold text-base ${
+                       isDark ? 'text-white' : 'text-slate-900'
+                     }`}>{hotel.name}</td>
+                     <td className={`py-5 px-6 font-semibold ${
+                       isDark ? 'text-gray-300' : 'text-slate-700'
+                     }`}>{hotel.code}</td>
+                     <td className={`py-5 px-6 font-medium ${
+                       isDark ? 'text-gray-400' : 'text-slate-600'
+                     }`}>{hotel.altName || '-'}</td>
+                     <td className={`py-5 px-6 font-medium ${
+                       isDark ? 'text-gray-400' : 'text-slate-600'
+                     }`}>{hotel.address || '-'}</td>
+                     <td className={`py-5 px-6 font-medium ${
+                       isDark ? 'text-gray-400' : 'text-slate-600'
+                     }`}>{hotel.location || '-'}</td>
                      <td className="py-5 px-6 text-slate-600">
                        <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900 border border-blue-300/50 shadow-sm">
                          {hotel.roomCount || 0}

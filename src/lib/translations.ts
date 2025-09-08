@@ -29,6 +29,9 @@ export interface Translations {
     languageToggle: string;
     english: string;
     arabic: string;
+    themeToggle: string;
+    lightMode: string;
+    darkMode: string;
   };
   
   // Common UI elements
@@ -585,6 +588,9 @@ const en: Translations = {
     languageToggle: 'Language',
     english: 'English',
     arabic: 'العربية',
+    themeToggle: 'Theme',
+    lightMode: 'Light Mode',
+    darkMode: 'Dark Mode',
   },
   
   common: {
@@ -1189,6 +1195,9 @@ const ar: Translations = {
     languageToggle: 'تبديل اللغة',
     english: 'English',
     arabic: 'العربية',
+    themeToggle: 'تبديل المظهر',
+    lightMode: 'المظهر الفاتح',
+    darkMode: 'المظهر الداكن',
   },
   
   common: {
