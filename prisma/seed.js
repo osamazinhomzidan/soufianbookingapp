@@ -444,6 +444,7 @@ async function main() {
       fullName: 'Ahmed Mohammed Al-Rashid',
       email: 'ahmed.alrashid@email.com',
       phone: '+971-50-123-4567',
+      telephone: '+971-50-123-4568',
       nationality: 'UAE',
       passportNumber: 'A12345678',
       dateOfBirth: new Date('1985-03-15'),
@@ -457,10 +458,12 @@ async function main() {
       source: 'Online Booking',
       group: 'Business Group',
       isVip: true,
+      vip: true,
       notes: 'Prefers high floor rooms',
       totalStays: 5,
       totalSpent: 2500.00,
       lastStayDate: new Date('2024-01-10'),
+      lastStay: '2024-01-10',
     },
   });
 
@@ -472,6 +475,7 @@ async function main() {
       fullName: 'Sarah Elizabeth Johnson',
       email: 'sarah.johnson@email.com',
       phone: '+1-555-987-6543',
+      telephone: '+1-555-987-6544',
       nationality: 'American',
       passportNumber: 'US987654321',
       dateOfBirth: new Date('1990-07-22'),
@@ -485,10 +489,12 @@ async function main() {
       source: 'Travel Agent',
       group: 'Corporate',
       isVip: false,
+      vip: false,
       notes: 'Vegetarian meals preferred',
       totalStays: 2,
       totalSpent: 800.00,
       lastStayDate: new Date('2023-12-15'),
+      lastStay: '2023-12-15',
     },
   });
 
@@ -500,6 +506,7 @@ async function main() {
       fullName: 'Mohammed Ali Hassan',
       email: 'mohammed.hassan@email.com',
       phone: '+966-50-111-2222',
+      telephone: '+966-50-111-2223',
       nationality: 'Saudi Arabian',
       passportNumber: 'SA111222333',
       dateOfBirth: new Date('1978-11-08'),
@@ -513,10 +520,12 @@ async function main() {
       source: 'Direct Booking',
       group: 'Family',
       isVip: true,
+      vip: true,
       notes: 'Family with 2 children',
       totalStays: 8,
       totalSpent: 4200.00,
       lastStayDate: new Date('2024-01-20'),
+      lastStay: '2024-01-20',
     },
   });
 

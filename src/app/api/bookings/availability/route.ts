@@ -128,6 +128,7 @@ export async function GET(request: NextRequest) {
             checkInDate: true,
             checkOutDate: true,
             status: true,
+            numberOfRooms: true,
           },
         },
       },
@@ -135,8 +136,22 @@ export async function GET(request: NextRequest) {
 
     // Calculate availability for each room
     const availabilityResults = rooms.map((room) => {
-      // Calculate total booked rooms for the date range
-      const bookedRooms = room.bookings.length;
+      // Check if room is within its availability date range
+      let isWithinAvailabilityPeriod = true;
+      if (room.availableFrom || room.availableTo) {
+        const roomAvailableFrom = room.availableFrom ? new Date(room.availableFrom) : null;
+        const roomAvailableTo = room.availableTo ? new Date(room.availableTo) : null;
+        
+        if (roomAvailableFrom && checkIn < roomAvailableFrom) {
+          isWithinAvailabilityPeriod = false;
+        }
+        if (roomAvailableTo && checkOut > roomAvailableTo) {
+          isWithinAvailabilityPeriod = false;
+        }
+      }
+
+      // Calculate total booked rooms for the date range (sum of numberOfRooms from all bookings)
+      const bookedRooms = room.bookings.reduce((total, booking) => total + (booking.numberOfRooms || 1), 0);
 
       // Check availability slots if they exist
       let availableFromSlots = null;
@@ -148,28 +163,35 @@ export async function GET(request: NextRequest) {
       }
 
       // Determine available rooms
-      // If we have availability slots, use them; otherwise, assume room capacity minus bookings
+      // If we have availability slots, use them; otherwise, use room quantity minus bookings
       const totalAvailable = availableFromSlots !== null 
         ? availableFromSlots 
-        : Math.max(0, room.capacity - bookedRooms);
+        : Math.max(0, room.quantity - bookedRooms);
 
-      const isAvailable = totalAvailable >= numberOfRooms;
+      const isAvailable = isWithinAvailabilityPeriod && totalAvailable >= numberOfRooms;
 
       return {
         room: {
           id: room.id,
           roomType: room.roomType,
           roomTypeDescription: room.roomTypeDescription,
+          altDescription: room.altDescription,
           boardType: room.boardType,
           basePrice: room.basePrice,
+          alternativePrice: room.alternativePrice,
+          availableFrom: room.availableFrom,
+          availableTo: room.availableTo,
+          quantity: room.quantity,
           capacity: room.capacity,
           hotel: room.hotel,
+          roomAmenities: room.roomAmenities,
         },
         availability: {
           isAvailable,
           totalAvailable,
           requestedRooms: numberOfRooms,
           bookedRooms,
+          isWithinAvailabilityPeriod,
           availabilitySlots: room.availabilitySlots,
         },
         conflictingBookings: room.bookings,

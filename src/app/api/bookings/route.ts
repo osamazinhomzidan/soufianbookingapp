@@ -126,13 +126,22 @@ export async function GET(request: NextRequest) {
               fullName: true,
               email: true,
               phone: true,
+              telephone: true,
               nationality: true,
+              passportNumber: true,
+              dateOfBirth: true,
+              gender: true,
+              address: true,
+              city: true,
+              country: true,
               guestClassification: true,
               travelAgent: true,
               company: true,
               source: true,
               group: true,
               isVip: true,
+              vip: true,
+              notes: true,
             },
           },
           payments: {
@@ -290,14 +299,23 @@ export async function POST(request: NextRequest) {
             lastName: guestData.lastName || guestData.fullName?.split(' ').slice(1).join(' ') || '',
             fullName: guestData.fullName,
             email: guestData.email,
-            phone: guestData.telephone || guestData.phone,
+            phone: guestData.phone,
+            telephone: guestData.telephone,
             nationality: guestData.nationality,
+            passportNumber: guestData.passportNumber,
+            dateOfBirth: guestData.dateOfBirth ? new Date(guestData.dateOfBirth) : null,
+            gender: guestData.gender?.toUpperCase(),
+            address: guestData.address,
+            city: guestData.city,
+            country: guestData.country,
             company: guestData.company,
             guestClassification: guestData.guestClassification,
             travelAgent: guestData.travelAgent,
             source: guestData.source,
             group: guestData.group,
             isVip: guestData.vip || guestData.isVip || false,
+            vip: guestData.vip || guestData.isVip || false,
+            notes: guestData.notes,
             updatedAt: new Date(),
           },
         });
@@ -330,14 +348,23 @@ export async function POST(request: NextRequest) {
             lastName: guestData.lastName || nameParts.slice(1).join(' ') || '',
             fullName: guestData.fullName || '',
             email: guestData.email,
-            phone: guestData.telephone || guestData.phone,
+            phone: guestData.phone,
+            telephone: guestData.telephone,
             nationality: guestData.nationality,
+            passportNumber: guestData.passportNumber,
+            dateOfBirth: guestData.dateOfBirth ? new Date(guestData.dateOfBirth) : null,
+            gender: guestData.gender?.toUpperCase(),
+            address: guestData.address,
+            city: guestData.city,
+            country: guestData.country,
             company: guestData.company,
             guestClassification: guestData.guestClassification,
             travelAgent: guestData.travelAgent,
             source: guestData.source,
             group: guestData.group,
             isVip: guestData.vip || guestData.isVip || false,
+            vip: guestData.vip || guestData.isVip || false,
+            notes: guestData.notes,
           },
         });
       }
@@ -404,43 +431,48 @@ export async function POST(request: NextRequest) {
       });
 
       // Create payment record if payment data provided
-      if (paymentData) {
-        // Validate payment method
-        const validPaymentMethods = ['CASH', 'CREDIT'];
-        const paymentMethod = paymentData.method?.toUpperCase() || 'CASH';
-        
-        if (!validPaymentMethods.includes(paymentMethod)) {
-          throw new Error(`Invalid payment method: ${paymentData.method}. Valid methods are: ${validPaymentMethods.join(', ')}`);
-        }
+        if (paymentData) {
+          // Validate payment method
+          const validPaymentMethods = ['CASH', 'CREDIT'];
+          const paymentMethod = paymentData.method?.toUpperCase() || 'CASH';
+          
+          if (!validPaymentMethods.includes(paymentMethod)) {
+            throw new Error(`Invalid payment method: ${paymentData.method}. Valid methods are: ${validPaymentMethods.join(', ')}`);
+          }
 
-        // Calculate payment amounts based on method
-        let paidAmount, remainingAmount, remainingDueDate;
-        
-        if (paymentMethod === 'CASH') {
-          // For cash: full payment on payment date
-          paidAmount = paymentData.amount || totalAmount;
-          remainingAmount = 0;
-          remainingDueDate = null;
-        } else if (paymentMethod === 'CREDIT') {
-          // For credit: partial payment today, remaining amount on future date
-          paidAmount = paymentData.paidAmount || 0;
-          remainingAmount = totalAmount.sub(paidAmount);
-          remainingDueDate = paymentData.remainingDueDate ? new Date(paymentData.remainingDueDate) : null;
-        }
+          // Calculate payment amounts based on method
+          let paidAmount, remainingAmount, remainingDueDate;
+          
+          if (paymentMethod === 'CASH') {
+            // For cash: full payment on payment date (not editable)
+            paidAmount = totalAmount; // Always full amount for cash
+            remainingAmount = 0;
+            remainingDueDate = null;
+          } else if (paymentMethod === 'CREDIT') {
+            // For credit: pay now amount + pay later amount with due date
+            paidAmount = paymentData.paidAmount || 0;
+            remainingAmount = totalAmount - paidAmount;
+            remainingDueDate = paymentData.remainingDueDate ? new Date(paymentData.remainingDueDate) : null;
+            
+            // Validate credit payment requirements
+            if (!remainingDueDate && remainingAmount > 0) {
+              throw new Error('Due date is required for credit payments with remaining amount');
+            }
+          }
 
-        await tx.payment.create({
-          data: {
-            bookingId: booking.id,
-            method: paymentMethod,
-            totalAmount: totalAmount,
-            paidAmount: paidAmount,
-            remainingAmount: remainingAmount,
-            paymentDate: paymentData.date ? new Date(paymentData.date) : new Date(),
-            remainingDueDate: remainingDueDate,
-            status: remainingAmount > 0 ? 'PARTIALLY_PAID' : 'COMPLETED',
-          },
-        });
-      }
+          await tx.payment.create({
+            data: {
+              bookingId: booking.id,
+              method: paymentMethod,
+              totalAmount: totalAmount,
+              paidAmount: paidAmount,
+              remainingAmount: remainingAmount,
+              paymentDate: paymentData.date ? new Date(paymentData.date) : new Date(),
+              remainingDueDate: remainingDueDate,
+              status: remainingAmount > 0 ? 'PARTIALLY_PAID' : 'COMPLETED',
+            },
+          });
+        }
 
       return booking;
     });
