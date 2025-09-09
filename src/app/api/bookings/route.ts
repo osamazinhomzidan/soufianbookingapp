@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { Decimal } from '@prisma/client/runtime/library';
 import { verifyAuthToken } from '../../../lib/auth';
 
 const prisma = new PrismaClient();
@@ -284,7 +285,10 @@ export async function POST(request: NextRequest) {
     } else {
       finalRoomRate = roomRate || room.basePrice;
     }
-    const totalAmount = finalRoomRate.mul(numberOfNights).mul(numberOfRooms);
+    
+    // Convert to Decimal for calculation
+    const finalRoomRateDecimal = new Decimal(finalRoomRate.toString());
+    const totalAmount = finalRoomRateDecimal.mul(numberOfNights).mul(numberOfRooms);
 
     // Start transaction for booking creation
     const result = await prisma.$transaction(async (tx) => {
@@ -484,6 +488,388 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Create booking API error:', error);
+    return NextResponse.json(
+      { success: false, message: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT /api/bookings - Update an existing booking
+export async function PUT(request: NextRequest) {
+  try {
+    // Get auth token from cookies
+    const token = request.cookies.get('auth-token')?.value;
+    
+    if (!token) {
+      return NextResponse.json(
+        { success: false, message: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Verify token
+    const user = await verifyAuthToken(token);
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: 'Invalid or expired token' },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+    const {
+      id,
+      hotelId,
+      roomId,
+      guestData,
+      numberOfRooms,
+      checkInDate,
+      checkOutDate,
+      roomRate,
+      alternativeRate,
+      useAlternativeRate,
+      rateCode,
+      status,
+      assignedRoomNo,
+      specialRequests,
+      notes,
+      paymentData,
+    } = body;
+
+    // Validate required fields
+    if (!id) {
+      return NextResponse.json(
+        { success: false, message: 'Booking ID is required' },
+        { status: 400 }
+      );
+    }
+
+    // Check if booking exists
+    const existingBooking = await prisma.booking.findUnique({
+      where: { id },
+      include: {
+        room: true,
+        guest: true,
+        payments: true,
+      },
+    });
+
+    if (!existingBooking) {
+      return NextResponse.json(
+        { success: false, message: 'Booking not found' },
+        { status: 404 }
+      );
+    }
+
+    // Validate dates if provided
+    let checkIn, checkOut, numberOfNights;
+    if (checkInDate && checkOutDate) {
+      checkIn = new Date(checkInDate);
+      checkOut = new Date(checkOutDate);
+      
+      if (checkIn >= checkOut) {
+        return NextResponse.json(
+          { success: false, message: 'Check-out date must be after check-in date' },
+          { status: 400 }
+        );
+      }
+
+      // Calculate number of nights
+      const timeDiff = checkOut.getTime() - checkIn.getTime();
+      numberOfNights = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    }
+
+    // Check room availability if room is being changed
+    let room = existingBooking.room;
+    if (roomId && roomId !== existingBooking.roomId) {
+      room = await prisma.room.findUnique({
+        where: { id: roomId },
+        include: { hotel: true },
+      });
+
+      if (!room) {
+        return NextResponse.json(
+          { success: false, message: 'Room not found' },
+          { status: 404 }
+        );
+      }
+
+      if (!room.isActive) {
+        return NextResponse.json(
+          { success: false, message: 'Room is not available' },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Calculate total amount if rates or dates changed
+    let totalAmount = existingBooking.totalAmount;
+    if (roomRate || alternativeRate || useAlternativeRate !== undefined || numberOfNights || numberOfRooms) {
+      let finalRoomRate;
+      const useAltRate = useAlternativeRate !== undefined ? useAlternativeRate : existingBooking.useAlternativeRate;
+      
+      if (useAltRate && (alternativeRate || room.alternativePrice)) {
+        finalRoomRate = alternativeRate || room.alternativePrice;
+      } else {
+        finalRoomRate = roomRate || room.basePrice;
+      }
+      
+      // Convert to Decimal for calculation
+      const finalRoomRateDecimal = new Decimal(finalRoomRate.toString());
+      const nights = numberOfNights || existingBooking.numberOfNights;
+      const rooms = numberOfRooms || existingBooking.numberOfRooms;
+      totalAmount = finalRoomRateDecimal.mul(nights).mul(rooms);
+    }
+
+    // Start transaction for booking update
+    const result = await prisma.$transaction(async (tx) => {
+      // Update guest if guest data provided
+      let guest = existingBooking.guest;
+      if (guestData && guestData.id) {
+        guest = await tx.guest.update({
+          where: { id: guestData.id },
+          data: {
+            firstName: guestData.firstName || guestData.fullName?.split(' ')[0] || guest.firstName,
+            lastName: guestData.lastName || guestData.fullName?.split(' ').slice(1).join(' ') || guest.lastName,
+            fullName: guestData.fullName || guest.fullName,
+            email: guestData.email || guest.email,
+            phone: guestData.phone || guest.phone,
+            telephone: guestData.telephone || guest.telephone,
+            nationality: guestData.nationality || guest.nationality,
+            passportNumber: guestData.passportNumber || guest.passportNumber,
+            dateOfBirth: guestData.dateOfBirth ? new Date(guestData.dateOfBirth) : guest.dateOfBirth,
+            gender: guestData.gender?.toUpperCase() || guest.gender,
+            address: guestData.address || guest.address,
+            city: guestData.city || guest.city,
+            country: guestData.country || guest.country,
+            company: guestData.company || guest.company,
+            guestClassification: guestData.guestClassification || guest.guestClassification,
+            travelAgent: guestData.travelAgent || guest.travelAgent,
+            source: guestData.source || guest.source,
+            group: guestData.group || guest.group,
+            isVip: guestData.vip !== undefined ? guestData.vip : (guestData.isVip !== undefined ? guestData.isVip : guest.isVip),
+            vip: guestData.vip !== undefined ? guestData.vip : (guestData.isVip !== undefined ? guestData.isVip : guest.vip),
+            notes: guestData.notes || guest.notes,
+            updatedAt: new Date(),
+          },
+        });
+      }
+
+      // Update booking
+      const booking = await tx.booking.update({
+        where: { id },
+        data: {
+          hotelId: hotelId || existingBooking.hotelId,
+          roomId: roomId || existingBooking.roomId,
+          numberOfRooms: numberOfRooms || existingBooking.numberOfRooms,
+          checkInDate: checkIn || existingBooking.checkInDate,
+          checkOutDate: checkOut || existingBooking.checkOutDate,
+          numberOfNights: numberOfNights || existingBooking.numberOfNights,
+          roomRate: roomRate || existingBooking.roomRate,
+          alternativeRate: alternativeRate || existingBooking.alternativeRate,
+          useAlternativeRate: useAlternativeRate !== undefined ? useAlternativeRate : existingBooking.useAlternativeRate,
+          totalAmount,
+          rateCode: rateCode || existingBooking.rateCode,
+          status: status || existingBooking.status,
+          assignedRoomNo: assignedRoomNo || existingBooking.assignedRoomNo,
+          specialRequests: specialRequests || existingBooking.specialRequests,
+          notes: notes !== undefined ? notes : existingBooking.notes,
+          updatedAt: new Date(),
+        },
+        include: {
+          hotel: {
+            select: {
+              id: true,
+              name: true,
+              code: true,
+            },
+          },
+          room: {
+            select: {
+              id: true,
+              roomType: true,
+              roomTypeDescription: true,
+              boardType: true,
+              basePrice: true,
+              capacity: true,
+            },
+          },
+          guest: {
+            select: {
+              id: true,
+              profileId: true,
+              firstName: true,
+              lastName: true,
+              fullName: true,
+              email: true,
+              phone: true,
+              nationality: true,
+              guestClassification: true,
+              travelAgent: true,
+              company: true,
+              source: true,
+              group: true,
+              isVip: true,
+            },
+          },
+          payments: {
+            select: {
+              id: true,
+              method: true,
+              totalAmount: true,
+              paidAmount: true,
+              remainingAmount: true,
+              paymentDate: true,
+              remainingDueDate: true,
+              status: true,
+            },
+            orderBy: { createdAt: 'desc' },
+          },
+        },
+      });
+
+      // Update payment record if payment data provided
+      if (paymentData && existingBooking.payments.length > 0) {
+        const existingPayment = existingBooking.payments[0];
+        
+        // Validate payment method
+        const validPaymentMethods = ['CASH', 'CREDIT'];
+        const paymentMethod = paymentData.method?.toUpperCase() || existingPayment.method;
+        
+        if (!validPaymentMethods.includes(paymentMethod)) {
+          throw new Error(`Invalid payment method: ${paymentData.method}. Valid methods are: ${validPaymentMethods.join(', ')}`);
+        }
+
+        // Calculate payment amounts based on method
+        let paidAmount, remainingAmount, remainingDueDate;
+        
+        if (paymentMethod === 'CASH') {
+          // For cash: full payment on payment date (not editable)
+          paidAmount = totalAmount; // Always full amount for cash
+          remainingAmount = 0;
+          remainingDueDate = null;
+        } else if (paymentMethod === 'CREDIT') {
+          // For credit: pay now amount + pay later amount with due date
+          paidAmount = paymentData.paidAmount !== undefined ? paymentData.paidAmount : existingPayment.paidAmount;
+          remainingAmount = totalAmount - paidAmount;
+          remainingDueDate = paymentData.remainingDueDate ? new Date(paymentData.remainingDueDate) : existingPayment.remainingDueDate;
+          
+          // Validate credit payment requirements
+          if (!remainingDueDate && remainingAmount > 0) {
+            throw new Error('Due date is required for credit payments with remaining amount');
+          }
+        }
+
+        await tx.payment.update({
+          where: { id: existingPayment.id },
+          data: {
+            method: paymentMethod,
+            totalAmount: totalAmount,
+            paidAmount: paidAmount,
+            remainingAmount: remainingAmount,
+            paymentDate: paymentData.date ? new Date(paymentData.date) : existingPayment.paymentDate,
+            remainingDueDate: remainingDueDate,
+            status: remainingAmount > 0 ? 'PARTIALLY_PAID' : 'COMPLETED',
+            updatedAt: new Date(),
+          },
+        });
+      }
+
+      return booking;
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: result,
+      message: 'Booking updated successfully',
+    });
+  } catch (error) {
+    console.error('Update booking API error:', error);
+    return NextResponse.json(
+      { success: false, message: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE /api/bookings - Delete a booking
+export async function DELETE(request: NextRequest) {
+  try {
+    // Get auth token from cookies
+    const token = request.cookies.get('auth-token')?.value;
+    
+    if (!token) {
+      return NextResponse.json(
+        { success: false, message: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Verify token
+    const user = await verifyAuthToken(token);
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: 'Invalid or expired token' },
+        { status: 401 }
+      );
+    }
+
+    // Get booking ID from query parameters
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, message: 'Booking ID is required' },
+        { status: 400 }
+      );
+    }
+
+    // Check if booking exists
+    const existingBooking = await prisma.booking.findUnique({
+      where: { id },
+      include: {
+        payments: true,
+      },
+    });
+
+    if (!existingBooking) {
+      return NextResponse.json(
+        { success: false, message: 'Booking not found' },
+        { status: 404 }
+      );
+    }
+
+    // Check if booking can be deleted (e.g., not checked in)
+    if (existingBooking.status === 'CHECKED_IN') {
+      return NextResponse.json(
+        { success: false, message: 'Cannot delete a checked-in booking' },
+        { status: 400 }
+      );
+    }
+
+    // Start transaction for booking deletion
+    await prisma.$transaction(async (tx) => {
+      // Delete associated payments first
+      if (existingBooking.payments.length > 0) {
+        await tx.payment.deleteMany({
+          where: { bookingId: id },
+        });
+      }
+
+      // Delete the booking
+      await tx.booking.delete({
+        where: { id },
+      });
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Booking deleted successfully',
+    });
+  } catch (error) {
+    console.error('Delete booking API error:', error);
     return NextResponse.json(
       { success: false, message: 'Internal server error' },
       { status: 500 }

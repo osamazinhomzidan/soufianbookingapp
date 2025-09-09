@@ -147,34 +147,47 @@ export default function Booking() {
   const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
   const [availableRooms, setAvailableRooms] = useState<AvailabilityResult[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [nationalities, setNationalities] = useState<{code: string, name: string, nameAr: string}[]>([]);
   const [loading, setLoading] = useState(false);
   const [checkingAvailability, setCheckingAvailability] = useState(false);
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
+  const [message, setMessage] = useState<{type: 'success' | 'error' | null, text: string}>({type: null, text: ''});
   
   // Calculated values
   const [numberOfNights, setNumberOfNights] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   
-  // Fetch hotels on component mount
+  // Fetch hotels and nationalities on component mount
   useEffect(() => {
-    const fetchHotels = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/hotels');
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success && result.data) {
-            setHotels(result.data);
+        
+        // Fetch hotels
+        const hotelsResponse = await fetch('/api/hotels');
+        if (hotelsResponse.ok) {
+          const hotelsResult = await hotelsResponse.json();
+          if (hotelsResult.success && hotelsResult.data) {
+            setHotels(hotelsResult.data);
+          }
+        }
+        
+        // Fetch nationalities
+        const nationalitiesResponse = await fetch('/api/bookings/nationalities');
+        if (nationalitiesResponse.ok) {
+          const nationalitiesResult = await nationalitiesResponse.json();
+          if (nationalitiesResult.success && nationalitiesResult.data) {
+            setNationalities(nationalitiesResult.data);
           }
         }
       } catch (error) {
-        console.error('Error fetching hotels:', error);
+        console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
     };
     
-    fetchHotels();
+    fetchData();
   }, []);
   
   // Calculate number of nights when dates change
@@ -293,6 +306,7 @@ export default function Booking() {
     if (!guestData.fullName.trim()) errors.fullName = 'Full name is required';
     if (!guestData.email.trim()) errors.email = 'Email is required';
     if (!guestData.phone.trim()) errors.phone = 'Phone is required';
+    if (!guestData.nationality.trim()) errors.nationality = 'Nationality is required';
     if (!guestData.guestClassification.trim()) errors.guestClassification = 'Guest classification is required';
     
     // Payment validation
@@ -316,6 +330,9 @@ export default function Booking() {
   // Submit booking
   const handleSubmit = async () => {
     if (!validateForm()) return;
+    
+    // Clear any existing messages
+    setMessage({type: null, text: ''});
     
     try {
       setLoading(true);
@@ -354,15 +371,17 @@ export default function Booking() {
       const result = await response.json();
       
       if (result.success) {
-        alert('Booking created successfully!');
-        // Reset form or redirect
-        window.location.reload();
+        setMessage({type: 'success', text: 'Booking created successfully!'});
+        // Reset form or redirect after a delay to show the message
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       } else {
-        alert(`Error: ${result.message}`);
+        setMessage({type: 'error', text: `Error: ${result.message}`});
       }
     } catch (error) {
       console.error('Error creating booking:', error);
-      alert('An error occurred while creating the booking');
+      setMessage({type: 'error', text: 'An error occurred while creating the booking'});
     } finally {
       setLoading(false);
     }
@@ -393,6 +412,36 @@ export default function Booking() {
             </div>
             
             <div className="p-6">
+              {/* Message Display */}
+              {message.type && (
+                <div className={`mb-6 p-4 rounded-lg flex items-center justify-between ${
+                  message.type === 'success' 
+                    ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200'
+                    : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200'
+                }`}>
+                  <div className="flex items-center">
+                    {message.type === 'success' ? (
+                      <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                    <span className="font-medium">{message.text}</span>
+                  </div>
+                  <button
+                    onClick={() => setMessage({type: null, text: ''})}
+                    className="ml-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+              
               {/* All Steps in One View */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
@@ -745,14 +794,23 @@ export default function Booking() {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Nationality
+                          Nationality *
                         </label>
-                        <input
-                          type="text"
+                        <select
                           value={guestData.nationality}
                           onChange={(e) => setGuestData(prev => ({ ...prev, nationality: e.target.value }))}
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                        />
+                        >
+                          <option value="">Select nationality</option>
+                          {nationalities.map((nationality) => (
+                            <option key={nationality.code} value={nationality.name}>
+                              {nationality.name}
+                            </option>
+                          ))}
+                        </select>
+                        {validationErrors.nationality && (
+                          <p className="mt-1 text-sm text-red-600">{validationErrors.nationality}</p>
+                        )}
                       </div>
                       
                       <div>
