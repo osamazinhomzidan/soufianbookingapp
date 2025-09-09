@@ -208,6 +208,20 @@ export default function Booking() {
     }
   }, [checkInDate, checkOutDate, selectedHotelId, numberOfRooms]);
   
+  // Clear selected room if it becomes unavailable when number of rooms changes
+  useEffect(() => {
+    if (selectedRoomId && availableRooms.length > 0) {
+      const selectedRoomResult = availableRooms.find(r => r.room.id === selectedRoomId);
+      if (selectedRoomResult) {
+        const availability = selectedRoomResult.availability;
+        if (!availability.isAvailable || availability.totalAvailable < numberOfRooms) {
+          setSelectedRoomId('');
+          setSelectedRoom(null);
+        }
+      }
+    }
+  }, [numberOfRooms, availableRooms, selectedRoomId]);
+  
   // Calculate total amount when room or nights change
   useEffect(() => {
     if (selectedRoom && numberOfNights > 0) {
@@ -302,6 +316,19 @@ export default function Booking() {
     if (!checkOutDate) errors.checkOut = 'Please select check-out date';
     if (numberOfRooms < 1) errors.numberOfRooms = 'Number of rooms must be at least 1';
     
+    // Room availability validation
+    if (selectedRoomId) {
+      const selectedRoomResult = availableRooms.find(r => r.room.id === selectedRoomId);
+      if (selectedRoomResult) {
+        const availability = selectedRoomResult.availability;
+        if (!availability.isAvailable) {
+          errors.room = 'Selected room is not available for the chosen dates';
+        } else if (availability.totalAvailable < numberOfRooms) {
+          errors.room = `Only ${availability.totalAvailable} rooms available, but ${numberOfRooms} requested`;
+        }
+      }
+    }
+    
     // Guest Data validation
     if (!guestData.fullName.trim()) errors.fullName = 'Full name is required';
     if (!guestData.email.trim()) errors.email = 'Email is required';
@@ -371,11 +398,32 @@ export default function Booking() {
       const result = await response.json();
       
       if (result.success) {
-        setMessage({type: 'success', text: 'Booking created successfully!'});
-        // Reset form or redirect after a delay to show the message
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
+        setMessage({
+          type: 'success', 
+          text: `🎉 Booking created successfully! Reservation ID: ${result.data?.resId || 'N/A'}. You can create another booking or close this form.`
+        });
+        // Scroll to top to show the success message
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Reset form data for next booking
+        setSelectedHotelId('');
+        setSelectedRoomId('');
+        setSelectedRoom(null);
+        setAvailableRooms([]);
+        setCheckInDate('');
+        setCheckOutDate('');
+        setNumberOfRooms(1);
+        setGuestData({
+          fullName: '', firstName: '', lastName: '', email: '', phone: '', telephone: '',
+          nationality: '', passportNumber: '', dateOfBirth: '', gender: 'MALE',
+          address: '', city: '', country: '', guestClassification: '', travelAgent: '',
+          company: '', source: '', group: '', isVip: false, vip: false, profileId: '', notes: ''
+        });
+        setPaymentData({
+          method: 'CASH',
+          date: new Date().toISOString().split('T')[0],
+          paidAmount: 0,
+          remainingDueDate: ''
+        });
       } else {
         setMessage({type: 'error', text: `Error: ${result.message}`});
       }
@@ -638,12 +686,20 @@ export default function Booking() {
                             return (
                               <div
                                 key={room.id}
-                                className={`border rounded-lg p-3 cursor-pointer transition-colors text-sm ${
-                                  selectedRoomId === room.id
-                                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                    : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'
+                                className={`border rounded-lg p-3 transition-colors text-sm ${
+                                  !availability.isAvailable
+                                    ? 'border-red-300 bg-red-50 dark:bg-red-900/20 cursor-not-allowed opacity-60'
+                                    : availability.totalAvailable < numberOfRooms
+                                    ? 'border-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 cursor-not-allowed opacity-60'
+                                    : selectedRoomId === room.id
+                                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 cursor-pointer'
+                                    : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 cursor-pointer'
                                 }`}
-                                onClick={() => handleRoomSelection(room.id)}
+                                onClick={() => {
+                                  if (availability.isAvailable && availability.totalAvailable >= numberOfRooms) {
+                                    handleRoomSelection(room.id);
+                                  }
+                                }}
                               >
                                 <div className="flex justify-between items-start">
                                   <div className="flex-1">
@@ -657,8 +713,32 @@ export default function Booking() {
                                     <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
                                       <span><strong>Board:</strong> {room.boardType}</span>
                                       <span className="ml-3"><strong>Capacity:</strong> {room.capacity}</span>
-                                      <span className="ml-3"><strong>Available:</strong> {availability.totalAvailable}</span>
-                                      <span className="ml-3"><strong>Quantity:</strong> {room.quantity}</span>
+                                      <span className="ml-3"><strong>Total Rooms:</strong> {room.quantity}</span>
+                                    </div>
+                                    
+                                    {/* Availability Status */}
+                                    <div className="mt-2 text-xs">
+                                      {!availability.isAvailable ? (
+                                        <div className="text-red-600 dark:text-red-400">
+                                          <strong>❌ Not Available</strong>
+                                          {!availability.isWithinAvailabilityPeriod && (
+                                            <span className="ml-2">- Outside availability period</span>
+                                          )}
+                                        </div>
+                                      ) : availability.totalAvailable < numberOfRooms ? (
+                                        <div className="text-yellow-600 dark:text-yellow-400">
+                                          <strong>⚠️ Insufficient Rooms</strong>
+                                          <span className="ml-2">Available: {availability.totalAvailable}, Requested: {numberOfRooms}</span>
+                                        </div>
+                                      ) : (
+                                        <div className="text-green-600 dark:text-green-400">
+                                          <strong>✅ Available</strong>
+                                          <span className="ml-2">{availability.totalAvailable} rooms available</span>
+                                          {availability.bookedRooms > 0 && (
+                                            <span className="ml-2">({availability.bookedRooms} booked)</span>
+                                          )}
+                                        </div>
+                                      )}
                                     </div>
                                     
                                     {room.altDescription && (

@@ -255,10 +255,37 @@ export async function POST(request: NextRequest) {
     const timeDiff = checkOut.getTime() - checkIn.getTime();
     const numberOfNights = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-    // Check room availability
+    // Check room availability with comprehensive validation
     const room = await prisma.room.findUnique({
       where: { id: roomId },
-      include: { hotel: true },
+      include: { 
+        hotel: true,
+        availabilitySlots: {
+          where: {
+            date: {
+              gte: checkIn,
+              lte: checkOut,
+            },
+          },
+        },
+        bookings: {
+          where: {
+            OR: [
+              {
+                checkInDate: {
+                  lte: checkOut,
+                },
+                checkOutDate: {
+                  gte: checkIn,
+                },
+              },
+            ],
+            status: {
+              in: ['CONFIRMED', 'CHECKED_IN', 'PENDING'],
+            },
+          },
+        },
+      },
     });
 
     if (!room) {
@@ -271,6 +298,55 @@ export async function POST(request: NextRequest) {
     if (!room.isActive) {
       return NextResponse.json(
         { success: false, message: 'Room is not available' },
+        { status: 400 }
+      );
+    }
+
+    // Check if room is within its availability date range
+    if (room.availableFrom || room.availableTo) {
+      const roomAvailableFrom = room.availableFrom ? new Date(room.availableFrom) : null;
+      const roomAvailableTo = room.availableTo ? new Date(room.availableTo) : null;
+      
+      if (roomAvailableFrom && checkIn < roomAvailableFrom) {
+        return NextResponse.json(
+          { success: false, message: `Room is not available before ${roomAvailableFrom.toDateString()}` },
+          { status: 400 }
+        );
+      }
+      if (roomAvailableTo && checkOut > roomAvailableTo) {
+        return NextResponse.json(
+          { success: false, message: `Room is not available after ${roomAvailableTo.toDateString()}` },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Calculate total booked rooms for the date range
+    const bookedRooms = room.bookings.reduce((total, booking) => total + (booking.numberOfRooms || 1), 0);
+
+    // Check availability slots if they exist
+    let availableFromSlots = null;
+    if (room.availabilitySlots.length > 0) {
+      // Find minimum available rooms across all dates in range
+      availableFromSlots = Math.min(
+        ...room.availabilitySlots.map(slot => slot.availableCount)
+      );
+    }
+
+    // Determine available rooms
+    const totalAvailable = availableFromSlots !== null 
+      ? availableFromSlots 
+      : Math.max(0, room.quantity - bookedRooms);
+
+    // Check if requested number of rooms is available
+    if (totalAvailable < numberOfRooms) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          message: `Only ${totalAvailable} room(s) available for the selected dates. You requested ${numberOfRooms} room(s).`,
+          availableRooms: totalAvailable,
+          requestedRooms: numberOfRooms
+        },
         { status: 400 }
       );
     }
@@ -389,7 +465,7 @@ export async function POST(request: NextRequest) {
           useAlternativeRate: useAlternativeRate || false,
           totalAmount,
           rateCode: rateCode || 'STANDARD',
-          status: 'PENDING',
+          status: 'CONFIRMED',
           assignedRoomNo: guestData.roomNo,
           specialRequests: specialRequests || [],
           notes,
