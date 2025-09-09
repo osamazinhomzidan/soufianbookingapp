@@ -293,6 +293,7 @@ export default function Booking() {
     if (!guestData.fullName.trim()) errors.fullName = 'Full name is required';
     if (!guestData.email.trim()) errors.email = 'Email is required';
     if (!guestData.phone.trim()) errors.phone = 'Phone is required';
+    if (!guestData.guestClassification.trim()) errors.guestClassification = 'Guest classification is required';
     
     // Payment validation
     if (!paymentData.date) errors.paymentDate = 'Payment date is required';
@@ -756,15 +757,21 @@ export default function Booking() {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Guest Classification
+                          Guest Classification *
                         </label>
-                        <input
-                          type="text"
+                        <select
                           value={guestData.guestClassification}
                           onChange={(e) => setGuestData(prev => ({ ...prev, guestClassification: e.target.value }))}
-                          placeholder="e.g., Saudi Citizen, Visitor"
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                        />
+                        >
+                          <option value="">Select guest classification</option>
+                          <option value="Saudi Citizen">Saudi Citizen</option>
+                          <option value="Visitor">Visitor</option>
+                          <option value="Resident">Resident (Non‑Saudi)</option>
+                        </select>
+                        {validationErrors.guestClassification && (
+                          <p className="mt-1 text-sm text-red-600">{validationErrors.guestClassification}</p>
+                        )}
                       </div>
                       
                       <div>
