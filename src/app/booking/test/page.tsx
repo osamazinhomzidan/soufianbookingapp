@@ -442,11 +442,11 @@ export default function Booking() {
                 </div>
               )}
               
-              {/* All Steps in One View */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* All Steps in One View - Vertical Layout */}
+              <div className="space-y-8">
                 
                 {/* Step 1: Room Selection */}
-                <div className="space-y-6">
+                <div className="w-full">
                   <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
                     <h2 className="text-xl font-semibold text-blue-800 dark:text-blue-200 mb-4">
                       1. Room Selection
@@ -559,7 +559,7 @@ export default function Booking() {
                     )}
                     
                     {/* Date Selection */}
-                    <div className="grid grid-cols-1 gap-4 mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Check-in Date *
@@ -740,13 +740,13 @@ export default function Booking() {
                 </div>
                 
                 {/* Step 2: Guest Information */}
-                <div className="space-y-6">
+                <div className="w-full">
                   <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
                     <h2 className="text-xl font-semibold text-green-800 dark:text-green-200 mb-4">
                       2. Guest Information
                     </h2>
                     
-                    <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Full Name *
@@ -1030,7 +1030,7 @@ export default function Booking() {
                 </div>
                 
                 {/* Step 3: Payment Details */}
-                <div className="space-y-6">
+                <div className="w-full">
                   <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
                     <h2 className="text-xl font-semibold text-yellow-800 dark:text-yellow-200 mb-4">
                       3. Payment Details
@@ -1107,11 +1107,12 @@ export default function Booking() {
                     
                     {/* Credit Payment Details */}
                     {paymentData.method === 'CREDIT' && (
-                      <div className="bg-orange-50 dark:bg-orange-900/20 p-3 rounded-md space-y-3">
-                        <h4 className="font-medium text-orange-800 dark:text-orange-200 text-sm">
+                      <div className="bg-orange-50 dark:bg-orange-900/20 p-3 rounded-md">
+                        <h4 className="font-medium text-orange-800 dark:text-orange-200 text-sm mb-3">
                           Credit Payment Details
                         </h4>
                         
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Pay Now Amount *
@@ -1150,6 +1151,7 @@ export default function Booking() {
                           {validationErrors.remainingDueDate && (
                             <p className="mt-1 text-sm text-red-600">{validationErrors.remainingDueDate}</p>
                           )}
+                        </div>
                         </div>
                         
                         {paymentData.paidAmount && paymentData.paidAmount > 0 && (
