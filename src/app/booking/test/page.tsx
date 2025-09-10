@@ -453,17 +453,11 @@ export default function Booking() {
 
   return (
     <ProtectedRoute>
-      <div className={`min-h-screen relative overflow-hidden transition-colors duration-300 ${
+      <div className={`min-h-full relative overflow-hidden transition-colors duration-300 p-8 lg:p-16 ${
         isDark 
           ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' 
           : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
       } ${isRTL ? 'rtl' : 'ltr'}`}>
-        <div className="w-full">
-          <div className={`backdrop-blur-sm border-2 shadow-xl hover:shadow-2xl transition-all duration-300 p-8 lg:p-16 mb-8 lg:mb-16 ${
-            isDark 
-              ? 'bg-slate-800/90 border-slate-700/50' 
-              : 'bg-white/85 border-slate-200/70'
-          }`}>
             {/* Header */}
             <div className="mb-8 lg:mb-16">
               <div className="flex flex-col lg:flex-row items-center space-y-6 lg:space-y-0 lg:space-x-12 mb-8 lg:mb-16">
@@ -1518,16 +1512,13 @@ export default function Booking() {
                         </p>
                       </div>
                     )}
-                  </div>
-                </div>
-              </div>
-              
-              {/* Submit Button */}
+
+                    {/* Submit Button */}
               <div className="mt-12 flex justify-center">
                 <button
                   onClick={handleSubmit}
                   disabled={loading || !selectedRoom || totalAmount === 0}
-                  className="px-12 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white text-lg font-bold rounded-2xl hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-4 focus:ring-green-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl transform hover:scale-105 transition-all duration-200"
+                  className="w-full text-center px-12 py-8 bg-gradient-to-r from-blue-600 to-blue-600 text-white text-lg font-bold rounded-2xl hover:from-blue-700 hover:to-blue-700 focus:outline-none focus:ring-4 focus:ring-green-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl transform  transition-all duration-200"
                 >
                   {loading ? (
                     <div className="flex items-center space-x-3">
@@ -1538,7 +1529,7 @@ export default function Booking() {
                       <span>Creating Booking...</span>
                     </div>
                   ) : (
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-3 text-center justify-center">
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
@@ -1547,11 +1538,12 @@ export default function Booking() {
                   )}
                 </button>
               </div>
-            
+                  </div>
+                </div>
+              </div>
+              
+              
       
-        
-      
-    </div></div>
     </ProtectedRoute>
   );
 }
