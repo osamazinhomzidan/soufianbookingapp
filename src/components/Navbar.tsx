@@ -125,7 +125,7 @@ const Navbar = ({ isOpen, onToggle }: NavbarProps) => {
                 `}
               >
                 <item.icon className={`w-5 h-5 transition-colors duration-200 ${item.isActive ? 'text-white' : `${isDark ? 'text-gray-400 group-hover:text-green-400' : 'text-gray-600 group-hover:text-green-600'}`}`} />
-                <span className={`font-bold text-lg ${textAlignClass} transition-colors duration-200`}>{item.title}</span>
+                <span className={`font-bold text-sm ${textAlignClass} transition-colors duration-200`}>{item.title}</span>
               </Link>
             ))}
           </div>

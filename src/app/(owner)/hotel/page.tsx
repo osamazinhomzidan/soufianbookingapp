@@ -477,18 +477,19 @@ export default function Hotel() {
 
   return (
     <ProtectedRoute requiredRole="OWNER">
-      <div className={`min-h-screen px-4 py-8 relative overflow-hidden transition-colors duration-300 ${
+      <div className={`h-screen overflow-hidden transition-colors duration-300 ${
         isDark 
-          ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' 
-          : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
+          ? 'bg-gray-900' 
+          : 'bg-gray-50'
       }`}>
-        {/* Error Display */}
-        {error && (
-          <div className={`backdrop-blur-xl rounded-3xl shadow-2xl p-6 ${
-            isDark 
-              ? 'bg-red-900/70 border border-red-700/50' 
-              : 'bg-red-50/70 border border-red-200/50'
-          }`}>
+        <div className="h-full flex flex-col p-2 sm:p-4 lg:p-6 gap-3 sm:gap-4 lg:gap-6">
+          {/* Error Display */}
+          {error && (
+            <div className={`rounded-lg shadow-sm p-3 sm:p-4 ${
+              isDark 
+                ? 'bg-red-900/80 border border-red-700/50' 
+                : 'bg-red-50 border border-red-200'
+            }`}>
             <div className="flex items-center space-x-3">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -508,165 +509,208 @@ export default function Hotel() {
                     <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>
                 </button>
-              </div>
-            </div>
+                      </div>
+                      
+                      {/* Clear Filters Button */}
+                      <div className="mt-3 flex justify-center">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNameFilter('');
+                            setCodeFilter('');
+                            setLocationFilter('');
+                            setAddressFilter('');
+                            setHasFilesFilter('');
+                            setGeneralSearch('');
+                            setHasRoomsFilter('');
+                            setMinRoomCountFilter('');
+                            setMaxRoomCountFilter('');
+                          }}
+                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all flex items-center space-x-2 border ${
+                            isDark
+                              ? 'border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white bg-gray-700 hover:bg-gray-600'
+                              : 'border-gray-200 hover:border-gray-300 text-gray-600 hover:text-gray-800 bg-white hover:bg-gray-50'
+                          }`}
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                          <span>{t('hotels.clearFilters')}</span>
+                        </button>
+                      </div>
+                    </div>
           </div>
         )}
 
-        {/* Main Content Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 xl:grid-cols-5 gap-6 mb-8">
-          {/* Add/Edit Hotel Section - Left Side (20% on both lg and xl screens) */}
-          <div className="lg:col-span-1 xl:col-span-1">
-            <div className={`border rounded-xl shadow-sm transition-all duration-200 p-4 h-fit sticky top-4 ${
-              isDark 
-                ? 'bg-gray-800/90 border-gray-700' 
-                : 'bg-white border-gray-200'
-            }`}>
-          <form onSubmit={editingHotel ? handleUpdateHotel : handleAddHotel} className="space-y-3">
+          {/* Main Content Layout */}
+          <div className="flex-1 flex flex-col lg:flex-row gap-3 sm:gap-4 lg:gap-6 min-h-0">
+            {/* Add/Edit Hotel Section - Left Side */}
+            <div className="lg:w-80 xl:w-96 flex-shrink-0">
+              <div className={`border rounded-xl shadow-lg p-3 sm:p-4 h-fit backdrop-blur-sm ${
+                isDark 
+                  ? 'bg-gradient-to-br from-gray-800/95 to-gray-900/95 border-gray-700/50' 
+                  : 'bg-gradient-to-br from-white/95 to-gray-50/95 border-gray-200/50'
+              }`}>
+          <form onSubmit={editingHotel ? handleUpdateHotel : handleAddHotel} className="space-y-1">
             {/* All inputs in vertical layout */}
-            <div className="space-y-3">
+            <div className="space-y-1">
               {/* Hotel Name */}
               <div>
-                <label className={`block text-sm font-medium mb-1 ${
-                  isDark ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  {t('hotels.hotelName')}
-                </label>
-                <input
-                  type="text"
-                  value={hotelName}
-                  onChange={(e) => setHotelName(e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm ${
-                    isDark 
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  }`}
-                  placeholder={t('hotels.enterHotelName')}
-                  required
-                />
+                <div className="relative">
+                  <svg className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  <input
+                    type="text"
+                    value={hotelName}
+                    onChange={(e) => setHotelName(e.target.value)}
+                    className={`w-full pl-10 pr-4 py-1.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-sm font-medium min-h-[2rem] ${
+                      isDark 
+                        ? 'bg-gray-700/50 border-gray-600/50 text-white placeholder-gray-400' 
+                        : 'bg-white/80 border-gray-300/50 text-gray-900 placeholder-gray-500'
+                    }`}
+                    placeholder={t('hotels.enterHotelName')}
+                    required
+                  />
+                </div>
               </div>
 
               {/* Alt Hotel Name */}
               <div>
-                <label className={`block text-sm font-medium mb-1 ${
-                  isDark ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  {t('hotels.altHotelName')}
-                </label>
-                <input
-                  type="text"
-                  value={altHotelName}
-                  onChange={(e) => setAltHotelName(e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm ${
-                    isDark 
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  }`}
-                  placeholder={t('hotels.enterAltName')}
-                  required
-                />
+                <div className="relative">
+                  <svg className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                  <input
+                    type="text"
+                    value={altHotelName}
+                    onChange={(e) => setAltHotelName(e.target.value)}
+                    className={`w-full pl-10 pr-4 py-1.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-sm font-medium min-h-[2rem] ${
+                      isDark 
+                        ? 'bg-gray-700/50 border-gray-600/50 text-white placeholder-gray-400' 
+                        : 'bg-white/80 border-gray-300/50 text-gray-900 placeholder-gray-500'
+                    }`}
+                    placeholder={t('hotels.enterAltName')}
+                    required
+                  />
+                </div>
               </div>
 
               {/* Hotel Code */}
               <div>
-                <label className={`block text-sm font-medium mb-1 ${
-                  isDark ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  {t('hotels.hotelCode')}
-                </label>
-                <input
-                  type="text"
-                  value={hotelCode}
-                  onChange={(e) => setHotelCode(e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm ${
-                    isDark 
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  }`}
-                  placeholder={t('hotels.enterHotelCode')}
-                  required
-                />
+                <div className="relative">
+                  <svg className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                  </svg>
+                  <input
+                    type="text"
+                    value={hotelCode}
+                    onChange={(e) => setHotelCode(e.target.value)}
+                    className={`w-full pl-10 pr-4 py-1.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-sm font-medium min-h-[2rem] ${
+                      isDark 
+                        ? 'bg-gray-700/50 border-gray-600/50 text-white placeholder-gray-400' 
+                        : 'bg-white/80 border-gray-300/50 text-gray-900 placeholder-gray-500'
+                    }`}
+                    placeholder={t('hotels.enterHotelCode')}
+                    required
+                  />
+                </div>
               </div>
 
               {/* Hotel Address */}
               <div>
-                <label className={`block text-sm font-medium mb-1 ${
-                  isDark ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  {t('hotels.hotelAddress')}
-                </label>
-                <input
-                  type="text"
-                  value={hotelAddress}
-                  onChange={(e) => setHotelAddress(e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm ${
-                    isDark 
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  }`}
-                  placeholder={t('hotels.enterHotelAddress')}
-                  required
-                />
+                <div className="relative">
+                  <svg className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <input
+                    type="text"
+                    value={hotelAddress}
+                    onChange={(e) => setHotelAddress(e.target.value)}
+                    className={`w-full pl-10 pr-4 py-1.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-sm font-medium min-h-[2rem] ${
+                      isDark 
+                        ? 'bg-gray-700/50 border-gray-600/50 text-white placeholder-gray-400' 
+                        : 'bg-white/80 border-gray-300/50 text-gray-900 placeholder-gray-500'
+                    }`}
+                    placeholder={t('hotels.enterHotelAddress')}
+                    required
+                  />
+                </div>
               </div>
 
               {/* Location */}
               <div>
-                <label className={`block text-sm font-medium mb-1 ${
-                  isDark ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  {t('hotels.location')}
-                </label>
-                <input
-                  type="text"
-                  value={hotelLocation}
-                  onChange={(e) => setHotelLocation(e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm ${
-                    isDark 
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  }`}
-                  placeholder={t('hotels.enterLocation')}
-                />
+                <div className="relative">
+                  <svg className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <input
+                    type="text"
+                    value={hotelLocation}
+                    onChange={(e) => setHotelLocation(e.target.value)}
+                    className={`w-full pl-10 pr-4 py-1.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-sm font-medium min-h-[2rem] ${
+                      isDark 
+                        ? 'bg-gray-700/50 border-gray-600/50 text-white placeholder-gray-400' 
+                        : 'bg-white/80 border-gray-300/50 text-gray-900 placeholder-gray-500'
+                    }`}
+                    placeholder={t('hotels.enterLocation')}
+                  />
+                </div>
               </div>
 
               {/* Hotel Description */}
               <div>
-                <label className={`block text-sm font-medium mb-1 ${
-                  isDark ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  {t('hotels.hotelDescription')}
-                </label>
-                <textarea
-                  value={hotelDescription}
-                  onChange={(e) => setHotelDescription(e.target.value)}
-                  rows={3}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm resize-none ${
-                    isDark 
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  }`}
-                  placeholder={t('hotels.enterHotelDescription')}
-                />
+                <div className="relative">
+                  <svg className={`absolute left-3 top-3 w-4 h-4 ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <textarea
+                    value={hotelDescription}
+                    onChange={(e) => setHotelDescription(e.target.value)}
+                    rows={1}
+                    className={`w-full pl-10 pr-4 py-1.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-sm font-medium resize-none ${
+                      isDark 
+                        ? 'bg-gray-700/50 border-gray-600/50 text-white placeholder-gray-400' 
+                        : 'bg-white/80 border-gray-300/50 text-gray-900 placeholder-gray-500'
+                    }`}
+                    placeholder={t('hotels.enterHotelDescription')}
+                  />
+                </div>
               </div>
 
               {/* Alt Hotel Description */}
               <div>
-                <label className={`block text-sm font-medium mb-1 ${
-                  isDark ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  {t('hotels.altHotelDescription')}
-                </label>
-                <textarea
-                  value={altHotelDescription}
-                  onChange={(e) => setAltHotelDescription(e.target.value)}
-                  rows={3}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm resize-none ${
-                    isDark 
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  }`}
-                  placeholder={t('hotels.enterAltHotelDescription')}
-                />
+                <div className="relative">
+                  <svg className={`absolute left-3 top-3 w-4 h-4 ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  <textarea
+                    value={altHotelDescription}
+                    onChange={(e) => setAltHotelDescription(e.target.value)}
+                    rows={1}
+                    className={`w-full pl-10 pr-4 py-1.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-sm font-medium resize-none ${
+                      isDark 
+                        ? 'bg-gray-700/50 border-gray-600/50 text-white placeholder-gray-400' 
+                        : 'bg-white/80 border-gray-300/50 text-gray-900 placeholder-gray-500'
+                    }`}
+                    placeholder={t('hotels.enterAltHotelDescription')}
+                  />
+                </div>
               </div>
             </div>
 
@@ -674,15 +718,10 @@ export default function Hotel() {
 
               {/* File Upload Section */}
               <div>
-                <label className={`block text-sm font-medium mb-1 ${
-                  isDark ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  Agreement Files
-                </label>
-                <div className={`relative border-2 border-dashed rounded-lg p-3 text-center transition-all duration-200 hover:border-blue-500 ${
+                <div className={`relative border-2 border-dashed rounded-lg p-2 text-center transition-all hover:scale-[1.02] ${
                   isDark 
-                    ? 'border-gray-600 hover:border-gray-500' 
-                    : 'border-gray-300 hover:border-gray-400'
+                    ? 'border-gray-600/50 hover:border-blue-500/50 bg-gray-800/30' 
+                    : 'border-gray-300/50 hover:border-blue-400/50 bg-gray-50/30'
                 }`}>
                   <input
                     type="file"
@@ -695,12 +734,14 @@ export default function Hotel() {
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     id="agreement-files"
                   />
-                  <div className="space-y-1">
-                    <svg className="mx-auto w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="space-y-0.5">
+                    <svg className={`mx-auto w-6 h-6 ${
+                      isDark ? 'text-blue-400' : 'text-blue-500'
+                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                     </svg>
-                    <p className={`text-sm font-medium ${
-                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    <p className={`text-sm font-semibold ${
+                      isDark ? 'text-gray-200' : 'text-gray-800'
                     }`}>
                       {agreementFiles.length > 0
                         ? `${agreementFiles.length} files selected`
@@ -708,19 +749,19 @@ export default function Hotel() {
                       }
                     </p>
                     <p className={`text-xs ${
-                      isDark ? 'text-gray-400' : 'text-gray-500'
+                      isDark ? 'text-gray-400' : 'text-gray-600'
                     }`}>
                       PDF, DOC, DOCX, TXT
                     </p>
                   </div>
                 </div>
                 {agreementFiles.length > 0 && (
-                  <div className="mt-2 space-y-1 max-h-20 overflow-y-auto">
+                  <div className="mt-1 space-y-0.5 max-h-12 overflow-y-auto">
                     {agreementFiles.map((file, index) => (
-                      <div key={index} className={`flex items-center justify-between px-2 py-1 rounded text-xs ${
+                      <div key={index} className={`flex items-center justify-between px-2 py-1 rounded text-xs font-medium ${
                         isDark 
-                          ? 'bg-gray-700 text-gray-300' 
-                          : 'bg-gray-100 text-gray-700'
+                          ? 'bg-gray-700/70 text-gray-200' 
+                          : 'bg-gray-100/70 text-gray-800'
                       }`}>
                         <span className="truncate">{file.name}</span>
                         <button
@@ -728,7 +769,7 @@ export default function Hotel() {
                           onClick={() => {
                             setAgreementFiles(prev => prev.filter((_, i) => i !== index));
                           }}
-                          className="ml-2 text-red-500 hover:text-red-700"
+                          className="ml-1 text-red-500 hover:text-red-600 transition-colors text-sm font-bold"
                         >
                           ×
                         </button>
@@ -740,14 +781,14 @@ export default function Hotel() {
             
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-2 pt-4">
+            <div className="flex flex-col sm:flex-row gap-2 pt-2">
               <button
                 type="submit"
                 disabled={loading}
-                className={`flex-1 py-2 px-4 rounded-lg font-medium text-sm transition-all duration-200 focus:outline-none focus:ring-2 ${
+                className={`flex-1 py-2 px-4 rounded-lg font-semibold text-sm min-h-[2.25rem] transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] ${
                   loading
                     ? 'bg-gray-400 cursor-not-allowed text-gray-600'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-300'
+                    : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white focus:ring-blue-300/50'
                 }`}
               >
                 {loading ? (
@@ -765,10 +806,10 @@ export default function Hotel() {
               
               <button
                 type="button"
-                className={`flex-1 py-2 px-4 rounded-lg font-medium text-sm transition-all duration-200 focus:outline-none focus:ring-2 ${
+                className={`flex-1 py-2 px-4 rounded-lg font-semibold text-sm min-h-[2.25rem] transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] ${
                   isDark
-                    ? 'bg-gray-700 hover:bg-gray-600 text-white focus:ring-gray-500'
-                    : 'bg-gray-200 hover:bg-gray-300 text-gray-800 focus:ring-gray-300'
+                    ? 'bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white focus:ring-gray-500/50'
+                    : 'bg-gradient-to-r from-gray-200 to-gray-300 hover:from-gray-300 hover:to-gray-400 text-gray-800 focus:ring-gray-300/50'
                 }`}
                 onClick={editingHotel ? handleCancelEdit : () => {
                   setHotelName('');
@@ -788,163 +829,175 @@ export default function Hotel() {
             </div>
           </div>
 
-          {/* Hotels List Section - Right Side (80% on both lg and xl screens) */}
-          <div className="lg:col-span-4 xl:col-span-4">
-          <div className={`border-2 rounded-2xl p-4`}>
+            {/* Hotels List Section - Right Side */}
+            <div className="flex-1 min-w-0">
+              <div className={`border rounded-lg p-3 sm:p-4 h-full flex flex-col ${
+                isDark 
+                  ? 'bg-gray-800 border-gray-700' 
+                  : 'bg-white border-gray-200'
+              }`}>
         
           {/* Search and Filter Section */}
-          <div>
-            {/* Minimalistic Filter Bar */}
-            <div className="mb-8">
-              <div className="flex flex-wrap items-center gap-4">
+          <div className="flex-shrink-0">
+            {/* Modern Minimalistic Filter Bar */}
+            <div className="mb-4">
+              <div className={`flex flex-wrap items-center gap-3 p-4 rounded-xl border backdrop-blur-sm transition-all duration-300 ${
+                isDark 
+                  ? 'bg-gray-800/50 border-gray-700/50' 
+                  : 'bg-white/80 border-gray-200/60'
+              }`}>
                 {/* Name Filter */}
-                <div className="flex items-center space-x-2 min-w-0 flex-1">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                  <input
-                    type="text"
-                    value={nameFilter}
-                    onChange={(e) => setNameFilter(e.target.value)}
-                    className={`flex-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition-all ${
-                      isDark 
-                        ? 'border-gray-600 placeholder-gray-400 text-white focus:border-gray-500' 
-                        : 'border-gray-200 placeholder-gray-500 text-gray-700 focus:border-gray-300'
-                    }`}
-                    placeholder={t('hotels.searchByName')}
-                  />
-                </div>
+                 <div className="relative min-w-[140px] flex-1">
+                   <svg className="absolute left-2 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                   </svg>
+                   <input
+                     type="text"
+                     value={nameFilter}
+                     onChange={(e) => setNameFilter(e.target.value)}
+                     className={`w-full pl-7 pr-2 py-1.5 border rounded-md text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all duration-300 placeholder:font-bold ${
+                       isDark 
+                         ? 'bg-gray-800/60 border-gray-600/50 placeholder-gray-400 text-white focus:bg-gray-800/80' 
+                         : 'bg-white/90 border-gray-200/50 placeholder-gray-500 text-gray-700 focus:bg-white'
+                     }`}
+                     placeholder={t('hotels.searchByName')}
+                   />
+                 </div>
 
                 {/* Code Filter */}
-                <div className="flex items-center space-x-2 min-w-0 flex-1">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                  </svg>
-                  <input
-                    type="text"
-                    value={codeFilter}
-                    onChange={(e) => setCodeFilter(e.target.value)}
-                    className={`flex-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition-all ${
-                      isDark 
-                        ? 'border-gray-600 placeholder-gray-400 text-white focus:border-gray-500' 
-                        : 'border-gray-200 placeholder-gray-500 text-gray-700 focus:border-gray-300'
-                    }`}
-                    placeholder={t('hotels.searchByCode')}
-                  />
-                </div>
+                 <div className="relative min-w-[120px] flex-1">
+                   <svg className="absolute left-2 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                   </svg>
+                   <input
+                     type="text"
+                     value={codeFilter}
+                     onChange={(e) => setCodeFilter(e.target.value)}
+                     className={`w-full pl-7 pr-2 py-1.5 border rounded-md text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all duration-300 placeholder:font-bold ${
+                       isDark 
+                         ? 'bg-gray-800/60 border-gray-600/50 placeholder-gray-400 text-white focus:bg-gray-800/80' 
+                         : 'bg-white/90 border-gray-200/50 placeholder-gray-500 text-gray-700 focus:bg-white'
+                     }`}
+                     placeholder={t('hotels.searchByCode')}
+                   />
+                 </div>
 
                 {/* Location Filter */}
-                <div className="flex items-center space-x-2 min-w-0 flex-1">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <input
-                    type="text"
-                    value={locationFilter}
-                    onChange={(e) => setLocationFilter(e.target.value)}
-                    className={`flex-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition-all ${
-                      isDark 
-                        ? 'border-gray-600 placeholder-gray-400 text-white focus:border-gray-500' 
-                        : 'border-gray-200 placeholder-gray-500 text-gray-700 focus:border-gray-300'
-                    }`}
-                    placeholder={t('hotels.searchByLocation')}
-                  />
-                </div>
+                 <div className="relative min-w-[140px] flex-1">
+                   <svg className="absolute left-2 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                   </svg>
+                   <input
+                     type="text"
+                     value={locationFilter}
+                     onChange={(e) => setLocationFilter(e.target.value)}
+                     className={`w-full pl-7 pr-2 py-1.5 border rounded-md text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all duration-300 placeholder:font-bold ${
+                       isDark 
+                         ? 'bg-gray-800/60 border-gray-600/50 placeholder-gray-400 text-white focus:bg-gray-800/80' 
+                         : 'bg-white/90 border-gray-200/50 placeholder-gray-500 text-gray-700 focus:bg-white'
+                     }`}
+                     placeholder={t('hotels.searchByLocation')}
+                   />
+                 </div>
 
                 {/* Address Filter */}
-                <div className="flex items-center space-x-2 min-w-0 flex-1">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                  </svg>
-                  <input
-                    type="text"
-                    value={addressFilter}
-                    onChange={(e) => setAddressFilter(e.target.value)}
-                    className={`flex-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition-all ${
-                      isDark 
-                        ? 'border-gray-600 placeholder-gray-400 text-white focus:border-gray-500' 
-                        : 'border-gray-200 placeholder-gray-500 text-gray-700 focus:border-gray-300'
-                    }`}
-                    placeholder="Search by address"
-                  />
-                </div>
+                 <div className="relative min-w-[140px] flex-1">
+                   <svg className="absolute left-2 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                   </svg>
+                   <input
+                     type="text"
+                     value={addressFilter}
+                     onChange={(e) => setAddressFilter(e.target.value)}
+                     className={`w-full pl-7 pr-2 py-1.5 border rounded-md text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all duration-300 placeholder:font-bold ${
+                       isDark 
+                         ? 'bg-gray-800/60 border-gray-600/50 placeholder-gray-400 text-white focus:bg-gray-800/80' 
+                         : 'bg-white/90 border-gray-200/50 placeholder-gray-500 text-gray-700 focus:bg-white'
+                     }`}
+                     placeholder="Search by address"
+                   />
+                 </div>
 
                 {/* Rooms Filter */}
-                <div className="flex items-center space-x-2">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                  <select
-                    value={hasRoomsFilter}
-                    onChange={(e) => setHasRoomsFilter(e.target.value)}
-                    className={`px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition-all ${
-                      isDark 
-                        ? 'border-gray-600 text-white focus:border-gray-500' 
-                        : 'border-gray-200 text-gray-700 focus:border-gray-300'
-                    }`}
-                  >
-                    <option value="">{t('hotels.allHotels')}</option>
-                    <option value="true">{t('hotels.hotelsWithRooms')}</option>
-                    <option value="false">{t('hotels.hotelsWithoutRooms')}</option>
-                  </select>
-                </div>
+                 <div className="relative min-w-[100px]">
+                   <svg className="absolute left-2 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                   </svg>
+                   <select
+                     value={hasRoomsFilter}
+                     onChange={(e) => setHasRoomsFilter(e.target.value)}
+                     className={`w-full pl-7 pr-5 py-1.5 border rounded-md text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all duration-300 cursor-pointer appearance-none ${
+                       isDark 
+                         ? 'bg-gray-800/60 border-gray-600/50 text-white focus:bg-gray-800/80' 
+                         : 'bg-white/90 border-gray-200/50 text-gray-700 focus:bg-white'
+                     }`}
+                   >
+                     <option value="">{t('hotels.allHotels')}</option>
+                     <option value="true">{t('hotels.hotelsWithRooms')}</option>
+                     <option value="false">{t('hotels.hotelsWithoutRooms')}</option>
+                   </select>
+                   <svg className="absolute right-1.5 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
+                   </svg>
+                 </div>
 
                 {/* Room Count Filters */}
                 {hasRoomsFilter !== 'false' && (
                   <>
-                    <div className="flex items-center space-x-2">
-                      
-                      <input
-                        type="number"
-                        min="0"
-                        value={minRoomCountFilter}
-                        onChange={(e) => setMinRoomCountFilter(e.target.value)}
-                        className={`w-40 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition-all ${
-                          isDark 
-                            ? 'border-gray-600 placeholder-gray-400 text-white focus:border-gray-500' 
-                            : 'border-gray-200 placeholder-gray-500 text-gray-700 focus:border-gray-300'
-                        }`}
-                        placeholder="Min Rooms"
-                      />
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      
-                      <input
-                        type="number"
-                        min="0"
-                        value={maxRoomCountFilter}
-                        onChange={(e) => setMaxRoomCountFilter(e.target.value)}
-                        className={`w-40 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition-all ${
-                          isDark 
-                            ? 'border-gray-600 placeholder-gray-400 text-white focus:border-gray-500' 
-                            : 'border-gray-200 placeholder-gray-500 text-gray-700 focus:border-gray-300'
-                        }`}
-                        placeholder="Max Rooms"
-                      />
-                    </div>
+                    <div className="relative min-w-[80px]">
+                       <input
+                         type="number"
+                         min="0"
+                         value={minRoomCountFilter}
+                         onChange={(e) => setMinRoomCountFilter(e.target.value)}
+                         className={`w-full px-2 py-1.5 border rounded-md text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all duration-300 placeholder:font-bold ${
+                           isDark 
+                             ? 'bg-gray-800/60 border-gray-600/50 placeholder-gray-400 text-white focus:bg-gray-800/80' 
+                             : 'bg-white/90 border-gray-200/50 placeholder-gray-500 text-gray-700 focus:bg-white'
+                         }`}
+                         placeholder="Min"
+                       />
+                     </div>
+                     <div className="relative min-w-[80px]">
+                       <input
+                         type="number"
+                         min="0"
+                         value={maxRoomCountFilter}
+                         onChange={(e) => setMaxRoomCountFilter(e.target.value)}
+                         className={`w-full px-2 py-1.5 border rounded-md text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all duration-300 placeholder:font-bold ${
+                           isDark 
+                             ? 'bg-gray-800/60 border-gray-600/50 placeholder-gray-400 text-white focus:bg-gray-800/80' 
+                             : 'bg-white/90 border-gray-200/50 placeholder-gray-500 text-gray-700 focus:bg-white'
+                         }`}
+                         placeholder="Max"
+                       />
+                     </div>
                   </>
                 )}
 
                 {/* Files Filter */}
-                <div className="flex items-center space-x-2">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <select
-                    value={hasFilesFilter}
-                    onChange={(e) => setHasFilesFilter(e.target.value)}
-                    className={`px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition-all ${
-                      isDark 
-                        ? 'border-gray-600 text-white focus:border-gray-500' 
-                        : 'border-gray-200 text-gray-700 focus:border-gray-300'
-                    }`}
-                  >
-                    <option value="">All Hotels</option>
-                    <option value="true">Hotels with Files</option>
-                    <option value="false">Hotels without Files</option>
-                  </select>
-                </div>
+                 <div className="relative min-w-[100px]">
+                   <svg className="absolute left-2 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                   </svg>
+                   <select
+                     value={hasFilesFilter}
+                     onChange={(e) => setHasFilesFilter(e.target.value)}
+                     className={`w-full pl-7 pr-5 py-1.5 border rounded-md text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all duration-300 cursor-pointer appearance-none ${
+                       isDark 
+                         ? 'bg-gray-800/60 border-gray-600/50 text-white focus:bg-gray-800/80' 
+                         : 'bg-white/90 border-gray-200/50 text-gray-700 focus:bg-white'
+                     }`}
+                   >
+                     <option value="">All Hotels</option>
+                     <option value="true">Hotels with Files</option>
+                     <option value="false">Hotels without Files</option>
+                   </select>
+                   <svg className="absolute right-1.5 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
+                   </svg>
+                 </div>
                 
                 {/* Clear Filters Button */}
                 <button
@@ -960,270 +1013,285 @@ export default function Hotel() {
                     setMinRoomCountFilter('');
                     setMaxRoomCountFilter('');
                   }}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center space-x-2 border ${
+                  className={`p-1.5 rounded-md text-xs font-medium transition-all duration-200 flex items-center justify-center hover:scale-105 active:scale-95 ${
                     isDark
-                      ? 'border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white'
-                      : 'border-gray-200 hover:border-gray-300 text-gray-600 hover:text-gray-800'
+                      ? 'bg-gray-700/50 hover:bg-gray-600/60 text-gray-300 hover:text-white border border-gray-600/50'
+                      : 'bg-gray-100/80 hover:bg-gray-200/80 text-gray-600 hover:text-gray-800 border border-gray-200/60'
                   }`}
+                  title="Clear Filters"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
-                  <span>{t('hotels.clearFilters')}</span>
                 </button>
               </div>
             </div>
 
-            {/* Selected Hotels Actions */}
-            {selectedHotels.length > 0 && (
-              <div className="flex flex-wrap gap-3 p-4 border border-blue-200/50 rounded-xl">
-                <div className="flex items-center space-x-2 text-blue-700 font-medium">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>{selectedHotels.length} selected</span>
-                </div>
-                <button
-                  onClick={handleDeleteSelected}
-                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg transition-all duration-200 flex items-center space-x-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  <span>{t('hotels.deleteSelected')}</span>
-                </button>
-                <button
-                  onClick={handlePrintSelected}
-                  className="px-4 py-2 bg-slate-500 hover:bg-slate-600 text-white text-sm rounded-lg transition-all duration-200 flex items-center space-x-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                  </svg>
-                  <span>{t('hotels.printSelected')}</span>
-                </button>
-              </div>
-            )}
+                    {/* Selected Hotels Actions */}
+                    {selectedHotels.length > 0 && (
+                      <div className="mt-3 flex flex-col sm:flex-row gap-2 p-3 border border-blue-200/50 rounded-lg bg-blue-50/30">
+                        <div className="flex items-center space-x-2 text-blue-700 font-medium text-sm">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span>{selectedHotels.length} selected</span>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <button
+                            onClick={handleDeleteSelected}
+                            className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm rounded-md transition-all flex items-center justify-center space-x-2"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            <span>{t('hotels.deleteSelected')}</span>
+                          </button>
+                          <button
+                            onClick={handlePrintSelected}
+                            className="px-3 py-1.5 bg-slate-500 hover:bg-slate-600 text-white text-sm rounded-md transition-all flex items-center justify-center space-x-2"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                            </svg>
+                            <span>{t('hotels.printSelected')}</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
           </div>
 
           {/* Hotels Table */}
-           <div className={`overflow-x-auto rounded-2xl border-2 shadow-lg ${
-             isDark 
-               ? 'border-gray-700/50' 
-               : 'border-slate-200/50'
-           }`}>
-             {loading ? (
-               <div className="flex justify-center items-center py-16">
-                 <div className="flex items-center space-x-4">
-                   <svg className="animate-spin h-10 w-10 text-blue-600" viewBox="0 0 24 24">
-                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                   </svg>
-                   <span className={`font-semibold text-lg ${
-                     isDark ? 'text-gray-300' : 'text-slate-700'
-                   }`}>{t('common.loading')}</span>
-                 </div>
-               </div>
-             ) : (
-               <table className="w-full">
-                 <thead className={`${
-                   isDark 
-                     ? 'bg-gradient-to-r from-gray-700 to-gray-800/80' 
-                     : 'bg-gradient-to-r from-slate-50 to-slate-100/80'
-                 }`}>
-                   <tr className={`border-b-2 ${
-                     isDark ? 'border-gray-600/60' : 'border-slate-300/60'
-                   }`}>
-                     <th className={`text-left py-5 px-6 font-bold w-12 text-sm uppercase tracking-wide ${
-                       isDark ? 'text-gray-200' : 'text-slate-800'
-                     }`}>
-                       <input
-                         type="checkbox"
-                         checked={selectedHotels.length === (filteredHotels?.length || 0) && (filteredHotels?.length || 0) > 0}
-                         onChange={handleSelectAllHotels}
-                         className="w-5 h-5 text-blue-600 bg-white border-2 border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-200 cursor-pointer"
-                       />
-                     </th>
-                     <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
-                       isDark ? 'text-gray-200' : 'text-slate-800'
-                     }`}>
-                       {t('hotels.hotelName')}
-                     </th>
-                     <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
-                       isDark ? 'text-gray-200' : 'text-slate-800'
-                     }`}>
-                       {t('hotels.hotelCode')}
-                     </th>
-                     <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
-                       isDark ? 'text-gray-200' : 'text-slate-800'
-                     }`}>
-                       {t('hotels.altHotelName')}
-                     </th>
-                     <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
-                       isDark ? 'text-gray-200' : 'text-slate-800'
-                     }`}>
-                       {t('hotels.hotelAddress')}
-                     </th>
-                     <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
-                       isDark ? 'text-gray-200' : 'text-slate-800'
-                     }`}>
-                       {t('hotels.location')}
-                     </th>
-                     <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
-                       isDark ? 'text-gray-200' : 'text-slate-800'
-                     }`}>
-                       {t('hotels.roomCount')}
-                     </th>
-                     <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
-                       isDark ? 'text-gray-200' : 'text-slate-800'
-                     }`}>
-                       {t('hotels.agreementCount')}
-                     </th>
-                     <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
-                       isDark ? 'text-gray-200' : 'text-slate-800'
-                     }`}>
-                       {t('common.actions')}
-                     </th>
-                   </tr>
-                 </thead>
-                 <tbody className={`divide-y-2 ${
-                   isDark ? 'divide-gray-600/40' : 'divide-slate-200/40'
-                 }`}>
-                 {(filteredHotels || []).map((hotel, index) => (
-                   <tr key={hotel.id} className={`transition-all duration-300 ${
-                     isDark 
-                       ? `hover:bg-gradient-to-r hover:from-blue-900/30 hover:to-gray-800/30 ${
-                           selectedHotels.includes(hotel.id) 
-                             ? 'bg-gradient-to-r from-blue-900/40 to-gray-800/40 shadow-sm' 
-                             : ''
-                         }` 
-                       : `hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-slate-50/50 ${
-                           selectedHotels.includes(hotel.id) 
-                             ? 'bg-gradient-to-r from-blue-100/60 to-slate-100/60 shadow-sm' 
-                             : ''
-                         }`
-                   }`}>
-                     <td className="py-5 px-6">
-                       <input
-                         type="checkbox"
-                         checked={selectedHotels.includes(hotel.id)}
-                         onChange={() => handleSelectHotel(hotel.id)}
-                         className="w-5 h-5 text-blue-600 bg-white border-2 border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-200 cursor-pointer"
-                       />
-                     </td>
-                     <td className={`py-5 px-6 font-bold text-base ${
-                       isDark ? 'text-white' : 'text-slate-900'
-                     }`}>{hotel.name}</td>
-                     <td className={`py-5 px-6 font-semibold ${
-                       isDark ? 'text-gray-300' : 'text-slate-700'
-                     }`}>{hotel.code}</td>
-                     <td className={`py-5 px-6 font-medium ${
-                       isDark ? 'text-gray-400' : 'text-slate-600'
-                     }`}>{hotel.altName || '-'}</td>
-                     <td className={`py-5 px-6 font-medium ${
-                       isDark ? 'text-gray-400' : 'text-slate-600'
-                     }`}>{hotel.address || '-'}</td>
-                     <td className={`py-5 px-6 font-medium ${
-                       isDark ? 'text-gray-400' : 'text-slate-600'
-                     }`}>{hotel.location || '-'}</td>
-                     <td className="py-5 px-6 text-slate-600">
-                       <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900 border border-blue-300/50 shadow-sm">
-                         {hotel.roomCount || 0}
-                       </span>
-                     </td>
-                     <td className="py-5 px-6 text-slate-600">
-                       {hotel.agreements && hotel.agreements.length > 0 ? (
-                         <div className="space-y-2">
-                           {hotel.agreements.map((agreement) => (
-                             <div key={agreement.id} className="flex items-center space-x-2">
-                               <a
-                                 href={`/api/hotels/${hotel.id}/agreements/${agreement.id}/download`}
-                                 download={agreement.fileName}
-                                 className="text-blue-600 hover:text-blue-800 text-sm font-medium underline decoration-2 underline-offset-2 flex items-center space-x-2 transition-colors duration-200"
-                               >
-                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                 </svg>
-                                 <span>{agreement.fileName}</span>
-                               </a>
-                               <span className="text-xs text-slate-500 font-medium bg-slate-100 px-2 py-1 rounded-md">({Math.round(agreement.fileSize / 1024)}KB)</span>
-                             </div>
-                           ))}
-                         </div>
-                       ) : (
-                         <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-bold bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border border-gray-300/50 shadow-sm">
-                           No files
-                         </span>
-                       )}
-                     </td>
-                     <td className="py-5 px-6">
-                       <div className="flex flex-wrap gap-2">
-                         <button
-                           onClick={() => handleViewHotel(hotel.id)}
-                           className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border border-blue-500/30"
-                         >
-                           <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                           </svg>
-                           {t('common.view')}
-                         </button>
-                         <button
-                           onClick={() => handleEditHotel(hotel.id)}
-                           className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border border-amber-400/30"
-                         >
-                           <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                           </svg>
-                           {t('common.edit')}
-                         </button>
-                         <button
-                           onClick={() => handleDeleteHotel(hotel.id)}
-                           className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border border-red-400/30"
-                         >
-                           <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                           </svg>
-                           {t('common.delete')}
-                         </button>
-                         <button
-                           onClick={handlePrint}
-                           className="px-4 py-2 bg-gradient-to-r from-slate-600 to-slate-700 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 border border-slate-500/30"
-                         >
-                           <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                           </svg>
-                           {t('hotels.print')}
-                         </button>
-                       </div>
-                     </td>
-                   </tr>
-                 ))}
-                 </tbody>
-               </table>
+          <div className={`flex-1 flex flex-col rounded-lg border shadow-sm overflow-hidden ${
+            isDark 
+              ? 'border-gray-700/50 bg-gray-800/30' 
+              : 'border-slate-200/50 bg-white'
+          }`}>
+            {loading ? (
+              <div className="flex justify-center items-center py-16">
+                <div className="flex items-center space-x-4">
+                  <svg className="animate-spin h-8 w-8 text-blue-600" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span className={`font-medium text-base ${
+                    isDark ? 'text-gray-300' : 'text-slate-700'
+                  }`}>{t('common.loading')}</span>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col h-full">
+                {/* Fixed Table Header */}
+                <div className={`flex-shrink-0 ${
+                  isDark 
+                    ? 'bg-gray-700/80 border-b border-gray-600/60' 
+                    : 'bg-slate-50/80 border-b border-slate-200/60'
+                }`}>
+                  <div className="grid grid-cols-9 gap-2 px-3 py-3 text-xs font-semibold uppercase tracking-wide">
+                    <div className={`flex items-center justify-center ${
+                      isDark ? 'text-gray-200' : 'text-slate-800'
+                    }`}>
+                      <input
+                        type="checkbox"
+                        checked={selectedHotels.length === (filteredHotels?.length || 0) && (filteredHotels?.length || 0) > 0}
+                        onChange={handleSelectAllHotels}
+                        className="w-4 h-4 text-blue-600 bg-white border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500/30 focus:border-blue-600 transition-all cursor-pointer"
+                      />
+                    </div>
+                    <div className={`text-left ${
+                      isDark ? 'text-gray-200' : 'text-slate-800'
+                    }`}>
+                      {t('hotels.hotelName')}
+                    </div>
+                    <div className={`text-left ${
+                      isDark ? 'text-gray-200' : 'text-slate-800'
+                    }`}>
+                      {t('hotels.hotelCode')}
+                    </div>
+                    <div className={`text-left ${
+                      isDark ? 'text-gray-200' : 'text-slate-800'
+                    }`}>
+                      {t('hotels.altHotelName')}
+                    </div>
+                    <div className={`text-left ${
+                      isDark ? 'text-gray-200' : 'text-slate-800'
+                    }`}>
+                      {t('hotels.hotelAddress')}
+                    </div>
+                    <div className={`text-left ${
+                      isDark ? 'text-gray-200' : 'text-slate-800'
+                    }`}>
+                      {t('hotels.location')}
+                    </div>
+                    <div className={`text-center ${
+                      isDark ? 'text-gray-200' : 'text-slate-800'
+                    }`}>
+                      {t('hotels.roomCount')}
+                    </div>
+                    <div className={`text-center ${
+                      isDark ? 'text-gray-200' : 'text-slate-800'
+                    }`}>
+                      {t('hotels.agreementCount')}
+                    </div>
+                    <div className={`text-center ${
+                      isDark ? 'text-gray-200' : 'text-slate-800'
+                    }`}>
+                      {t('common.actions')}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Scrollable Table Body */}
+                <div className="flex-1 overflow-y-auto">
+                  <div className={`divide-y ${
+                    isDark ? 'divide-gray-600/40' : 'divide-slate-200/40'
+                  }`}>
+
+                    {(filteredHotels || []).map((hotel, index) => (
+                      <div key={hotel.id} className={`grid grid-cols-9 gap-2 px-3 py-3 transition-all ${
+                        isDark 
+                          ? `hover:bg-gray-700/50 ${
+                              selectedHotels.includes(hotel.id) 
+                                ? 'bg-gray-700/60' 
+                                : ''
+                            }` 
+                          : `hover:bg-slate-50/80 ${
+                              selectedHotels.includes(hotel.id) 
+                                ? 'bg-blue-50/60' 
+                                : ''
+                            }`
+                      }`}>
+                        <div className="flex items-center justify-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedHotels.includes(hotel.id)}
+                            onChange={() => handleSelectHotel(hotel.id)}
+                            className="w-4 h-4 text-blue-600 bg-white border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500/30 focus:border-blue-600 transition-all cursor-pointer"
+                          />
+                        </div>
+                        <div className={`font-medium text-sm break-words ${
+                          isDark ? 'text-white' : 'text-slate-900'
+                        }`}>{hotel.name}</div>
+                        <div className={`font-medium text-sm break-words ${
+                          isDark ? 'text-gray-300' : 'text-slate-700'
+                        }`}>{hotel.code}</div>
+                        <div className={`text-sm break-words ${
+                          isDark ? 'text-gray-400' : 'text-slate-600'
+                        }`}>{hotel.altName || '-'}</div>
+                        <div className={`text-sm break-words ${
+                          isDark ? 'text-gray-400' : 'text-slate-600'
+                        }`}>{hotel.address || '-'}</div>
+                        <div className={`text-sm break-words ${
+                          isDark ? 'text-gray-400' : 'text-slate-600'
+                        }`}>{hotel.location || '-'}</div>
+                        <div className="flex justify-center items-center">
+                          <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                            {hotel.roomCount || 0}
+                          </span>
+                        </div>
+                        <div className="flex justify-center items-center">
+                          {hotel.agreements && hotel.agreements.length > 0 ? (
+                            <div className="space-y-1 max-w-full">
+                              {hotel.agreements.slice(0, 2).map((agreement, index) => (
+                                <div key={agreement.id} className="flex items-center space-x-1">
+                                  <a
+                                    href={`/api/hotels/${hotel.id}/agreements/${agreement.id}/download`}
+                                    download={agreement.fileName}
+                                    className="text-blue-600 hover:text-blue-800 text-xs font-medium underline break-words transition-colors"
+                                  >
+                                    <svg className="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    File {index + 1}
+                                  </a>
+                                </div>
+                              ))}
+                              {hotel.agreements.length > 2 && (
+                                <span className="text-xs text-gray-500">+{hotel.agreements.length - 2} more</span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-600">
+                              No files
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex justify-center items-center">
+                          <div className="flex flex-col sm:flex-row gap-1 w-20 sm:w-auto">
+                            <button
+                              onClick={() => handleViewHotel(hotel.id)}
+                              className="w-6 h-6 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition-all flex items-center justify-center flex-shrink-0"
+                              title={t('common.view')}
+                            >
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => handleEditHotel(hotel.id)}
+                              className="w-6 h-6 bg-amber-500 text-white text-xs font-medium rounded hover:bg-amber-600 transition-all flex items-center justify-center flex-shrink-0"
+                              title={t('common.edit')}
+                            >
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteHotel(hotel.id)}
+                              className="w-6 h-6 bg-red-500 text-white text-xs font-medium rounded hover:bg-red-600 transition-all flex items-center justify-center flex-shrink-0"
+                              title={t('common.delete')}
+                            >
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
              )}
            </div>
 
-          {(filteredHotels?.length || 0) === 0 && (
-             <div className="text-center py-20 backdrop-blur-sm rounded-2xl border-2 border-slate-200/50 shadow-lg">
-               <div className="w-20 h-20 mx-auto bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center mb-6 shadow-md">
-                 <svg className="w-10 h-10 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                 </svg>
-               </div>
-               <p className="text-slate-600 font-semibold text-lg">
-                  {(nameFilter || codeFilter) ? 
-                    t('hotels.noHotelsMatch') :
-                    t('hotels.noHotelsAdded')
-                  }
+            {(filteredHotels?.length || 0) === 0 && (
+              <div className={`text-center py-16 rounded-lg border ${
+                isDark 
+                  ? 'border-gray-700/50 bg-gray-800/30' 
+                  : 'border-slate-200/50 bg-white'
+              }`}>
+                <div className={`w-16 h-16 mx-auto rounded-lg flex items-center justify-center mb-4 ${
+                  isDark 
+                    ? 'bg-gray-700/50' 
+                    : 'bg-slate-100'
+                }`}>
+                  <svg className={`w-8 h-8 ${
+                    isDark ? 'text-gray-400' : 'text-slate-500'
+                  }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
+                <p className={`font-medium text-base ${
+                  isDark ? 'text-gray-300' : 'text-slate-600'
+                }`}>
+                   {(nameFilter || codeFilter) ? 
+                     t('hotels.noHotelsMatch') :
+                     t('hotels.noHotelsAdded')
+                   }
                 </p>
-             </div>
-           )}
+              </div>
+            )}
          </div>
 
-         {/* Hotel Details Modal */}
-         {selectedHotelDetails && (
-           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-             <div className="backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          {/* Hotel Details Modal */}
+          {selectedHotelDetails && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4">
+              <div className={`rounded-lg shadow-xl p-4 sm:p-6 max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto ${
+                isDark 
+                  ? 'bg-gray-800 border border-gray-700' 
+                  : 'bg-white border border-gray-200'
+              }`}>
                <div className="flex items-center justify-between mb-6">
                  <h3 className="text-2xl font-semibold text-gray-900">
                    {t('hotels.hotelDetails')}
@@ -1240,7 +1308,7 @@ export default function Hotel() {
                
                <div className="space-y-6">
                  {/* Basic Information */}
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                    <div className="space-y-2">
                      <label className="block text-sm font-medium text-gray-700">
                        {t('hotels.hotelName')}
@@ -1411,10 +1479,10 @@ export default function Hotel() {
                    )}
                  </div>
                  
-                 <div className="flex gap-4 pt-4">
+                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 pt-4">
                    <button
                      onClick={() => handleEditHotel(selectedHotelDetails.id)}
-                     className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
+                     className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md font-medium text-sm sm:text-base min-h-[2.75rem] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-300"
                    >
                      {t('common.edit')}
                    </button>
@@ -1423,13 +1491,13 @@ export default function Hotel() {
                        handleDeleteHotel(selectedHotelDetails.id);
                        setSelectedHotelDetails(null);
                      }}
-                     className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
+                     className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-red-500 hover:bg-red-600 text-white rounded-md font-medium text-sm sm:text-base min-h-[2.75rem] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-300"
                    >
                      {t('common.delete')}
                    </button>
                    <button
                      onClick={handlePrint}
-                     className="px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
+                     className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-md font-medium text-sm sm:text-base min-h-[2.75rem] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
                    >
                      {t('hotels.print')}
                    </button>
@@ -1442,7 +1510,7 @@ export default function Hotel() {
           
         </div>
 
-        </div>
+        </div></div>
       
     </ProtectedRoute>
   );
