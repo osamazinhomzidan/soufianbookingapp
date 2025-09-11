@@ -577,11 +577,11 @@ const en: Translations = {
   
   sidebar: {
     logo: 'Hotel Management System',
-    hotelsManagement: 'Hotels Management',
-    roomsManagement: 'Rooms Management',
+    hotelsManagement: 'Hotels',
+    roomsManagement: 'Rooms',
     createReservation: 'Create Reservation',
-    allReservations: 'All Reservations',
-    allGuests: 'All Guests',
+    allReservations: 'Reservations',
+    allGuests: 'Guests',
     security: 'Security',
     logout: 'Logout',
     loggingOut: 'Logging out...',
@@ -1184,11 +1184,11 @@ const ar: Translations = {
   
   sidebar: {
     logo: 'نظام إدارة الفنادق',
-    hotelsManagement: 'إدارة الفنادق',
-    roomsManagement: 'إدارة الغرف',
+    hotelsManagement: 'الفنادق',
+    roomsManagement: 'الغرف',
     createReservation: 'إنشاء حجز',
-    allReservations: 'جميع الحجوزات',
-    allGuests: 'جميع النزلاء',
+    allReservations: 'الحجوزات',
+    allGuests: 'النزلاء',
     security: 'الأمان',
     logout: 'تسجيل الخروج',
     loggingOut: 'جاري تسجيل الخروج...',
