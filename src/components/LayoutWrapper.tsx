@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
-import Sidebar from './Sidebar';
+import Navbar from './Navbar';
 import { Bars3Icon } from '@heroicons/react/24/outline';
 
 interface LayoutWrapperProps {
@@ -12,12 +12,12 @@ interface LayoutWrapperProps {
 }
 
 const LayoutWrapper = ({ children }: LayoutWrapperProps) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isAuthenticated, isLoading } = useAuth();
   const { isRTL } = useTranslation();
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
   };
 
   // Show loading spinner while checking authentication
@@ -34,34 +34,16 @@ const LayoutWrapper = ({ children }: LayoutWrapperProps) => {
     return <>{children}</>;
   }
 
-  // If authenticated, show the full layout with sidebar
+  // If authenticated, show the full layout with navbar
   return (
-    <div className={`flex h-screen bg-gray-50 ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Sidebar */}
-      <Sidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
+    <div className={`min-h-screen bg-gray-50 ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Horizontal Navbar */}
+      <Navbar isOpen={mobileMenuOpen} onToggle={toggleMobileMenu} />
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col lg:ml-0">
-        {/* Mobile Header */}
-        <header className="lg:hidden bg-white shadow-sm border-b border-gray-200 p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={toggleSidebar}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <Bars3Icon className="w-6 h-6" />
-              </button>
-              <h1 className="text-lg font-semibold text-gray-800">Hotel Management</h1>
-            </div>
-          </div>
-        </header>
-        
-        {/* Page Content */}
-        <main className="flex-1 overflow-auto">
-          {children}
-        </main>
-      </div>
+      <main className="pt-20">
+        {children}
+      </main>
     </div>
   );
 };
