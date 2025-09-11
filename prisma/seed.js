@@ -275,265 +275,245 @@ async function main() {
   console.log('🏨 Created hotels');
 
   // Create Hotel Amenities
-  const hotelAmenities = [
-    { hotelId: grandPalace.id, name: 'WiFi', icon: '📶' },
-    { hotelId: grandPalace.id, name: 'Pool', icon: '🏊' },
-    { hotelId: grandPalace.id, name: 'Spa', icon: '💆' },
-    { hotelId: grandPalace.id, name: 'Restaurant', icon: '🍽️' },
-    { hotelId: grandPalace.id, name: 'Gym', icon: '💪' },
-    { hotelId: oceanView.id, name: 'WiFi', icon: '📶' },
-    { hotelId: oceanView.id, name: 'Beach Access', icon: '🏖️' },
-    { hotelId: oceanView.id, name: 'Pool', icon: '🏊' },
-    { hotelId: oceanView.id, name: 'Restaurant', icon: '🍽️' },
-    { hotelId: oceanView.id, name: 'Water Sports', icon: '🏄' },
-    { hotelId: mountainLodge.id, name: 'WiFi', icon: '📶' },
-    { hotelId: mountainLodge.id, name: 'Fireplace', icon: '🔥' },
-    { hotelId: mountainLodge.id, name: 'Hiking Trails', icon: '🥾' },
-    { hotelId: mountainLodge.id, name: 'Restaurant', icon: '🍽️' },
-    { hotelId: mountainLodge.id, name: 'Spa', icon: '💆' },
-    { hotelId: cityCenter.id, name: 'WiFi', icon: '📶' },
-    { hotelId: cityCenter.id, name: 'Business Center', icon: '💼' },
-    { hotelId: cityCenter.id, name: 'Conference Rooms', icon: '🏢' },
-    { hotelId: cityCenter.id, name: 'Restaurant', icon: '🍽️' },
+  const amenityTypes = [
+    { name: 'WiFi', icon: '📶' },
+    { name: 'Pool', icon: '🏊' },
+    { name: 'Spa', icon: '💆' },
+    { name: 'Restaurant', icon: '🍽️' },
+    { name: 'Gym', icon: '💪' },
+    { name: 'Beach Access', icon: '🏖️' },
+    { name: 'Water Sports', icon: '🏄' },
+    { name: 'Fireplace', icon: '🔥' },
+    { name: 'Hiking Trails', icon: '🥾' },
+    { name: 'Business Center', icon: '💼' },
+    { name: 'Conference Rooms', icon: '🏢' },
+    { name: 'Parking', icon: '🚗' },
+    { name: 'Room Service', icon: '🛎️' },
+    { name: 'Laundry', icon: '👕' },
+    { name: 'Airport Shuttle', icon: '✈️' },
+    { name: 'Pet Friendly', icon: '🐕' },
+    { name: 'Bar', icon: '🍸' },
+    { name: 'Concierge', icon: '🎩' },
+    { name: 'Balcony', icon: '🏞️' },
+    { name: 'Garden', icon: '🌺' }
   ];
+
+  const hotelAmenities = [];
+  hotels.forEach((hotel, index) => {
+    // Each hotel gets 4-6 random amenities
+    const numAmenities = 4 + Math.floor(Math.random() * 3);
+    const shuffledAmenities = [...amenityTypes].sort(() => 0.5 - Math.random());
+    
+    for (let i = 0; i < numAmenities; i++) {
+      hotelAmenities.push({
+        hotelId: hotel.id,
+        name: shuffledAmenities[i].name,
+        icon: shuffledAmenities[i].icon
+      });
+    }
+  });
 
   await prisma.hotelAmenity.createMany({ data: hotelAmenities });
   console.log('🏨 Created hotel amenities');
 
   // Create Sample Agreement Files
-  const agreements = [
-    {
-      hotelId: grandPalace.id,
-      fileName: 'partnership_agreement.pdf',
-      filePath: '/uploads/agreements/grand_palace_partnership.pdf',
-      fileSize: 2048576, // 2MB
-      mimeType: 'application/pdf',
-      uploadedAt: new Date(),
-    },
-    {
-      hotelId: grandPalace.id,
-      fileName: 'service_contract.docx',
-      filePath: '/uploads/agreements/grand_palace_service.docx',
-      fileSize: 1024000, // 1MB
-      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      uploadedAt: new Date(),
-    },
-    {
-      hotelId: oceanView.id,
-      fileName: 'resort_management_agreement.pdf',
-      filePath: '/uploads/hotel/1757307394004_soufian-Final-MVP__2___2_.docx',
-      fileSize: 3145728, // 3MB
-      mimeType: 'application/pdf',
-      uploadedAt: new Date(),
-    },
-    {
-      hotelId: mountainLodge.id,
-      fileName: 'lodge_operations_contract.pdf',
-      filePath: '/uploads/hotel/1757307394004_soufian-Final-MVP__2___2_.docx',
-      fileSize: 1572864, // 1.5MB
-      mimeType: 'application/pdf',
-      uploadedAt: new Date(),
-    },
-    {
-      hotelId: cityCenter.id,
-      fileName: 'business_partnership.pdf',
-      filePath: '/uploads/hotel/1757307394004_soufian-Final-MVP__2___2_.docx',
-      fileSize: 2621440, // 2.5MB
-      mimeType: 'application/pdf',
-      uploadedAt: new Date(),
-    },
-    {
-      hotelId: cityCenter.id,
-      fileName: 'corporate_rates_agreement.txt',
-      filePath: '/uploads/hotel/1757307394004_soufian-Final-MVP__2___2_.docx',
-      fileSize: 51200, // 50KB
-      mimeType: 'text/plain',
-      uploadedAt: new Date(),
-    },
+  const agreementTypes = [
+    { fileName: 'partnership_agreement.pdf', mimeType: 'application/pdf', sizeRange: [1024000, 3145728] },
+    { fileName: 'service_contract.docx', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', sizeRange: [512000, 2048576] },
+    { fileName: 'management_agreement.pdf', mimeType: 'application/pdf', sizeRange: [1572864, 4194304] },
+    { fileName: 'operations_contract.pdf', mimeType: 'application/pdf', sizeRange: [1048576, 2621440] },
+    { fileName: 'corporate_rates_agreement.txt', mimeType: 'text/plain', sizeRange: [25600, 102400] }
   ];
+
+  const agreements = [];
+  hotels.forEach((hotel, index) => {
+    // Each hotel gets 1-3 random agreement files
+    const numAgreements = 1 + Math.floor(Math.random() * 3);
+    const shuffledAgreements = [...agreementTypes].sort(() => 0.5 - Math.random());
+    
+    for (let i = 0; i < numAgreements; i++) {
+      const agreement = shuffledAgreements[i];
+      const fileSize = agreement.sizeRange[0] + Math.floor(Math.random() * (agreement.sizeRange[1] - agreement.sizeRange[0]));
+      const hotelCode = hotel.code.toLowerCase().replace(/\s+/g, '_');
+      
+      agreements.push({
+        hotelId: hotel.id,
+        fileName: agreement.fileName,
+        filePath: `/uploads/agreements/${hotelCode}_${agreement.fileName}`,
+        fileSize: fileSize,
+        mimeType: agreement.mimeType,
+        uploadedAt: new Date(),
+      });
+    }
+  });
 
   await prisma.hotelAgreement.createMany({ data: agreements });
   console.log('📄 Created sample agreement files');
 
   // Create Rooms
-  const deluxeSuite = await prisma.room.create({
-    data: {
-      hotelId: grandPalace.id,
-      roomType: 'Deluxe Suite',
-      roomTypeDescription: 'Luxury suite with ocean view and premium amenities including king bed, marble bathroom, and private balcony',
-      altDescription: 'جناح فاخر مع إطلالة على المحيط ووسائل راحة متميزة',
-      purchasePrice: 200.00,
-      basePrice: 250.00,
-      alternativePrice: 300.00,
-      availableFrom: new Date('2025-09-15'),
-      availableTo: new Date('2025-09-27'),
-      quantity: 5,
+  const roomTypes = [
+    {
+      roomType: 'Standard Room',
+      roomTypeDescription: 'Comfortable room with modern amenities and city view',
+      altDescription: 'غرفة مريحة مع وسائل راحة حديثة وإطلالة على المدينة',
+      purchasePrice: [80, 120],
+      basePrice: [100, 150],
+      alternativePrice: [120, 180],
+      quantity: [8, 15],
       boardType: 'BED_BREAKFAST',
-      size: '45 sqm',
+      size: ['25 sqm', '30 sqm'],
       capacity: 2,
-      floor: 1,
-      createdById: owner.id,
+      floor: [1, 3]
     },
-  });
-
-  const familyRoom = await prisma.room.create({
-    data: {
-      hotelId: grandPalace.id,
-      roomType: 'Family Room',
-      roomTypeDescription: 'Spacious room perfect for families with children, featuring two double beds and play area',
-      altDescription: 'غرفة واسعة مثالية للعائلات مع الأطفال',
-      purchasePrice: 140.00,
-      basePrice: 180.00,
-      alternativePrice: 220.00,
-      availableFrom: new Date('2025-09-15'),
-      availableTo: new Date('2025-09-27'),
-      quantity: 8,
+    {
+      roomType: 'Deluxe Room',
+      roomTypeDescription: 'Spacious room with premium amenities and beautiful views',
+      altDescription: 'غرفة واسعة مع وسائل راحة متميزة وإطلالات جميلة',
+      purchasePrice: [150, 200],
+      basePrice: [180, 250],
+      alternativePrice: [220, 300],
+      quantity: [5, 10],
       boardType: 'HALF_BOARD',
-      size: '35 sqm',
-      capacity: 4,
-      floor: 2,
-      createdById: owner.id,
+      size: ['35 sqm', '45 sqm'],
+      capacity: 2,
+      floor: [2, 4]
     },
-  });
-
-  const presidentialSuite = await prisma.room.create({
-    data: {
-      hotelId: grandPalace.id,
-      roomType: 'Presidential Suite',
-      roomTypeDescription: 'Ultimate luxury suite with separate living room, dining area, and panoramic city views',
-      altDescription: 'جناح رئاسي فاخر مع غرفة معيشة منفصلة ومنطقة طعام',
-      purchasePrice: 350.00,
-      basePrice: 450.00,
-      alternativePrice: 550.00,
-      availableFrom: new Date('2025-09-15'),
-      availableTo: new Date('2025-09-27'),
-      quantity: 1,
+    {
+      roomType: 'Family Suite',
+      roomTypeDescription: 'Large suite perfect for families with separate living area',
+      altDescription: 'جناح كبير مثالي للعائلات مع منطقة معيشة منفصلة',
+      purchasePrice: [200, 280],
+      basePrice: [250, 350],
+      alternativePrice: [300, 420],
+      quantity: [3, 8],
       boardType: 'FULL_BOARD',
-      size: '80 sqm',
+      size: ['50 sqm', '65 sqm'],
+      capacity: 4,
+      floor: [2, 5]
+    },
+    {
+      roomType: 'Executive Suite',
+      roomTypeDescription: 'Luxury suite with premium amenities and exclusive services',
+      altDescription: 'جناح فاخر مع وسائل راحة متميزة وخدمات حصرية',
+      purchasePrice: [300, 400],
+      basePrice: [380, 500],
+      alternativePrice: [450, 600],
+      quantity: [1, 3],
+      boardType: 'FULL_BOARD',
+      size: ['70 sqm', '90 sqm'],
       capacity: 3,
-      floor: 3,
-      createdById: owner.id,
-    },
-  });
+      floor: [3, 6]
+    }
+  ];
 
-  const oceanViewRoom = await prisma.room.create({
-    data: {
-      hotelId: oceanView.id,
-      roomType: 'Ocean View Room',
-      roomTypeDescription: 'Beautiful room with direct ocean views and modern amenities',
-      altDescription: 'غرفة جميلة مع إطلالة مباشرة على المحيط',
-      purchasePrice: 160.00,
-      basePrice: 200.00,
-      alternativePrice: 240.00,
-      availableFrom: new Date('2025-09-15'),
-      availableTo: new Date('2025-09-27'),
-      quantity: 10,
-      boardType: 'BED_BREAKFAST',
-      size: '30 sqm',
-      capacity: 2,
-      floor: 2,
-      createdById: owner.id,
-    },
-  });
-
-  const mountainView = await prisma.room.create({
-    data: {
-      hotelId: mountainLodge.id,
-      roomType: 'Mountain View Cabin',
-      roomTypeDescription: 'Cozy cabin with stunning mountain views and rustic charm',
-      altDescription: 'كابينة مريحة مع إطلالات جبلية خلابة',
-      purchasePrice: 90.00,
-      basePrice: 120.00,
-      alternativePrice: 150.00,
-      availableFrom: new Date('2025-09-15'),
-      availableTo: new Date('2025-09-27'),
-      quantity: 6,
-      boardType: 'ROOM_ONLY',
-      size: '25 sqm',
-      capacity: 2,
-      floor: 1,
-      createdById: owner.id,
-    },
-  });
-
-  const businessRoom = await prisma.room.create({
-    data: {
-      hotelId: cityCenter.id,
-      roomType: 'Business Room',
-      roomTypeDescription: 'Modern room designed for business travelers with work desk and high-speed internet',
-      altDescription: 'غرفة حديثة مصممة لرجال الأعمال',
-      purchasePrice: 120.00,
-      basePrice: 150.00,
-      alternativePrice: 180.00,
-      availableFrom: new Date('2025-09-15'),
-      availableTo: new Date('2025-09-27'),
-      quantity: 15,
-      boardType: 'BED_BREAKFAST',
-      size: '28 sqm',
-      capacity: 2,
-      floor: 4,
-      createdById: owner.id,
-    },
-  });
+  const createdRooms = [];
+  for (const hotel of hotels) {
+    // Each hotel gets 2-4 different room types
+    const numRoomTypes = 2 + Math.floor(Math.random() * 3);
+    const shuffledRoomTypes = [...roomTypes].sort(() => 0.5 - Math.random());
+    
+    for (let i = 0; i < numRoomTypes; i++) {
+      const roomType = shuffledRoomTypes[i];
+      const purchasePrice = roomType.purchasePrice[0] + Math.random() * (roomType.purchasePrice[1] - roomType.purchasePrice[0]);
+      const basePrice = roomType.basePrice[0] + Math.random() * (roomType.basePrice[1] - roomType.basePrice[0]);
+      const alternativePrice = roomType.alternativePrice[0] + Math.random() * (roomType.alternativePrice[1] - roomType.alternativePrice[0]);
+      const quantity = roomType.quantity[0] + Math.floor(Math.random() * (roomType.quantity[1] - roomType.quantity[0] + 1));
+      const floor = roomType.floor[0] + Math.floor(Math.random() * (roomType.floor[1] - roomType.floor[0] + 1));
+      const size = Array.isArray(roomType.size) ? roomType.size[Math.floor(Math.random() * roomType.size.length)] : roomType.size;
+      
+      const room = await prisma.room.create({
+        data: {
+          hotelId: hotel.id,
+          roomType: roomType.roomType,
+          roomTypeDescription: roomType.roomTypeDescription,
+          altDescription: roomType.altDescription,
+          purchasePrice: Math.round(purchasePrice * 100) / 100,
+          basePrice: Math.round(basePrice * 100) / 100,
+          alternativePrice: Math.round(alternativePrice * 100) / 100,
+          availableFrom: new Date('2025-09-15'),
+          availableTo: new Date('2025-09-27'),
+          quantity: quantity,
+          boardType: roomType.boardType,
+          size: size,
+          capacity: roomType.capacity,
+          floor: floor,
+          createdById: owner.id,
+        },
+      });
+      
+      createdRooms.push(room);
+    }
+  }
+  
+  // Maintain backward compatibility
+  const deluxeSuite = createdRooms[0];
+  const familyRoom = createdRooms[1];
+  const presidentialSuite = createdRooms[2];
+  const oceanViewRoom = createdRooms[3];
+  const mountainView = createdRooms[4];
+  const businessRoom = createdRooms[5];
 
   console.log('🏠 Created rooms');
 
   // Create Room Amenities
-  const roomAmenities = [
-    // Deluxe Suite amenities
-    { roomId: deluxeSuite.id, name: 'King Bed', icon: '🛏️' },
-    { roomId: deluxeSuite.id, name: 'Ocean View', icon: '🌊' },
-    { roomId: deluxeSuite.id, name: 'Balcony', icon: '🏡' },
-    { roomId: deluxeSuite.id, name: 'Marble Bathroom', icon: '🛁' },
-    { roomId: deluxeSuite.id, name: 'Mini Bar', icon: '🍷' },
-    { roomId: deluxeSuite.id, name: 'Safe', icon: '🔒' },
-    { roomId: deluxeSuite.id, name: 'Air Conditioning', icon: '❄️' },
-    { roomId: deluxeSuite.id, name: 'WiFi', icon: '📶' },
+  const roomAmenityTypes = {
+    'Standard Room': [
+      { name: 'Queen Bed', icon: '🛏️' },
+      { name: 'Air Conditioning', icon: '❄️' },
+      { name: 'WiFi', icon: '📶' },
+      { name: 'Private Bathroom', icon: '🚿' },
+      { name: 'City View', icon: '🏙️' },
+      { name: 'Safe', icon: '🔒' },
+      { name: 'Mini Fridge', icon: '🧊' }
+    ],
+    'Deluxe Room': [
+      { name: 'King Bed', icon: '🛏️' },
+      { name: 'Balcony', icon: '🏡' },
+      { name: 'Marble Bathroom', icon: '🛁' },
+      { name: 'Mini Bar', icon: '🍷' },
+      { name: 'Safe', icon: '🔒' },
+      { name: 'Air Conditioning', icon: '❄️' },
+      { name: 'Premium WiFi', icon: '📶' },
+      { name: 'Room Service', icon: '🛎️' }
+    ],
+    'Family Suite': [
+      { name: 'Two Double Beds', icon: '🛏️' },
+      { name: 'Living Area', icon: '🛋️' },
+      { name: 'Refrigerator', icon: '❄️' },
+      { name: 'Safe', icon: '🔒' },
+      { name: 'WiFi', icon: '📶' },
+      { name: 'Baby Crib Available', icon: '👶' },
+      { name: 'Play Area', icon: '🎮' },
+      { name: 'Kitchenette', icon: '🍳' }
+    ],
+    'Executive Suite': [
+      { name: 'King Bed', icon: '🛏️' },
+      { name: 'Living Room', icon: '🛋️' },
+      { name: 'Dining Area', icon: '🍽️' },
+      { name: 'Panoramic View', icon: '🌆' },
+      { name: 'Jacuzzi', icon: '🛁' },
+      { name: 'Butler Service', icon: '🤵' },
+      { name: 'Private Terrace', icon: '🌿' },
+      { name: 'Premium WiFi', icon: '📶' },
+      { name: 'Concierge Service', icon: '🎩' }
+    ]
+  };
+
+  const roomAmenities = [];
+  createdRooms.forEach(room => {
+    const amenitiesForType = roomAmenityTypes[room.roomType] || roomAmenityTypes['Standard Room'];
+    // Each room gets 4-7 amenities from its type
+    const numAmenities = 4 + Math.floor(Math.random() * 4);
+    const shuffledAmenities = [...amenitiesForType].sort(() => 0.5 - Math.random());
     
-    // Family Room amenities
-    { roomId: familyRoom.id, name: 'Two Double Beds', icon: '🛏️' },
-    { roomId: familyRoom.id, name: 'Play Area', icon: '🎮' },
-    { roomId: familyRoom.id, name: 'Refrigerator', icon: '❄️' },
-    { roomId: familyRoom.id, name: 'Safe', icon: '🔒' },
-    { roomId: familyRoom.id, name: 'City View', icon: '🏙️' },
-    { roomId: familyRoom.id, name: 'WiFi', icon: '📶' },
-    { roomId: familyRoom.id, name: 'Baby Crib Available', icon: '👶' },
-    
-    // Presidential Suite amenities
-    { roomId: presidentialSuite.id, name: 'King Bed', icon: '🛏️' },
-    { roomId: presidentialSuite.id, name: 'Living Room', icon: '🛋️' },
-    { roomId: presidentialSuite.id, name: 'Dining Area', icon: '🍽️' },
-    { roomId: presidentialSuite.id, name: 'Panoramic View', icon: '🌆' },
-    { roomId: presidentialSuite.id, name: 'Jacuzzi', icon: '🛁' },
-    { roomId: presidentialSuite.id, name: 'Butler Service', icon: '🤵' },
-    { roomId: presidentialSuite.id, name: 'Private Terrace', icon: '🌿' },
-    { roomId: presidentialSuite.id, name: 'Premium WiFi', icon: '📶' },
-    
-    // Ocean View Room amenities
-    { roomId: oceanViewRoom.id, name: 'Queen Bed', icon: '🛏️' },
-    { roomId: oceanViewRoom.id, name: 'Ocean View', icon: '🌊' },
-    { roomId: oceanViewRoom.id, name: 'Private Bathroom', icon: '🚿' },
-    { roomId: oceanViewRoom.id, name: 'Air Conditioning', icon: '❄️' },
-    { roomId: oceanViewRoom.id, name: 'WiFi', icon: '📶' },
-    { roomId: oceanViewRoom.id, name: 'Mini Fridge', icon: '🧊' },
-    
-    // Mountain View amenities
-    { roomId: mountainView.id, name: 'Double Bed', icon: '🛏️' },
-    { roomId: mountainView.id, name: 'Mountain View', icon: '🏔️' },
-    { roomId: mountainView.id, name: 'Fireplace', icon: '🔥' },
-    { roomId: mountainView.id, name: 'Wooden Furniture', icon: '🪵' },
-    { roomId: mountainView.id, name: 'WiFi', icon: '📶' },
-    { roomId: mountainView.id, name: 'Hiking Gear Storage', icon: '🎒' },
-    
-    // Business Room amenities
-    { roomId: businessRoom.id, name: 'Queen Bed', icon: '🛏️' },
-    { roomId: businessRoom.id, name: 'Work Desk', icon: '💻' },
-    { roomId: businessRoom.id, name: 'Ergonomic Chair', icon: '🪑' },
-    { roomId: businessRoom.id, name: 'High-Speed WiFi', icon: '📶' },
-    { roomId: businessRoom.id, name: 'Business Center Access', icon: '🏢' },
-    { roomId: businessRoom.id, name: 'Coffee Machine', icon: '☕' },
-    { roomId: businessRoom.id, name: 'City View', icon: '🏙️' },
-  ];
+    for (let i = 0; i < Math.min(numAmenities, shuffledAmenities.length); i++) {
+      roomAmenities.push({
+        roomId: room.id,
+        name: shuffledAmenities[i].name,
+        icon: shuffledAmenities[i].icon
+      });
+    }
+  });
 
   await prisma.roomAmenity.createMany({ data: roomAmenities });
   console.log('🛏️ Created room amenities');
