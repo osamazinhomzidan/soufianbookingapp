@@ -455,6 +455,67 @@ a,
   }
 }
 
+/* Elegant Blue Scrollbar Styles */
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  margin: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--color-apple-blue) 0%, var(--color-apple-blue-light) 100%);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--color-apple-blue-dark) 0%, var(--color-apple-blue) 100%);
+  transform: scale(1.1);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: var(--color-apple-blue-dark);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Dark mode scrollbar */
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--color-apple-blue-light) 0%, var(--color-apple-teal) 100%);
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--color-apple-blue) 0%, var(--color-apple-blue-light) 100%);
+  }
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-apple-blue) rgba(0, 0, 0, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+  * {
+    scrollbar-color: var(--color-apple-blue-light) rgba(255, 255, 255, 0.05);
+  }
+}
+
 /* Modern Navbar Styles */
 .navbar-blur {
   backdrop-filter: blur(20px);
