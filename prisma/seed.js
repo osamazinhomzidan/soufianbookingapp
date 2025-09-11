@@ -71,57 +71,206 @@ async function main() {
   console.log('👥 Created users');
 
   // Create Hotels
-  const grandPalace = await prisma.hotel.create({
-    data: {
+  const hotels = [];
+  
+  const hotelData = [
+    {
       name: 'Grand Palace Hotel',
       code: 'GPH001',
       altName: 'فندق القصر الكبير',
       description: 'Luxury hotel in the heart of the city',
       altDescription: 'فندق فاخر في قلب المدينة مع خدمات متميزة ووسائل راحة حديثة',
       address: '123 Main Street, Downtown',
-      location: 'Downtown Business District',
-      createdById: owner.id,
+      location: 'Downtown Business District'
     },
-  });
-
-  const oceanView = await prisma.hotel.create({
-    data: {
+    {
       name: 'Ocean View Resort',
       code: 'OVR002',
       altName: 'منتجع إطلالة المحيط',
       description: 'Beautiful resort with stunning ocean views',
       altDescription: 'منتجع جميل مع إطلالات خلابة على المحيط وشاطئ خاص',
       address: '456 Ocean Drive, Beachfront',
-      location: 'Beachfront Resort Area',
-      createdById: owner.id,
+      location: 'Beachfront Resort Area'
     },
-  });
-
-  const mountainLodge = await prisma.hotel.create({
-    data: {
+    {
       name: 'Mountain Lodge',
       code: 'ML003',
       altName: 'نزل الجبل',
       description: 'Cozy lodge with mountain scenery',
       altDescription: 'نزل مريح مع مناظر جبلية خلابة وأجواء هادئة',
       address: '789 Mountain Road, Mountain View',
-      location: 'Mountain View Resort',
-      createdById: owner.id,
+      location: 'Mountain View Resort'
     },
-  });
-
-  const cityCenter = await prisma.hotel.create({
-    data: {
+    {
       name: 'City Center Hotel',
       code: 'CCH004',
       altName: 'فندق وسط المدينة',
       description: 'Modern hotel perfect for business travelers',
       altDescription: 'فندق حديث مثالي لرجال الأعمال مع مرافق متطورة',
       address: '321 Business District, City Center',
-      location: 'City Center Business Hub',
-      createdById: owner.id,
+      location: 'City Center Business Hub'
     },
-  });
+    {
+      name: 'Royal Gardens Hotel',
+      code: 'RGH005',
+      altName: 'فندق الحدائق الملكية',
+      description: 'Elegant hotel surrounded by beautiful gardens',
+      altDescription: 'فندق أنيق محاط بحدائق جميلة ومناظر طبيعية خلابة',
+      address: '555 Garden Avenue, Green District',
+      location: 'Garden District'
+    },
+    {
+      name: 'Desert Oasis Resort',
+      code: 'DOR006',
+      altName: 'منتجع واحة الصحراء',
+      description: 'Unique desert experience with luxury amenities',
+      altDescription: 'تجربة صحراوية فريدة مع وسائل راحة فاخرة ومغامرات مثيرة',
+      address: '777 Desert Highway, Oasis Valley',
+      location: 'Desert Oasis'
+    },
+    {
+      name: 'Skyline Tower Hotel',
+      code: 'STH007',
+      altName: 'فندق برج الأفق',
+      description: 'High-rise hotel with panoramic city views',
+      altDescription: 'فندق شاهق الارتفاع مع إطلالات بانورامية على المدينة',
+      address: '888 Skyline Boulevard, Financial District',
+      location: 'Financial District'
+    },
+    {
+      name: 'Seaside Paradise Resort',
+      code: 'SPR008',
+      altName: 'منتجع جنة البحر',
+      description: 'Tropical paradise with pristine beaches',
+      altDescription: 'جنة استوائية مع شواطئ نقية ومياه صافية',
+      address: '999 Paradise Beach, Coastal Area',
+      location: 'Paradise Beach'
+    },
+    {
+      name: 'Heritage Boutique Hotel',
+      code: 'HBH009',
+      altName: 'فندق التراث البوتيكي',
+      description: 'Charming boutique hotel with historical character',
+      altDescription: 'فندق بوتيكي ساحر بطابع تاريخي وتصميم أصيل',
+      address: '111 Heritage Street, Old Town',
+      location: 'Historic Old Town'
+    },
+    {
+      name: 'Alpine Retreat Lodge',
+      code: 'ARL010',
+      altName: 'نزل الملاذ الجبلي',
+      description: 'Peaceful mountain retreat with spa facilities',
+      altDescription: 'ملاذ جبلي هادئ مع مرافق سبا ومناظر طبيعية',
+      address: '222 Alpine Road, Mountain Peak',
+      location: 'Alpine Mountains'
+    },
+    {
+      name: 'Metropolitan Suites',
+      code: 'MS011',
+      altName: 'أجنحة المتروبوليتان',
+      description: 'Sophisticated suites in the metropolitan area',
+      altDescription: 'أجنحة راقية في المنطقة الحضرية مع خدمات متميزة',
+      address: '333 Metro Plaza, Central District',
+      location: 'Metropolitan Center'
+    },
+    {
+      name: 'Riverside Inn',
+      code: 'RI012',
+      altName: 'نزل ضفاف النهر',
+      description: 'Charming inn by the riverside with scenic views',
+      altDescription: 'نزل ساحر على ضفاف النهر مع مناظر خلابة',
+      address: '444 River Road, Riverside',
+      location: 'Riverside District'
+    },
+    {
+      name: 'Golden Sands Resort',
+      code: 'GSR013',
+      altName: 'منتجع الرمال الذهبية',
+      description: 'Luxury beachfront resort with golden sand beaches',
+      altDescription: 'منتجع فاخر على الشاطئ مع رمال ذهبية ومياه فيروزية',
+      address: '555 Golden Beach, Coastal Highway',
+      location: 'Golden Beach'
+    },
+    {
+      name: 'Urban Loft Hotel',
+      code: 'ULH014',
+      altName: 'فندق اللوفت الحضري',
+      description: 'Modern loft-style hotel in trendy urban area',
+      altDescription: 'فندق حديث بطراز اللوفت في منطقة حضرية عصرية',
+      address: '666 Loft Street, Trendy Quarter',
+      location: 'Urban Trendy Quarter'
+    },
+    {
+      name: 'Wellness Spa Resort',
+      code: 'WSR015',
+      altName: 'منتجع السبا والعافية',
+      description: 'Health and wellness focused resort with spa treatments',
+      altDescription: 'منتجع مخصص للصحة والعافية مع علاجات سبا متنوعة',
+      address: '777 Wellness Way, Spa Valley',
+      location: 'Wellness Valley'
+    },
+    {
+      name: 'Castle View Manor',
+      code: 'CVM016',
+      altName: 'قصر إطلالة القلعة',
+      description: 'Historic manor with castle views and royal ambiance',
+      altDescription: 'قصر تاريخي مع إطلالة على القلعة وأجواء ملكية',
+      address: '888 Castle Hill, Royal District',
+      location: 'Royal Castle District'
+    },
+    {
+      name: 'Eco Forest Lodge',
+      code: 'EFL017',
+      altName: 'نزل الغابة البيئي',
+      description: 'Eco-friendly lodge in pristine forest setting',
+      altDescription: 'نزل صديق للبيئة في بيئة غابات نقية ومحمية',
+      address: '999 Forest Trail, Green Valley',
+      location: 'Eco Forest Reserve'
+    },
+    {
+      name: 'Marina Bay Hotel',
+      code: 'MBH018',
+      altName: 'فندق خليج المارينا',
+      description: 'Waterfront hotel with marina and yacht facilities',
+      altDescription: 'فندق على الواجهة المائية مع مرافق مارينا ويخوت',
+      address: '101 Marina Boulevard, Harbor District',
+      location: 'Marina Harbor'
+    },
+    {
+      name: 'Sunset Valley Resort',
+      code: 'SVR019',
+      altName: 'منتجع وادي الغروب',
+      description: 'Romantic resort known for spectacular sunsets',
+      altDescription: 'منتجع رومانسي مشهور بمناظر الغروب الخلابة',
+      address: '202 Sunset Drive, Valley View',
+      location: 'Sunset Valley'
+    },
+    {
+      name: 'Business Executive Hotel',
+      code: 'BEH020',
+      altName: 'فندق رجال الأعمال التنفيذي',
+      description: 'Premium business hotel with executive facilities',
+      altDescription: 'فندق أعمال متميز مع مرافق تنفيذية ومؤتمرات',
+      address: '303 Executive Plaza, Business Park',
+      location: 'Executive Business Park'
+    }
+  ];
+
+  for (const hotelInfo of hotelData) {
+    const hotel = await prisma.hotel.create({
+      data: {
+        ...hotelInfo,
+        createdById: owner.id,
+      },
+    });
+    hotels.push(hotel);
+  }
+
+  // For backward compatibility, assign the first 4 hotels to original variables
+  const grandPalace = hotels[0];
+  const oceanView = hotels[1];
+  const mountainLodge = hotels[2];
+  const cityCenter = hotels[3];
 
   console.log('🏨 Created hotels');
 
