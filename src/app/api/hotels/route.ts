@@ -32,8 +32,9 @@ export async function GET(request: NextRequest) {
     const location = searchParams.get('location') || '';
     const hasRooms = searchParams.get('hasRooms');
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
-    const offset = (page - 1) * limit;
+    const limitParam = searchParams.get('limit');
+    const limit = limitParam === 'all' || limitParam === null ? undefined : parseInt(limitParam || '10');
+    const offset = limit ? (page - 1) * limit : 0;
 
     // Build where clause for search and filters
     const whereClause: any = {};
@@ -67,51 +68,57 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    // Get hotels with pagination and room count
-    const [hotels, totalCount] = await Promise.all([
-      prisma.hotel.findMany({
-        where: whereClause,
-        select: {
-          id: true,
-          name: true,
-          altName: true,
-          code: true,
-          description: true,
-          altDescription: true,
-          address: true,
-          location: true,
-          createdAt: true,
-          updatedAt: true,
-          _count: {
-            select: {
-              rooms: true,
-              agreements: true
-            }
+    // Get hotels with optional pagination and room count
+    const queryOptions: any = {
+      where: whereClause,
+      select: {
+        id: true,
+        name: true,
+        altName: true,
+        code: true,
+        description: true,
+        altDescription: true,
+        address: true,
+        location: true,
+        createdAt: true,
+        updatedAt: true,
+        _count: {
+          select: {
+            rooms: true,
+            agreements: true
+          }
+        },
+        agreements: {
+          select: {
+            id: true,
+            fileName: true,
+            filePath: true,
+            fileSize: true,
+            mimeType: true,
+            uploadedAt: true,
           },
-          agreements: {
-            select: {
-              id: true,
-              fileName: true,
-              filePath: true,
-              fileSize: true,
-              mimeType: true,
-              uploadedAt: true,
-            },
-            orderBy: { createdAt: 'desc' },
-          },
-          createdBy: {
-            select: {
-              id: true,
-              username: true,
-              firstName: true,
-              lastName: true,
-            },
+          orderBy: { createdAt: 'desc' },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            username: true,
+            firstName: true,
+            lastName: true,
           },
         },
-        orderBy: { createdAt: 'desc' },
-        skip: offset,
-        take: limit,
-      }),
+      },
+      orderBy: { createdAt: 'desc' },
+    };
+
+    // Add pagination only if limit is specified
+    if (limit) {
+      queryOptions.skip = offset;
+      queryOptions.take = limit;
+    }
+
+    const [hotels, totalCount] = await Promise.all([
+      prisma.hotel.findMany(queryOptions),
       prisma.hotel.count({ where: whereClause }),
     ]);
 
@@ -126,11 +133,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: transformedHotels,
-      pagination: {
+      pagination: limit ? {
         page,
         limit,
         total: totalCount,
         totalPages: Math.ceil(totalCount / limit),
+      } : {
+        page: 1,
+        limit: totalCount,
+        total: totalCount,
+        totalPages: 1,
       },
     });
   } catch (error) {

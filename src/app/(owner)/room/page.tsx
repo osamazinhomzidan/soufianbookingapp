@@ -178,7 +178,7 @@ export default function Room() {
   const fetchHotels = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/hotels');
+      const response = await fetch('/api/hotels?limit=all');
       const result: ApiResponse<Hotel[]> = await response.json();
       
       if (result.success && result.data) {

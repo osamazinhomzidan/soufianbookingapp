@@ -80,6 +80,7 @@ export interface Translations {
     clearAll: string;
     min: string;
     max: string;
+    print: string;
   };
   
   // Booking page translations
@@ -271,6 +272,7 @@ export interface Translations {
     enterMinimumRooms: string;
     maximumRoomCount: string;
     enterMaximumRooms: string;
+    selectedHotel: string;
   };
   
   // Rooms page translations (Owner only)
@@ -637,6 +639,7 @@ const en: Translations = {
     clearAll: 'Clear All',
     min: 'Min',
     max: 'Max',
+    print: 'Print',
   },
   
   booking: {
@@ -877,6 +880,7 @@ const en: Translations = {
     enterMinimumRooms: 'Enter minimum number of rooms',
     maximumRoomCount: 'Maximum Room Count',
     enterMaximumRooms: 'Enter maximum number of rooms',
+    selectedHotel: 'Business Executive Hotel',
   },
   
   rooms: {
@@ -1243,6 +1247,7 @@ const ar: Translations = {
     clearAll: 'مسح الكل',
     min: 'أدنى',
     max: 'أعلى',
+    print: 'طباعة',
   },
   
   booking: {
@@ -1483,6 +1488,7 @@ const ar: Translations = {
     enterMinimumRooms: 'أدخل الحد الأدنى لعدد الغرف',
     maximumRoomCount: 'الحد الأقصى لعدد الغرف',
     enterMaximumRooms: 'أدخل الحد الأقصى لعدد الغرف',
+    selectedHotel: 'فندق بزنس إكزكيوتيف',
   },
   
   rooms: {

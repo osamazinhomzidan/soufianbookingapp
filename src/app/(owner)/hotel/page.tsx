@@ -76,6 +76,7 @@ export default function Hotel() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingHotel, setEditingHotel] = useState<Hotel | null>(null);
+  const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
   const [screenWidth, setScreenWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
 
   // Fetch hotels from API
@@ -88,11 +89,15 @@ export default function Hotel() {
       if (search) params.append('search', search);
       if (location) params.append('location', location);
       if (hasRooms && hasRooms !== 'all') params.append('hasRooms', hasRooms);
+      // Add limit=all to fetch all hotels without pagination
+      params.append('limit', 'all');
       
       const queryString = params.toString();
-      const url = `/api/hotels${queryString ? `?${queryString}` : ''}`;
+      const url = `/api/hotels?${queryString}`;
       
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        credentials: 'include'
+      });
       const result: ApiResponse<Hotel[]> = await response.json();
       
       if (result.success && result.data) {
@@ -208,6 +213,7 @@ export default function Hotel() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(hotelData),
+        credentials: 'include'
       });
 
       const result: ApiResponse<Hotel> = await response.json();
@@ -226,6 +232,7 @@ export default function Hotel() {
             const uploadResponse = await fetch(`/api/hotels/${createdHotel.id}/agreements`, {
               method: 'POST',
               body: formData,
+              credentials: 'include'
             });
 
             const uploadResult = await uploadResponse.json();
@@ -291,6 +298,7 @@ export default function Hotel() {
         code: hotelCode,
         altName: altHotelName || null,
         address: hotelAddress || null,
+        location: hotelLocation || null,
         description: hotelDescription || null,
         altDescription: altHotelDescription || null
       };
@@ -301,6 +309,7 @@ export default function Hotel() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(hotelData),
+        credentials: 'include'
       });
 
       const result: ApiResponse<Hotel> = await response.json();
@@ -319,6 +328,7 @@ export default function Hotel() {
             const uploadResponse = await fetch(`/api/hotels/${updatedHotel.id}/agreements`, {
               method: 'POST',
               body: formData,
+              credentials: 'include'
             });
 
             if (uploadResponse.ok) {
@@ -374,6 +384,7 @@ export default function Hotel() {
       
       const response = await fetch(`/api/hotels/${id}`, {
         method: 'DELETE',
+        credentials: 'include'
       });
 
       const result: ApiResponse<null> = await response.json();
@@ -408,6 +419,21 @@ export default function Hotel() {
         ? prev.filter(selectedId => selectedId !== id)
         : [...prev, id]
     );
+  };
+
+  const handleRowClick = (hotel: Hotel) => {
+    setSelectedHotel(hotel);
+    setEditingHotel(hotel); // Automatically set to edit mode
+    // Populate form fields with selected hotel data
+    setHotelName(hotel.name);
+    setHotelCode(hotel.code);
+    setAltHotelName(hotel.altName || '');
+    setHotelAddress(hotel.address || '');
+    setHotelLocation(hotel.location || '');
+    setHotelDescription(hotel.description || '');
+    setAltHotelDescription(hotel.altDescription || '');
+    // Clear agreement files as they can't be pre-populated
+    setAgreementFiles([]);
   };
 
   const handleSelectAllHotels = () => {
@@ -457,6 +483,193 @@ export default function Hotel() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePrintSelectedHotel = () => {
+    if (!selectedHotel) {
+      console.log('No hotel selected for printing');
+      return;
+    }
+
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    if (!printWindow) {
+      alert('Please allow popups to print hotel details');
+      return;
+    }
+
+    // Generate print content using the same layout as handlePrint
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Hotel Details - ${selectedHotel.name}</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 20px;
+              color: #333;
+            }
+            .header {
+              text-align: center;
+              border-bottom: 2px solid #333;
+              padding-bottom: 10px;
+              margin-bottom: 20px;
+            }
+            .hotel-title {
+              font-size: 24px;
+              font-weight: bold;
+              margin: 0;
+            }
+            .hotel-code {
+              font-size: 16px;
+              color: #666;
+              margin: 5px 0;
+            }
+            .section {
+              margin-bottom: 20px;
+            }
+            .section-title {
+              font-size: 18px;
+              font-weight: bold;
+              margin-bottom: 10px;
+              color: #333;
+              border-bottom: 1px solid #ddd;
+              padding-bottom: 5px;
+            }
+            .info-grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 10px;
+              margin-bottom: 15px;
+            }
+            .info-item {
+              display: flex;
+              flex-direction: column;
+            }
+            .info-label {
+              font-weight: bold;
+              color: #555;
+              margin-bottom: 2px;
+            }
+            .info-value {
+              color: #333;
+            }
+            .description {
+              margin-top: 10px;
+              padding: 10px;
+              background-color: #f9f9f9;
+              border-left: 4px solid #007bff;
+            }
+            .agreements {
+              margin-top: 15px;
+            }
+            .agreement-item {
+              padding: 8px;
+              margin: 5px 0;
+              background-color: #f8f9fa;
+              border: 1px solid #dee2e6;
+              border-radius: 4px;
+            }
+            @media print {
+              body { margin: 0; }
+              .header { page-break-after: avoid; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1 class="hotel-title">${selectedHotel.name}</h1>
+            <p class="hotel-code">Code: ${selectedHotel.code}</p>
+          </div>
+          
+          <div class="section">
+            <h2 class="section-title">Hotel Information</h2>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Hotel Name:</span>
+                <div class="info-value">${selectedHotel.name}</div>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Hotel Code:</span>
+                <div class="info-value">${selectedHotel.code}</div>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Alternative Name:</span>
+                <div class="info-value">${selectedHotel.altName || 'N/A'}</div>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Room Count:</span>
+                <div class="info-value">${selectedHotel.roomCount || 0} rooms</div>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Address:</span>
+                <div class="info-value">${selectedHotel.address || 'N/A'}</div>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Location:</span>
+                <div class="info-value">${selectedHotel.location || 'N/A'}</div>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Created Date:</span>
+                <div class="info-value">${new Date(selectedHotel.createdAt).toLocaleDateString()}</div>
+              </div>
+              ${selectedHotel.createdBy ? `
+              <div class="info-item">
+                <span class="info-label">Created By:</span>
+                <div class="info-value">${selectedHotel.createdBy.firstName && selectedHotel.createdBy.lastName
+                  ? `${selectedHotel.createdBy.firstName} ${selectedHotel.createdBy.lastName}`
+                  : selectedHotel.createdBy.username}</div>
+              </div>
+              ` : ''}
+            </div>
+          </div>
+          
+          ${(selectedHotel.description || selectedHotel.altDescription) ? `
+          <div class="section">
+            <h2 class="section-title">Description</h2>
+            ${selectedHotel.description ? `
+            <div class="description">
+              <strong>Description:</strong><br>
+              <div>${selectedHotel.description}</div>
+            </div>
+            ` : ''}
+            ${selectedHotel.altDescription ? `
+            <div class="description">
+              <strong>Alternative Description:</strong><br>
+              <div>${selectedHotel.altDescription}</div>
+            </div>
+            ` : ''}
+          </div>
+          ` : ''}
+          
+          ${selectedHotel.agreements && selectedHotel.agreements.length > 0 ?
+            `<div class="section">
+              <h2 class="section-title">Agreements (${selectedHotel.agreements.length})</h2>
+              <div class="agreements">
+                ${selectedHotel.agreements.map(agreement => `
+                  <div class="agreement-item">
+                    <strong>${agreement.fileName}</strong><br>
+                    <small>Size: ${(agreement.fileSize / 1024).toFixed(2)} KB | Type: ${agreement.mimeType}</small><br>
+                    <small>Uploaded: ${new Date(agreement.uploadedAt).toLocaleDateString()}</small>
+                  </div>
+                `).join('')}
+              </div>
+            </div>` : ''
+          }
+        </body>
+      </html>
+    `;
+
+    // Write content and print
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+
+    // Wait for content to load then print
+    printWindow.onload = () => {
+      printWindow.print();
+      printWindow.close();
+    };
   };
 
   const handlePrint = () => {
@@ -1331,7 +1544,37 @@ export default function Hotel() {
               >
                 {editingHotel ? t('common.cancel') : t('hotels.clear')}
               </button>
-            </div> 
+            </div>
+            
+            {/* Selected Hotel Action Buttons */}
+            {selectedHotel && (
+              <div className="mt-4 pt-4 border-t border-gray-300 dark:border-gray-600">
+                
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleViewHotel(selectedHotel.id)}
+                    className={`py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white focus:ring-blue-300/50`}
+                  >
+                    {t('common.view')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handlePrintSelectedHotel}
+                    className={`py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white focus:ring-green-300/50`}
+                  >
+                    {t('common.print')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteHotel(selectedHotel.id)}
+                    className={`py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white focus:ring-red-300/50`}
+                  >
+                    {t('common.delete')}
+                  </button>
+                </div>
+              </div>
+            )}
           </form>
             </div>
           </div>
@@ -1941,12 +2184,6 @@ export default function Hotel() {
                       </svg>
                       {t('hotels.agreementCount')}
                     </div>
-                    <div className={`text-center flex items-center justify-center gap-2 ${
-                      isDark ? 'text-gray-200' : 'text-slate-700'
-                    }`}>
-                      
-                      {t('common.actions')}
-                    </div>
                   </div>
                 </div>
                 
@@ -1985,19 +2222,19 @@ export default function Hotel() {
                             }`
                       }`} style={{
                          gridTemplateColumns: screenWidth < 640 
-                           ? 'minmax(20px, 25px) minmax(80px, 100px) minmax(40px, 50px) minmax(60px, 80px) minmax(70px, 90px) minmax(50px, 70px) minmax(35px, 45px) minmax(35px, 45px) minmax(40px, 50px)'
+                           ? 'minmax(20px, 25px) minmax(80px, 100px) minmax(40px, 50px) minmax(60px, 80px) minmax(70px, 90px) minmax(50px, 70px) minmax(35px, 45px) minmax(35px, 45px)'
                            : screenWidth < 768
-                           ? 'minmax(22px, 27px) minmax(100px, 120px) minmax(50px, 60px) minmax(70px, 90px) minmax(85px, 105px) minmax(60px, 80px) minmax(40px, 50px) minmax(40px, 50px) minmax(50px, 60px)'
+                           ? 'minmax(22px, 27px) minmax(100px, 120px) minmax(50px, 60px) minmax(70px, 90px) minmax(85px, 105px) minmax(60px, 80px) minmax(40px, 50px) minmax(40px, 50px)'
                            : screenWidth < 1024
-                           ? 'minmax(25px, 30px) minmax(120px, 140px) minmax(60px, 70px) minmax(80px, 100px) minmax(100px, 120px) minmax(70px, 90px) minmax(50px, 60px) minmax(50px, 60px) minmax(60px, 70px)'
+                           ? 'minmax(25px, 30px) minmax(120px, 140px) minmax(60px, 70px) minmax(80px, 100px) minmax(100px, 120px) minmax(70px, 90px) minmax(50px, 60px) minmax(50px, 60px)'
                            : screenWidth < 1366
-                           ? 'minmax(22px, 28px) minmax(110px, 130px) minmax(55px, 65px) minmax(75px, 90px) minmax(90px, 110px) minmax(65px, 80px) minmax(50px, 60px) minmax(50px, 60px) minmax(70px, 80px)'
+                           ? 'minmax(22px, 28px) minmax(110px, 130px) minmax(55px, 65px) minmax(75px, 90px) minmax(90px, 110px) minmax(65px, 80px) minmax(50px, 60px) minmax(50px, 60px)'
                            : screenWidth < 1920
-                           ? 'minmax(35px, 40px) minmax(160px, 180px) minmax(80px, 90px) minmax(120px, 140px) minmax(140px, 160px) minmax(100px, 120px) minmax(70px, 80px) minmax(70px, 80px) minmax(80px, 90px)'
+                           ? 'minmax(35px, 40px) minmax(160px, 180px) minmax(80px, 90px) minmax(120px, 140px) minmax(140px, 160px) minmax(100px, 120px) minmax(70px, 80px) minmax(70px, 80px)'
                            : screenWidth < 2560
-                           ? 'minmax(40px, 50px) minmax(180px, 220px) minmax(90px, 110px) minmax(140px, 170px) minmax(160px, 200px) minmax(120px, 150px) minmax(80px, 100px) minmax(80px, 100px) minmax(90px, 110px)'
-                           : 'minmax(50px, 60px) minmax(220px, 280px) minmax(110px, 140px) minmax(170px, 220px) minmax(200px, 260px) minmax(150px, 200px) minmax(100px, 130px) minmax(100px, 130px) minmax(110px, 140px)'
-                       }}>
+                           ? 'minmax(40px, 50px) minmax(180px, 220px) minmax(90px, 110px) minmax(140px, 170px) minmax(160px, 200px) minmax(120px, 150px) minmax(80px, 100px) minmax(80px, 100px)'
+                           : 'minmax(50px, 60px) minmax(220px, 280px) minmax(110px, 140px) minmax(170px, 220px) minmax(200px, 260px) minmax(150px, 200px) minmax(100px, 130px) minmax(100px, 130px)'
+                       }} onClick={() => handleRowClick(hotel)}>
                         <div className="flex items-center justify-center">
                           <input
                               type="checkbox"
@@ -2148,7 +2385,7 @@ export default function Hotel() {
                               : 'text-xl'
                           } ${
                             isDark ? 'text-gray-300' : 'text-gray-700'
-                          }`} title={hotel.location || 'Unknown'}>
+                          }`} title={hotel.location || '-'}>
                             <svg className={`mr-0.5 flex-shrink-0 mt-0.5 ${
                               screenWidth < 640 
                                 ? 'w-1.5 h-1.5'
@@ -2166,7 +2403,7 @@ export default function Hotel() {
                             }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                             </svg>
-                            <span className="break-words">{hotel.location || 'Unknown'}</span>
+                            <span className="break-words">{hotel.location || '-'}</span>
                           </span>
                         </div>
                         <div className="flex justify-center items-center">
@@ -2283,101 +2520,7 @@ export default function Hotel() {
                             </span>
                           )}
                         </div>
-                        <div className="flex justify-center items-center">
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => handleViewHotel(hotel.id)}
-                              className={`group relative bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:scale-110 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-300/50 backdrop-blur-sm ${
-                                screenWidth < 640 
-                                  ? 'w-4 h-4'
-                                  : screenWidth < 768
-                                  ? 'w-5 h-5'
-                                  : screenWidth < 1024
-                                  ? 'w-6 h-6'
-                                  : screenWidth > 1920
-                                  ? 'w-8 h-8'
-                                  : 'w-6 h-6'
-                              }`}
-                              title={t('common.view')}
-                            >
-                              <svg className={`group-hover:scale-110 transition-transform duration-200 ${
-                                screenWidth < 640 
-                                  ? 'w-2 h-2'
-                                  : screenWidth < 768
-                                  ? 'w-2.5 h-2.5'
-                                  : screenWidth < 1024
-                                  ? 'w-3 h-3'
-                                  : screenWidth > 1920
-                                  ? 'w-4 h-4'
-                                  : 'w-3 h-3'
-                              }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                              </svg>
-                              <div className="absolute inset-0 rounded-lg bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            </button>
-                            <button
-                              onClick={() => handleEditHotel(hotel.id)}
-                              className={`group relative bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:via-amber-700 hover:to-amber-800 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:scale-110 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-amber-300/50 backdrop-blur-sm ${
-                                screenWidth < 640 
-                                  ? 'w-4 h-4'
-                                  : screenWidth < 768
-                                  ? 'w-5 h-5'
-                                  : screenWidth < 1024
-                                  ? 'w-6 h-6'
-                                  : screenWidth > 1920
-                                  ? 'w-8 h-8'
-                                  : 'w-6 h-6'
-                              }`}
-                              title={t('common.edit')}
-                            >
-                              <svg className={`group-hover:scale-110 transition-transform duration-200 ${
-                                screenWidth < 640 
-                                  ? 'w-2 h-2'
-                                  : screenWidth < 768
-                                  ? 'w-2.5 h-2.5'
-                                  : screenWidth < 1024
-                                  ? 'w-3 h-3'
-                                  : screenWidth > 1920
-                                  ? 'w-4 h-4'
-                                  : 'w-3 h-3'
-                              }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                              </svg>
-                              <div className="absolute inset-0 rounded-lg bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            </button>
-                            <button
-                              onClick={() => handleDeleteHotel(hotel.id)}
-                              className={`group relative bg-gradient-to-br from-red-500 via-red-600 to-red-700 hover:from-red-600 hover:via-red-700 hover:to-red-800 text-white rounded-lg shadow-lg hover:shadow-xl transform hover:scale-110 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-red-300/50 backdrop-blur-sm ${
-                                screenWidth < 640 
-                                  ? 'w-4 h-4'
-                                  : screenWidth < 768
-                                  ? 'w-5 h-5'
-                                  : screenWidth < 1024
-                                  ? 'w-6 h-6'
-                                  : screenWidth > 1920
-                                  ? 'w-8 h-8'
-                                  : 'w-6 h-6'
-                              }`}
-                              title={t('common.delete')}
-                            >
-                              <svg className={`group-hover:scale-110 transition-transform duration-200 ${
-                                screenWidth < 640 
-                                  ? 'w-2 h-2'
-                                  : screenWidth < 768
-                                  ? 'w-2.5 h-2.5'
-                                  : screenWidth < 1024
-                                  ? 'w-3 h-3'
-                                  : screenWidth > 1920
-                                  ? 'w-4 h-4'
-                                  : 'w-3 h-3'
-                              }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                              <div className="absolute inset-0 rounded-lg bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            </button>
-                          </div>
-                        </div>
+
                       </div>
                     ))}
                   </div>

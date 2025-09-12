@@ -87,9 +87,11 @@ export default function Hotel() {
       if (search) params.append('search', search);
       if (location) params.append('location', location);
       if (hasRooms && hasRooms !== 'all') params.append('hasRooms', hasRooms);
+      // Add limit=all to fetch all hotels without pagination
+      params.append('limit', 'all');
       
       const queryString = params.toString();
-      const url = `/api/hotels${queryString ? `?${queryString}` : ''}`;
+      const url = `/api/hotels?${queryString}`;
       
       const response = await fetch(url);
       const result: ApiResponse<Hotel[]> = await response.json();
