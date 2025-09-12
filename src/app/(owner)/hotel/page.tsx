@@ -2100,18 +2100,18 @@ export default function Hotel() {
                       : 'px-5 py-4 text-lg'
                   }`} style={{
                     gridTemplateColumns: screenWidth < 640 
-                      ? 'minmax(20px, 25px) minmax(80px, 100px) minmax(40px, 50px) minmax(60px, 80px) minmax(70px, 90px) minmax(50px, 70px) minmax(35px, 45px) minmax(35px, 45px) minmax(40px, 50px)'
+                      ? 'minmax(20px, 25px) minmax(80px, 100px) minmax(40px, 50px) minmax(60px, 80px) minmax(70px, 90px) minmax(50px, 70px) minmax(60px, 80px) minmax(60px, 80px) minmax(35px, 45px) minmax(35px, 45px)'
                       : screenWidth < 768
-                      ? 'minmax(22px, 27px) minmax(100px, 120px) minmax(50px, 60px) minmax(70px, 90px) minmax(85px, 105px) minmax(60px, 80px) minmax(40px, 50px) minmax(40px, 50px) minmax(50px, 60px)'
+                      ? 'minmax(22px, 27px) minmax(100px, 120px) minmax(50px, 60px) minmax(70px, 90px) minmax(85px, 105px) minmax(60px, 80px) minmax(70px, 90px) minmax(70px, 90px) minmax(40px, 50px) minmax(40px, 50px)'
                       : screenWidth < 1024
-                      ? 'minmax(25px, 30px) minmax(120px, 140px) minmax(60px, 70px) minmax(80px, 100px) minmax(100px, 120px) minmax(70px, 90px) minmax(50px, 60px) minmax(50px, 60px) minmax(60px, 70px)'
+                      ? 'minmax(25px, 30px) minmax(120px, 140px) minmax(60px, 70px) minmax(80px, 100px) minmax(100px, 120px) minmax(70px, 90px) minmax(80px, 100px) minmax(80px, 100px) minmax(50px, 60px) minmax(50px, 60px)'
                       : screenWidth < 1366
-                      ? 'minmax(22px, 28px) minmax(110px, 130px) minmax(55px, 65px) minmax(75px, 90px) minmax(90px, 110px) minmax(65px, 80px) minmax(50px, 60px) minmax(50px, 60px) minmax(70px, 80px)'
+                      ? 'minmax(22px, 28px) minmax(110px, 130px) minmax(55px, 65px) minmax(75px, 90px) minmax(90px, 110px) minmax(65px, 80px) minmax(90px, 110px) minmax(90px, 110px) minmax(50px, 60px) minmax(50px, 60px)'
                       : screenWidth < 1920
-                      ? 'minmax(35px, 40px) minmax(160px, 180px) minmax(80px, 90px) minmax(120px, 140px) minmax(140px, 160px) minmax(100px, 120px) minmax(70px, 80px) minmax(70px, 80px) minmax(80px, 90px)'
+                      ? 'minmax(35px, 40px) minmax(160px, 180px) minmax(80px, 90px) minmax(120px, 140px) minmax(140px, 160px) minmax(100px, 120px) minmax(120px, 140px) minmax(120px, 140px) minmax(70px, 80px) minmax(70px, 80px)'
                       : screenWidth < 2560
-                      ? 'minmax(40px, 50px) minmax(180px, 220px) minmax(90px, 110px) minmax(140px, 170px) minmax(160px, 200px) minmax(120px, 150px) minmax(80px, 100px) minmax(80px, 100px) minmax(90px, 110px)'
-                      : 'minmax(50px, 60px) minmax(220px, 280px) minmax(110px, 140px) minmax(170px, 220px) minmax(200px, 260px) minmax(150px, 200px) minmax(100px, 130px) minmax(100px, 130px) minmax(110px, 140px)'
+                      ? 'minmax(40px, 50px) minmax(180px, 220px) minmax(90px, 110px) minmax(140px, 170px) minmax(160px, 200px) minmax(120px, 150px) minmax(140px, 170px) minmax(140px, 170px) minmax(80px, 100px) minmax(80px, 100px)'
+                      : 'minmax(50px, 60px) minmax(220px, 280px) minmax(110px, 140px) minmax(170px, 220px) minmax(200px, 260px) minmax(150px, 200px) minmax(170px, 220px) minmax(170px, 220px) minmax(100px, 130px) minmax(100px, 130px)'
                   }}>
                     <div className={`flex items-center justify-center ${
                       isDark ? 'text-gray-200' : 'text-slate-700'
@@ -2170,6 +2170,22 @@ export default function Hotel() {
                       </svg>
                       {t('hotels.location')}
                     </div>
+                    <div className={`text-left flex items-center gap-2 ${
+                      isDark ? 'text-gray-200' : 'text-slate-700'
+                    }`}>
+                      <svg className="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                      </svg>
+                      Description
+                    </div>
+                    <div className={`text-left flex items-center gap-2 ${
+                      isDark ? 'text-gray-200' : 'text-slate-700'
+                    }`}>
+                      <svg className="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                      </svg>
+                      Alt Description
+                    </div>
                     <div className={`text-center flex items-center justify-center gap-2 ${
                       isDark ? 'text-gray-200' : 'text-slate-700'
                     }`}>
@@ -2222,18 +2238,18 @@ export default function Hotel() {
                             }`
                       }`} style={{
                          gridTemplateColumns: screenWidth < 640 
-                           ? 'minmax(20px, 25px) minmax(80px, 100px) minmax(40px, 50px) minmax(60px, 80px) minmax(70px, 90px) minmax(50px, 70px) minmax(35px, 45px) minmax(35px, 45px)'
+                           ? 'minmax(20px, 25px) minmax(80px, 100px) minmax(40px, 50px) minmax(60px, 80px) minmax(70px, 90px) minmax(50px, 70px) minmax(60px, 80px) minmax(60px, 80px) minmax(35px, 45px) minmax(35px, 45px)'
                            : screenWidth < 768
-                           ? 'minmax(22px, 27px) minmax(100px, 120px) minmax(50px, 60px) minmax(70px, 90px) minmax(85px, 105px) minmax(60px, 80px) minmax(40px, 50px) minmax(40px, 50px)'
+                           ? 'minmax(22px, 27px) minmax(100px, 120px) minmax(50px, 60px) minmax(70px, 90px) minmax(85px, 105px) minmax(60px, 80px) minmax(70px, 90px) minmax(70px, 90px) minmax(40px, 50px) minmax(40px, 50px)'
                            : screenWidth < 1024
-                           ? 'minmax(25px, 30px) minmax(120px, 140px) minmax(60px, 70px) minmax(80px, 100px) minmax(100px, 120px) minmax(70px, 90px) minmax(50px, 60px) minmax(50px, 60px)'
+                           ? 'minmax(25px, 30px) minmax(120px, 140px) minmax(60px, 70px) minmax(80px, 100px) minmax(100px, 120px) minmax(70px, 90px) minmax(80px, 100px) minmax(80px, 100px) minmax(50px, 60px) minmax(50px, 60px)'
                            : screenWidth < 1366
-                           ? 'minmax(22px, 28px) minmax(110px, 130px) minmax(55px, 65px) minmax(75px, 90px) minmax(90px, 110px) minmax(65px, 80px) minmax(50px, 60px) minmax(50px, 60px)'
+                           ? 'minmax(22px, 28px) minmax(110px, 130px) minmax(55px, 65px) minmax(75px, 90px) minmax(90px, 110px) minmax(65px, 80px) minmax(90px, 110px) minmax(90px, 110px) minmax(50px, 60px) minmax(50px, 60px)'
                            : screenWidth < 1920
-                           ? 'minmax(35px, 40px) minmax(160px, 180px) minmax(80px, 90px) minmax(120px, 140px) minmax(140px, 160px) minmax(100px, 120px) minmax(70px, 80px) minmax(70px, 80px)'
+                           ? 'minmax(35px, 40px) minmax(160px, 180px) minmax(80px, 90px) minmax(120px, 140px) minmax(140px, 160px) minmax(100px, 120px) minmax(120px, 140px) minmax(120px, 140px) minmax(70px, 80px) minmax(70px, 80px)'
                            : screenWidth < 2560
-                           ? 'minmax(40px, 50px) minmax(180px, 220px) minmax(90px, 110px) minmax(140px, 170px) minmax(160px, 200px) minmax(120px, 150px) minmax(80px, 100px) minmax(80px, 100px)'
-                           : 'minmax(50px, 60px) minmax(220px, 280px) minmax(110px, 140px) minmax(170px, 220px) minmax(200px, 260px) minmax(150px, 200px) minmax(100px, 130px) minmax(100px, 130px)'
+                           ? 'minmax(40px, 50px) minmax(180px, 220px) minmax(90px, 110px) minmax(140px, 170px) minmax(160px, 200px) minmax(120px, 150px) minmax(140px, 170px) minmax(140px, 170px) minmax(80px, 100px) minmax(80px, 100px)'
+                           : 'minmax(50px, 60px) minmax(220px, 280px) minmax(110px, 140px) minmax(170px, 220px) minmax(200px, 260px) minmax(150px, 200px) minmax(170px, 220px) minmax(170px, 220px) minmax(100px, 130px) minmax(100px, 130px)'
                        }} onClick={() => handleRowClick(hotel)}>
                         <div className="flex items-center justify-center">
                           <input
@@ -2404,6 +2420,48 @@ export default function Hotel() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                             </svg>
                             <span className="break-words">{hotel.location || '-'}</span>
+                          </span>
+                        </div>
+                        <div className={`text-xs break-words ${
+                          isDark ? 'text-gray-300' : 'text-slate-600'
+                        }`}>
+                          <span className={`break-words block ${
+                            screenWidth < 640 
+                              ? 'text-[7px]'
+                              : screenWidth < 768
+                              ? 'text-[8px]'
+                              : screenWidth < 1024
+                              ? 'text-xs'
+                              : screenWidth < 1366
+                              ? 'text-sm'
+                              : screenWidth < 1920
+                              ? 'text-base'
+                              : screenWidth < 2560
+                              ? 'text-lg'
+                              : 'text-xl'
+                          }`} title={hotel.description || 'No description'}>
+                            {hotel.description || <span className="italic opacity-60">No description</span>}
+                          </span>
+                        </div>
+                        <div className={`text-xs break-words ${
+                          isDark ? 'text-gray-300' : 'text-slate-600'
+                        }`}>
+                          <span className={`break-words block ${
+                            screenWidth < 640 
+                              ? 'text-[7px]'
+                              : screenWidth < 768
+                              ? 'text-[8px]'
+                              : screenWidth < 1024
+                              ? 'text-xs'
+                              : screenWidth < 1366
+                              ? 'text-sm'
+                              : screenWidth < 1920
+                              ? 'text-base'
+                              : screenWidth < 2560
+                              ? 'text-lg'
+                              : 'text-xl'
+                          }`} title={hotel.altDescription || 'No alt description'}>
+                            {hotel.altDescription || <span className="italic opacity-60">No alt description</span>}
                           </span>
                         </div>
                         <div className="flex justify-center items-center">

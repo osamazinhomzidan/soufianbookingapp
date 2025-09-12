@@ -1278,6 +1278,16 @@ export default function Hotel() {
                      <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
                        isDark ? 'text-gray-200' : 'text-slate-800'
                      }`}>
+                       Description
+                     </th>
+                     <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
+                       isDark ? 'text-gray-200' : 'text-slate-800'
+                     }`}>
+                       Alt Description
+                     </th>
+                     <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
+                       isDark ? 'text-gray-200' : 'text-slate-800'
+                     }`}>
                        {t('hotels.location')}
                      </th>
                      <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
@@ -1334,6 +1344,16 @@ export default function Hotel() {
                      <td className={`py-5 px-6 font-medium ${
                        isDark ? 'text-gray-400' : 'text-slate-600'
                      }`}>{hotel.address || '-'}</td>
+                     <td className={`py-5 px-6 font-medium ${
+                       isDark ? 'text-gray-400' : 'text-slate-600'
+                     }`} title={hotel.description || 'No description'}>
+                       {hotel.description || <span className="italic opacity-60">No description</span>}
+                     </td>
+                     <td className={`py-5 px-6 font-medium ${
+                       isDark ? 'text-gray-400' : 'text-slate-600'
+                     }`} title={hotel.altDescription || 'No alt description'}>
+                       {hotel.altDescription || <span className="italic opacity-60">No alt description</span>}
+                     </td>
                      <td className={`py-5 px-6 font-medium ${
                        isDark ? 'text-gray-400' : 'text-slate-600'
                      }`}>{hotel.location || '-'}</td>
