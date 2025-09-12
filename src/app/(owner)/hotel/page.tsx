@@ -1349,30 +1349,28 @@ export default function Hotel() {
             {/* Single Row Filter Section */}
             <div className="mb-4">
                {/* All Filters in Single Horizontal Row */}
-               <div className={`flex flex-wrap items-center gap-2 ${
+               <div className={`flex flex-wrap items-center ${
                  screenWidth < 640 
-                   ? 'gap-1.5' 
+                   ? 'gap-1' 
                    : screenWidth < 768
-                   ? 'gap-2'
+                   ? 'gap-1.5'
                    : screenWidth < 1024
-                   ? 'gap-2.5'
+                   ? 'gap-2'
                    : screenWidth < 1366
-                   ? 'gap-3'
-                   : screenWidth < 1920
-                   ? 'gap-3.5'
-                   : 'gap-4'
+                   ? 'gap-2.5'
+                   : 'gap-3'
                }`}>
                 {/* Name Filter */}
                  <div className={`relative flex-1 min-w-0 ${
                    screenWidth < 640 
-                     ? 'min-w-[120px]' 
+                     ? 'min-w-[90px]' 
                      : screenWidth < 768
-                     ? 'min-w-[140px]'
+                     ? 'min-w-[110px]'
                      : screenWidth < 1024
-                     ? 'min-w-[160px]'
+                     ? 'min-w-[130px]'
                      : screenWidth < 1366
-                     ? 'min-w-[180px]'
-                     : 'min-w-[200px]'
+                     ? 'min-w-[150px]'
+                     : 'min-w-[170px]'
                  }`}>
                    <svg className={`absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 ${
                      screenWidth < 640 
@@ -1393,12 +1391,12 @@ export default function Hotel() {
                      onChange={(e) => setNameFilter(e.target.value)}
                      className={`w-full ${
                        screenWidth < 640 
-                         ? 'pl-7 pr-2 py-1.5 text-xs' 
+                         ? 'pl-6 pr-2 py-1 text-xs' 
                          : screenWidth < 768
-                         ? 'pl-8 pr-2 py-1.5 text-xs'
+                         ? 'pl-7 pr-2 py-1.5 text-xs'
                          : screenWidth < 1024
-                         ? 'pl-9 pr-3 py-2 text-sm'
-                         : 'pl-10 pr-3 py-2 text-sm'
+                         ? 'pl-8 pr-2 py-1.5 text-sm'
+                         : 'pl-9 pr-3 py-2 text-sm'
                      } border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
                        isDark 
                          ? 'bg-gray-700/50 border-gray-600 placeholder-gray-400 text-white hover:bg-gray-700' 
@@ -1411,14 +1409,14 @@ export default function Hotel() {
                 {/* Code Filter */}
                  <div className={`relative flex-1 min-w-0 ${
                    screenWidth < 640 
-                     ? 'min-w-[100px]' 
+                     ? 'min-w-[80px]' 
                      : screenWidth < 768
-                     ? 'min-w-[120px]'
+                     ? 'min-w-[100px]'
                      : screenWidth < 1024
-                     ? 'min-w-[140px]'
+                     ? 'min-w-[120px]'
                      : screenWidth < 1366
-                     ? 'min-w-[160px]'
-                     : 'min-w-[180px]'
+                     ? 'min-w-[140px]'
+                     : 'min-w-[160px]'
                  }`}>
                    <svg className={`absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 ${
                      screenWidth < 640 
@@ -1439,12 +1437,12 @@ export default function Hotel() {
                      onChange={(e) => setCodeFilter(e.target.value)}
                      className={`w-full ${
                        screenWidth < 640 
-                         ? 'pl-7 pr-2 py-1.5 text-xs' 
+                         ? 'pl-6 pr-2 py-1 text-xs' 
                          : screenWidth < 768
-                         ? 'pl-8 pr-2 py-1.5 text-xs'
+                         ? 'pl-7 pr-2 py-1.5 text-xs'
                          : screenWidth < 1024
-                         ? 'pl-9 pr-3 py-2 text-sm'
-                         : 'pl-10 pr-3 py-2 text-sm'
+                         ? 'pl-8 pr-2 py-1.5 text-sm'
+                         : 'pl-9 pr-3 py-2 text-sm'
                      } border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
                        isDark 
                          ? 'bg-gray-700/50 border-gray-600 placeholder-gray-400 text-white hover:bg-gray-700' 
@@ -1457,14 +1455,14 @@ export default function Hotel() {
                 {/* Location Filter */}
                  <div className={`relative flex-1 min-w-0 ${
                    screenWidth < 640 
-                     ? 'min-w-[110px]' 
+                     ? 'min-w-[85px]' 
                      : screenWidth < 768
-                     ? 'min-w-[130px]'
+                     ? 'min-w-[105px]'
                      : screenWidth < 1024
-                     ? 'min-w-[150px]'
+                     ? 'min-w-[125px]'
                      : screenWidth < 1366
-                     ? 'min-w-[170px]'
-                     : 'min-w-[190px]'
+                     ? 'min-w-[145px]'
+                     : 'min-w-[165px]'
                  }`}>
                    <svg className={`absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 ${
                      screenWidth < 640 
@@ -1486,12 +1484,12 @@ export default function Hotel() {
                      onChange={(e) => setLocationFilter(e.target.value)}
                      className={`w-full ${
                        screenWidth < 640 
-                         ? 'pl-7 pr-2 py-1.5 text-xs' 
+                         ? 'pl-6 pr-2 py-1 text-xs' 
                          : screenWidth < 768
-                         ? 'pl-8 pr-2 py-1.5 text-xs'
+                         ? 'pl-7 pr-2 py-1.5 text-xs'
                          : screenWidth < 1024
-                         ? 'pl-9 pr-3 py-2 text-sm'
-                         : 'pl-10 pr-3 py-2 text-sm'
+                         ? 'pl-8 pr-2 py-1.5 text-sm'
+                         : 'pl-9 pr-3 py-2 text-sm'
                      } border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
                        isDark 
                          ? 'bg-gray-700/50 border-gray-600 placeholder-gray-400 text-white hover:bg-gray-700' 
@@ -1504,14 +1502,14 @@ export default function Hotel() {
                 {/* Address Filter */}
                  <div className={`relative flex-1 min-w-0 ${
                    screenWidth < 640 
-                     ? 'min-w-[110px]' 
+                     ? 'min-w-[85px]' 
                      : screenWidth < 768
-                     ? 'min-w-[130px]'
+                     ? 'min-w-[105px]'
                      : screenWidth < 1024
-                     ? 'min-w-[150px]'
+                     ? 'min-w-[125px]'
                      : screenWidth < 1366
-                     ? 'min-w-[170px]'
-                     : 'min-w-[190px]'
+                     ? 'min-w-[145px]'
+                     : 'min-w-[165px]'
                  }`}>
                    <svg className={`absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 ${
                      screenWidth < 640 
@@ -1532,12 +1530,12 @@ export default function Hotel() {
                      onChange={(e) => setAddressFilter(e.target.value)}
                      className={`w-full ${
                        screenWidth < 640 
-                         ? 'pl-7 pr-2 py-1.5 text-xs' 
+                         ? 'pl-6 pr-2 py-1 text-xs' 
                          : screenWidth < 768
-                         ? 'pl-8 pr-2 py-1.5 text-xs'
+                         ? 'pl-7 pr-2 py-1.5 text-xs'
                          : screenWidth < 1024
-                         ? 'pl-9 pr-3 py-2 text-sm'
-                         : 'pl-10 pr-3 py-2 text-sm'
+                         ? 'pl-8 pr-2 py-1.5 text-sm'
+                         : 'pl-9 pr-3 py-2 text-sm'
                      } border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
                        isDark 
                          ? 'bg-gray-700/50 border-gray-600 placeholder-gray-400 text-white hover:bg-gray-700' 
@@ -1549,14 +1547,14 @@ export default function Hotel() {
                 {/* Rooms Filter */}
                  <div className={`relative flex-1 min-w-0 ${
                    screenWidth < 640 
-                     ? 'min-w-[100px]' 
+                     ? 'min-w-[80px]' 
                      : screenWidth < 768
-                     ? 'min-w-[120px]'
+                     ? 'min-w-[100px]'
                      : screenWidth < 1024
-                     ? 'min-w-[140px]'
+                     ? 'min-w-[120px]'
                      : screenWidth < 1366
-                     ? 'min-w-[160px]'
-                     : 'min-w-[180px]'
+                     ? 'min-w-[140px]'
+                     : 'min-w-[160px]'
                  }`}>
                    <svg className={`absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 ${
                      screenWidth < 640 
@@ -1576,12 +1574,12 @@ export default function Hotel() {
                      onChange={(e) => setHasRoomsFilter(e.target.value)}
                      className={`w-full ${
                        screenWidth < 640 
-                         ? 'pl-7 pr-6 py-1.5 text-xs' 
+                         ? 'pl-6 pr-5 py-1 text-xs' 
                          : screenWidth < 768
-                         ? 'pl-8 pr-7 py-1.5 text-xs'
+                         ? 'pl-7 pr-6 py-1.5 text-xs'
                          : screenWidth < 1024
-                         ? 'pl-9 pr-8 py-2 text-sm'
-                         : 'pl-10 pr-9 py-2 text-sm'
+                         ? 'pl-8 pr-7 py-1.5 text-sm'
+                         : 'pl-9 pr-8 py-2 text-sm'
                      } border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer ${
                        isDark 
                          ? 'bg-gray-700/50 border-gray-600 text-white hover:bg-gray-700' 
@@ -1612,14 +1610,14 @@ export default function Hotel() {
                   <>
                     <div className={`relative flex-1 min-w-0 ${
                       screenWidth < 640 
-                        ? 'min-w-[80px]' 
+                        ? 'min-w-[60px]' 
                         : screenWidth < 768
-                        ? 'min-w-[90px]'
+                        ? 'min-w-[70px]'
                         : screenWidth < 1024
-                        ? 'min-w-[100px]'
+                        ? 'min-w-[80px]'
                         : screenWidth < 1366
-                        ? 'min-w-[110px]'
-                        : 'min-w-[120px]'
+                        ? 'min-w-[90px]'
+                        : 'min-w-[100px]'
                     }`}>
                       <input
                         type="number"
@@ -1628,11 +1626,11 @@ export default function Hotel() {
                         onChange={(e) => setMinRoomCountFilter(e.target.value)}
                         className={`w-full ${
                           screenWidth < 640 
-                            ? 'px-2 py-1.5 text-xs' 
+                            ? 'px-1.5 py-1 text-xs' 
                             : screenWidth < 768
                             ? 'px-2 py-1.5 text-xs'
                             : screenWidth < 1024
-                            ? 'px-3 py-2 text-sm'
+                            ? 'px-2 py-1.5 text-sm'
                             : 'px-3 py-2 text-sm'
                         } border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
                           isDark 
@@ -1644,14 +1642,14 @@ export default function Hotel() {
                     </div>
                     <div className={`relative flex-1 min-w-0 ${
                       screenWidth < 640 
-                        ? 'min-w-[80px]' 
+                        ? 'min-w-[60px]' 
                         : screenWidth < 768
-                        ? 'min-w-[90px]'
+                        ? 'min-w-[70px]'
                         : screenWidth < 1024
-                        ? 'min-w-[100px]'
+                        ? 'min-w-[80px]'
                         : screenWidth < 1366
-                        ? 'min-w-[110px]'
-                        : 'min-w-[120px]'
+                        ? 'min-w-[90px]'
+                        : 'min-w-[100px]'
                     }`}>
                       <input
                         type="number"
@@ -1660,11 +1658,11 @@ export default function Hotel() {
                         onChange={(e) => setMaxRoomCountFilter(e.target.value)}
                         className={`w-full ${
                           screenWidth < 640 
-                            ? 'px-2 py-1.5 text-xs' 
+                            ? 'px-1.5 py-1 text-xs' 
                             : screenWidth < 768
                             ? 'px-2 py-1.5 text-xs'
                             : screenWidth < 1024
-                            ? 'px-3 py-2 text-sm'
+                            ? 'px-2 py-1.5 text-sm'
                             : 'px-3 py-2 text-sm'
                         } border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
                           isDark 
@@ -1680,14 +1678,14 @@ export default function Hotel() {
                 {/* Files Filter */}
                  <div className={`relative flex-1 min-w-0 ${
                    screenWidth < 640 
-                     ? 'min-w-[100px]' 
+                     ? 'min-w-[80px]' 
                      : screenWidth < 768
-                     ? 'min-w-[120px]'
+                     ? 'min-w-[100px]'
                      : screenWidth < 1024
-                     ? 'min-w-[140px]'
+                     ? 'min-w-[120px]'
                      : screenWidth < 1366
-                     ? 'min-w-[160px]'
-                     : 'min-w-[180px]'
+                     ? 'min-w-[140px]'
+                     : 'min-w-[160px]'
                  }`}>
                    <svg className={`absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 ${
                      screenWidth < 640 
@@ -1707,12 +1705,12 @@ export default function Hotel() {
                      onChange={(e) => setHasFilesFilter(e.target.value)}
                      className={`w-full ${
                        screenWidth < 640 
-                         ? 'pl-7 pr-6 py-1.5 text-xs' 
+                         ? 'pl-6 pr-5 py-1 text-xs' 
                          : screenWidth < 768
-                         ? 'pl-8 pr-7 py-1.5 text-xs'
+                         ? 'pl-7 pr-6 py-1.5 text-xs'
                          : screenWidth < 1024
-                         ? 'pl-9 pr-8 py-2 text-sm'
-                         : 'pl-10 pr-9 py-2 text-sm'
+                         ? 'pl-8 pr-7 py-1.5 text-sm'
+                         : 'pl-9 pr-8 py-2 text-sm'
                      } border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer ${
                        isDark 
                          ? 'bg-gray-700/50 border-gray-600 text-white hover:bg-gray-700' 
@@ -1946,9 +1944,7 @@ export default function Hotel() {
                     <div className={`text-center flex items-center justify-center gap-2 ${
                       isDark ? 'text-gray-200' : 'text-slate-700'
                     }`}>
-                      <svg className="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                      </svg>
+                      
                       {t('common.actions')}
                     </div>
                   </div>
@@ -2069,7 +2065,7 @@ export default function Hotel() {
                             ? 'text-lg'
                             : 'text-xl'
                         } ${
-                          isDark ? 'text-emerald-300 bg-emerald-900/20' : 'text-emerald-700 bg-emerald-50'
+                          isDark ? 'text-gray-300' : 'text-gray-700'
                         }`} title={hotel.code}>
                           <span className="block break-words">{hotel.code}</span>
                         </div>
@@ -2151,7 +2147,7 @@ export default function Hotel() {
                               ? 'text-lg'
                               : 'text-xl'
                           } ${
-                            isDark ? 'bg-purple-900/30 text-purple-300' : 'bg-purple-100 text-purple-700'
+                            isDark ? 'text-gray-300' : 'text-gray-700'
                           }`} title={hotel.location || 'Unknown'}>
                             <svg className={`mr-0.5 flex-shrink-0 mt-0.5 ${
                               screenWidth < 640 

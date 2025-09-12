@@ -341,15 +341,15 @@ export default function SecurityPage() {
           )}
           
           {/* Filters and Search */}
-          <div className={`backdrop-blur-sm rounded-2xl p-6 shadow-lg mb-8 transition-colors duration-300 ${
+          <div className={`backdrop-blur-sm rounded-2xl p-4 shadow-lg mb-8 transition-colors duration-300 ${
             isDark 
               ? 'bg-gray-800/80 border border-gray-700/50' 
               : 'bg-white/80 border border-gray-200/50'
           }`}>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="flex flex-wrap gap-3">
               {/* Search */}
-              <div className="relative">
-                <MagnifyingGlassIcon className={`w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
+              <div className="relative flex-1 min-w-[200px]">
+                <MagnifyingGlassIcon className={`w-4 h-4 absolute left-2.5 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
                   isDark ? 'text-gray-500' : 'text-gray-400'
                 }`} />
                 <input
@@ -357,59 +357,69 @@ export default function SecurityPage() {
                   placeholder={t('security.searchUsers')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`w-full pl-10 pr-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                  className={`w-full pl-8 pr-3 py-2 text-sm rounded-lg border focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
                     isDark 
-                      ? 'bg-gray-700 border border-gray-600 text-white placeholder-gray-400' 
-                      : 'bg-white border border-gray-200 text-gray-900 placeholder-gray-500'
+                      ? 'bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 hover:bg-gray-700' 
+                      : 'bg-white/80 border-gray-300 text-gray-900 placeholder-gray-500 hover:bg-white'
                   }`}
                 />
               </div>
               
               {/* Role Filter */}
-              <div className="relative">
-                <FunnelIcon className={`w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
+              <div className="relative flex-1 min-w-[140px]">
+                <FunnelIcon className={`w-4 h-4 absolute left-2.5 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
                   isDark ? 'text-gray-500' : 'text-gray-400'
                 }`} />
                 <select
                   value={roleFilter}
                   onChange={(e) => setRoleFilter(e.target.value)}
-                  className={`w-full pl-10 pr-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 appearance-none ${
+                  className={`w-full pl-8 pr-7 py-2 text-sm rounded-lg border focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer ${
                     isDark 
-                      ? 'bg-gray-700 border border-gray-600 text-white' 
-                      : 'bg-white border border-gray-200 text-gray-900'
+                      ? 'bg-gray-700/50 border-gray-600 text-white hover:bg-gray-700' 
+                      : 'bg-white/80 border-gray-300 text-gray-900 hover:bg-white'
                   }`}
                 >
                   <option value="">{t('security.filterByRole')}</option>
                   <option value="OWNER">{t('security.owner')}</option>
                   <option value="STAFF">{t('security.staff')}</option>
                 </select>
+                <svg className={`absolute right-2 top-1/2 transform -translate-y-1/2 w-3 h-3 pointer-events-none transition-colors duration-300 ${
+                  isDark ? 'text-gray-400' : 'text-gray-500'
+                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
               </div>
               
               {/* Status Filter */}
-              <div className="relative">
-                <FunnelIcon className={`w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
+              <div className="relative flex-1 min-w-[140px]">
+                <FunnelIcon className={`w-4 h-4 absolute left-2.5 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
                   isDark ? 'text-gray-500' : 'text-gray-400'
                 }`} />
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className={`w-full pl-10 pr-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 appearance-none ${
+                  className={`w-full pl-8 pr-7 py-2 text-sm rounded-lg border focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer ${
                     isDark 
-                      ? 'bg-gray-700 border border-gray-600 text-white' 
-                      : 'bg-white border border-gray-200 text-gray-900'
+                      ? 'bg-gray-700/50 border-gray-600 text-white hover:bg-gray-700' 
+                      : 'bg-white/80 border-gray-300 text-gray-900 hover:bg-white'
                   }`}
                 >
                   <option value="">{t('security.filterByStatus')}</option>
                   <option value="active">{t('security.active')}</option>
                   <option value="inactive">{t('security.inactive')}</option>
                 </select>
+                <svg className={`absolute right-2 top-1/2 transform -translate-y-1/2 w-3 h-3 pointer-events-none transition-colors duration-300 ${
+                  isDark ? 'text-gray-400' : 'text-gray-500'
+                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
               </div>
               
               {/* Results Count */}
-              <div className={`flex items-center justify-center rounded-xl px-4 py-3 transition-colors duration-300 ${
-                isDark ? 'bg-gray-700' : 'bg-gray-50'
+              <div className={`flex items-center justify-center rounded-lg px-3 py-2 min-w-[100px] transition-colors duration-300 ${
+                isDark ? 'bg-gray-700/50' : 'bg-gray-50/80'
               }`}>
-                <span className={`font-medium transition-colors duration-300 ${
+                <span className={`font-medium text-sm transition-colors duration-300 ${
                   isDark ? 'text-gray-300' : 'text-gray-600'
                 }`}>
                   {filteredUsers.length} {t('common.results')}

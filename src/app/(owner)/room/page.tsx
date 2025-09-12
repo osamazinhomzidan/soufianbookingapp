@@ -1513,317 +1513,208 @@ export default function Room() {
                   </div>
                 </div>
 
-              {/* Enhanced Filter Groups - Two Rows Layout with Modern UI/UX */}
-              {/* First Row - Basic Filters */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+              {/* Enhanced Filter Groups - Single Row Layout with Compact Design */}
+              <div className="flex flex-wrap items-center gap-2 mb-6">
                     {/* Global Search */}
-                    <div className={`relative group rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-300 ${
-                      isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
-                    }`}>
-                      <div className="flex items-center mb-4">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
-                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                          </svg>
-                        </div>
-                        <label className={`block text-lg font-bold transition-colors duration-300 ${
-                          isDark ? 'text-white' : 'text-slate-800'
-                        }`}>{t('rooms.searchRoomOrHotel')}</label>
-                      </div>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          value={nameFilter}
-                          onChange={(e) => setNameFilter(e.target.value)}
-                          className={`w-full px-5 py-4 pl-12 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-base font-semibold ${
-                            isDark 
-                              ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white placeholder-gray-400' 
-                              : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900 placeholder-slate-400'
-                          }`}
-                          placeholder={t('rooms.searchRoomOrHotel')}
-                        />
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                          <svg className={`w-5 h-5 group-focus-within:text-blue-500 transition-colors duration-300 ${
-                            isDark ? 'text-gray-400' : 'text-slate-400'
-                          }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                          </svg>
-                        </div>
-                        {nameFilter && (
-                          <button
-                            onClick={() => setNameFilter('')}
-                            className={`absolute inset-y-0 right-0 pr-4 flex items-center hover:text-red-500 transition-colors duration-200 ${
-                              isDark ? 'text-gray-400' : 'text-slate-400'
-                            }`}
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        )}
-                      </div>
+                    <div className="relative flex-1 min-w-0 min-w-[120px]">
+                      <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none z-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                      <input
+                        type="text"
+                        value={nameFilter}
+                        onChange={(e) => setNameFilter(e.target.value)}
+                        className={`w-full pl-9 pr-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
+                          isDark 
+                            ? 'bg-gray-700/50 border-gray-600 placeholder-gray-400 text-white hover:bg-gray-700' 
+                            : 'bg-white/80 border-gray-300 placeholder-gray-500 text-gray-900 hover:bg-white'
+                        }`}
+                        placeholder={t('rooms.searchRoomOrHotel')}
+                      />
                     </div>
 
                     {/* Hotel Selection */}
-                    <div className={`relative group rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-300 ${
-                      isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
-                    }`}>
-                      <div className="flex items-center mb-4">
-                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
-                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                          </svg>
-                        </div>
-                        <label className={`block text-lg font-bold transition-colors duration-300 ${
-                          isDark ? 'text-white' : 'text-slate-800'
-                        }`}>{t('rooms.hotel')}</label>
-                      </div>
-                      <div className="relative">
-                        <select
-                          value={hotelFilter}
-                          onChange={(e) => setHotelFilter(e.target.value)}
-                          className={`w-full px-5 py-4 border-2 rounded-xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 text-base font-semibold appearance-none cursor-pointer ${
-                            isDark 
-                              ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white' 
-                              : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900'
-                          }`}
-                        >
-                          <option value="">{t('rooms.allHotels')}</option>
-                          {hotels.map((hotel) => (
-                            <option key={hotel.id} value={hotel.id}>
-                              {hotel.name}
-                            </option>
-                          ))}
-                        </select>
-                        <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                          <svg className={`w-5 h-5 group-focus-within:text-emerald-500 transition-colors duration-300 ${
-                            isDark ? 'text-gray-400' : 'text-slate-400'
-                          }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </div>
-                      </div>
+                    <div className="relative flex-1 min-w-0 min-w-[100px]">
+                      <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none z-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                      <select
+                        value={hotelFilter}
+                        onChange={(e) => setHotelFilter(e.target.value)}
+                        className={`w-full pl-9 pr-8 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-200 appearance-none cursor-pointer ${
+                          isDark 
+                            ? 'bg-gray-700/50 border-gray-600 text-white hover:bg-gray-700' 
+                            : 'bg-white/80 border-gray-300 text-gray-900 hover:bg-white'
+                        }`}
+                      >
+                        <option value="">{t('rooms.allHotels')}</option>
+                        {hotels.map((hotel) => (
+                          <option key={hotel.id} value={hotel.id}>
+                            {hotel.name}
+                          </option>
+                        ))}
+                      </select>
+                      <svg className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
+                      </svg>
                     </div>
 
                     {/* Board Type */}
-                    <div className={`relative group rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-300 ${
-                      isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
-                    }`}>
-                      <div className="flex items-center mb-4">
-                        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
-                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h2m0-8h10a2 2 0 012 2v6a2 2 0 01-2 2H9m0-8v8" />
-                          </svg>
-                        </div>
-                        <label className={`block text-lg font-bold transition-colors duration-300 ${
-                          isDark ? 'text-white' : 'text-slate-800'
-                        }`}>{t('rooms.boardType')}</label>
-                      </div>
-                      <div className="relative">
-                        <select
-                          value={boardTypeFilter}
-                          onChange={(e) => setBoardTypeFilter(e.target.value)}
-                          className={`w-full px-5 py-4 border-2 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 text-base font-semibold appearance-none cursor-pointer ${
-                            isDark 
-                              ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white' 
-                              : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900'
-                          }`}
-                        >
-                          <option value="">{t('rooms.allBoardTypes')}</option>
-                          <option value="Room only">{t('rooms.roomOnly')}</option>
-                          <option value="Bed & breakfast">{t('rooms.bedBreakfast')}</option>
-                          <option value="Half board">{t('rooms.halfBoard')}</option>
-                          <option value="Full board">{t('rooms.fullBoard')}</option>
-                        </select>
-                        <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                          <svg className={`w-5 h-5 group-focus-within:text-purple-500 transition-colors duration-300 ${
-                            isDark ? 'text-gray-400' : 'text-slate-400'
-                          }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </div>
-                      </div>
+                    <div className="relative flex-1 min-w-0 min-w-[100px]">
+                      <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none z-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h2m0-8h10a2 2 0 012 2v6a2 2 0 01-2 2H9m0-8v8" />
+                      </svg>
+                      <select
+                        value={boardTypeFilter}
+                        onChange={(e) => setBoardTypeFilter(e.target.value)}
+                        className={`w-full pl-9 pr-8 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-200 appearance-none cursor-pointer ${
+                          isDark 
+                            ? 'bg-gray-700/50 border-gray-600 text-white hover:bg-gray-700' 
+                            : 'bg-white/80 border-gray-300 text-gray-900 hover:bg-white'
+                        }`}
+                      >
+                        <option value="">{t('rooms.allBoardTypes')}</option>
+                        <option value="Room only">{t('rooms.roomOnly')}</option>
+                        <option value="Bed & breakfast">{t('rooms.bedBreakfast')}</option>
+                        <option value="Half board">{t('rooms.halfBoard')}</option>
+                        <option value="Full board">{t('rooms.fullBoard')}</option>
+                      </select>
+                      <svg className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
+                      </svg>
                     </div>
               
-              </div>
-                {/* Second Row - Price & Date Filters */}
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-                      {/* Purchase Price Range */}
-                      <div className={`rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-300 ${
-                        isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
-                      }`}>
-                        <div className="flex items-center mb-4">
-                          <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
-                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                            </svg>
-                          </div>
-                          <label className={`block text-base font-bold transition-colors duration-300 ${
-                            isDark ? 'text-white' : 'text-slate-800'
-                          }`}>{t('rooms.purchasePriceRange')}</label>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <input
-                            type="number"
-                            value={minPurchasePriceFilter}
-                            onChange={(e) => setMinPurchasePriceFilter(e.target.value)}
-                            className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 text-base font-semibold ${
-                              isDark 
-                                ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white placeholder-gray-400' 
-                                : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900 placeholder-slate-400'
-                            }`}
-                            placeholder={t('common.min')}
-                            min="0"
-                            step="0.01"
-                          />
-                          <input
-                            type="number"
-                            value={maxPurchasePriceFilter}
-                            onChange={(e) => setMaxPurchasePriceFilter(e.target.value)}
-                            className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 text-base font-semibold ${
-                              isDark 
-                                ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white placeholder-gray-400' 
-                                : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900 placeholder-slate-400'
-                            }`}
-                            placeholder={t('common.max')}
-                            min="0"
-                            step="0.01"
-                          />
-                        </div>
+                    {/* Purchase Price Range */}
+                    <div className="relative flex-1 min-w-0 min-w-[120px]">
+                      <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none z-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                      </svg>
+                      <div className="flex gap-1">
+                        <input
+                          type="number"
+                          value={minPurchasePriceFilter}
+                          onChange={(e) => setMinPurchasePriceFilter(e.target.value)}
+                          className={`w-full pl-9 pr-2 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-200 ${
+                            isDark 
+                              ? 'bg-gray-700/50 border-gray-600 text-white placeholder-gray-400' 
+                              : 'bg-white/80 border-gray-300 text-gray-900 placeholder-gray-400'
+                          }`}
+                          placeholder={t('common.min')}
+                          min="0"
+                          step="0.01"
+                        />
+                        <input
+                          type="number"
+                          value={maxPurchasePriceFilter}
+                          onChange={(e) => setMaxPurchasePriceFilter(e.target.value)}
+                          className={`w-full pl-2 pr-2 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-200 ${
+                            isDark 
+                              ? 'bg-gray-700/50 border-gray-600 text-white placeholder-gray-400' 
+                              : 'bg-white/80 border-gray-300 text-gray-900 placeholder-gray-400'
+                          }`}
+                          placeholder={t('common.max')}
+                          min="0"
+                          step="0.01"
+                        />
                       </div>
+                    </div>
 
-                      {/* Base Price Range */}
-                      <div className={`rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-300 ${
-                        isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
-                      }`}>
-                        <div className="flex items-center mb-4">
-                          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
-                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                            </svg>
-                          </div>
-                          <label className={`block text-base font-bold transition-colors duration-300 ${
-                            isDark ? 'text-white' : 'text-slate-800'
-                          }`}>Selling / {t('rooms.basePriceRange')}</label>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <input
-                            type="number"
-                            value={minBasePriceFilter}
-                            onChange={(e) => setMinBasePriceFilter(e.target.value)}
-                            className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-base font-semibold ${
-                              isDark 
-                                ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white placeholder-gray-400' 
-                                : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900 placeholder-slate-400'
-                            }`}
-                            placeholder={t('common.min')}
-                            min="0"
-                            step="0.01"
-                          />
-                          <input
-                            type="number"
-                            value={maxBasePriceFilter}
-                            onChange={(e) => setMaxBasePriceFilter(e.target.value)}
-                            className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-base font-semibold ${
-                              isDark 
-                                ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white placeholder-gray-400' 
-                                : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900 placeholder-slate-400'
-                            }`}
-                            placeholder={t('common.max')}
-                            min="0"
-                            step="0.01"
-                          />
-                        </div>
+                    {/* Base Price Range */}
+                    <div className="relative flex-1 min-w-0 min-w-[120px]">
+                      <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none z-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      </svg>
+                      <div className="flex gap-1">
+                        <input
+                          type="number"
+                          value={minBasePriceFilter}
+                          onChange={(e) => setMinBasePriceFilter(e.target.value)}
+                          className={`w-full pl-9 pr-2 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
+                            isDark 
+                              ? 'bg-gray-700/50 border-gray-600 text-white placeholder-gray-400' 
+                              : 'bg-white/80 border-gray-300 text-gray-900 placeholder-gray-400'
+                          }`}
+                          placeholder={t('common.min')}
+                          min="0"
+                          step="0.01"
+                        />
+                        <input
+                          type="number"
+                          value={maxBasePriceFilter}
+                          onChange={(e) => setMaxBasePriceFilter(e.target.value)}
+                          className={`w-full pl-2 pr-2 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
+                            isDark 
+                              ? 'bg-gray-700/50 border-gray-600 text-white placeholder-gray-400' 
+                              : 'bg-white/80 border-gray-300 text-gray-900 placeholder-gray-400'
+                          }`}
+                          placeholder={t('common.max')}
+                          min="0"
+                          step="0.01"
+                        />
                       </div>
+                    </div>
 
-                      {/* Availability Dates */}
-                      <div className={`rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-300 ${
-                        isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
-                      }`}>
-                        <div className="flex items-center mb-4">
-                          <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
-                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                          </div>
-                          <label className={`block text-base font-bold transition-colors duration-300 ${
-                            isDark ? 'text-white' : 'text-slate-800'
-                          }`}>{t('rooms.availabilityRange')}</label>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <input
-                            type="date"
-                            value={availableFromFilter}
-                            onChange={(e) => setAvailableFromFilter(e.target.value)}
-                            className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 text-base font-semibold ${
-                              isDark 
-                                ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white' 
-                                : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900'
-                            }`}
-                          />
-                          <input
-                            type="date"
-                            value={availableToFilter}
-                            onChange={(e) => setAvailableToFilter(e.target.value)}
-                            className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 text-base font-semibold ${
-                              isDark 
-                                ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white' 
-                                : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900'
-                            }`}
-                          />
-                        </div>
+                    {/* Availability Dates */}
+                    <div className="relative flex-1 min-w-0 min-w-[120px]">
+                      <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none z-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <div className="flex gap-1">
+                        <input
+                          type="date"
+                          value={availableFromFilter}
+                          onChange={(e) => setAvailableFromFilter(e.target.value)}
+                          className={`w-full pl-9 pr-2 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-200 ${
+                            isDark 
+                              ? 'bg-gray-700/50 border-gray-600 text-white' 
+                              : 'bg-white/80 border-gray-300 text-gray-900'
+                          }`}
+                        />
+                        <input
+                          type="date"
+                          value={availableToFilter}
+                          onChange={(e) => setAvailableToFilter(e.target.value)}
+                          className={`w-full pl-2 pr-2 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-200 ${
+                            isDark 
+                              ? 'bg-gray-700/50 border-gray-600 text-white' 
+                              : 'bg-white/80 border-gray-300 text-gray-900'
+                          }`}
+                        />
                       </div>
+                    </div>
 
-                    {/* Room Details Group - Enhanced Layout */}
-                    <div className={`rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-300 ${
-                      isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
-                    }`}>
-                      <div className="flex items-center mb-4">
-                        <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
-                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
-                          </svg>
-                        </div>
-                        <label className={`block text-base font-bold transition-colors duration-300 ${
-                          isDark ? 'text-white' : 'text-slate-800'
-                        }`}>{t('rooms.roomType')}</label>
-                      </div>
+                    {/* Room Type */}
+                    <div className="relative flex-1 min-w-0 min-w-[100px]">
+                      <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none z-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                      </svg>
                       <input
                         type="text"
                         value={typeFilter}
                         onChange={(e) => setTypeFilter(e.target.value)}
-                        className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-300 text-base font-semibold ${
+                        className={`w-full pl-9 pr-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 ${
                           isDark 
-                            ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white placeholder-gray-400' 
-                            : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900 placeholder-slate-400'
+                            ? 'bg-gray-700/50 border-gray-600 text-white placeholder-gray-400' 
+                            : 'bg-white/80 border-gray-300 text-gray-900 placeholder-gray-400'
                         }`}
                         placeholder={t('rooms.searchRoomType')}
                       />
                     </div>
 
                     {/* Quantity Range */}
-                    <div className={`rounded-xl border p-6 shadow-sm hover:shadow-md transition-all duration-300 ${
-                      isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
-                    }`}>
-                      <div className="flex items-center mb-4">
-                        <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center mr-3">
-                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
-                          </svg>
-                        </div>
-                        <label className={`block text-base font-bold transition-colors duration-300 ${
-                          isDark ? 'text-white' : 'text-slate-800'
-                        }`}>{t('rooms.quantityRange')}</label>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
+                    <div className="relative flex-1 min-w-0 min-w-[100px]">
+                      <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none z-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                      </svg>
+                      <div className="flex gap-1">
                         <input
                           type="number"
                           value={minQuantityFilter}
                           onChange={(e) => setMinQuantityFilter(e.target.value)}
-                          className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-300 text-base font-semibold ${
+                          className={`w-full pl-9 pr-2 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 ${
                             isDark 
-                              ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white placeholder-gray-400' 
-                              : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900 placeholder-slate-400'
+                              ? 'bg-gray-700/50 border-gray-600 text-white placeholder-gray-400' 
+                              : 'bg-white/80 border-gray-300 text-gray-900 placeholder-gray-400'
                           }`}
                           placeholder={t('common.min')}
                           min="0"
@@ -1832,10 +1723,10 @@ export default function Room() {
                           type="number"
                           value={maxQuantityFilter}
                           onChange={(e) => setMaxQuantityFilter(e.target.value)}
-                          className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-300 text-base font-semibold ${
+                          className={`w-full pl-2 pr-2 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 ${
                             isDark 
-                              ? 'bg-gray-700 border-gray-600 hover:border-gray-500 text-white placeholder-gray-400' 
-                              : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-900 placeholder-slate-400'
+                              ? 'bg-gray-700/50 border-gray-600 text-white placeholder-gray-400' 
+                              : 'bg-white/80 border-gray-300 text-gray-900 placeholder-gray-400'
                           }`}
                           placeholder={t('common.max')}
                           min="0"
