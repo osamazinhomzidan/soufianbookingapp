@@ -104,7 +104,7 @@ const Navbar = ({ isOpen, onToggle }: NavbarProps) => {
         <div className="flex items-center justify-between h-full px-4 xl:px-6">
           {/* Logo and Brand */}
           <div className={`flex items-center ${isRTL ? 'space-x-reverse' : ''} space-x-2 xl:space-x-3`}>
-            <div className="w-8 h-8 xl:w-10 xl:h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center shadow-md">
+            <div className="w-8 h-8 xl:w-10 xl:h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center ">
               <span className="text-white font-bold text-sm xl:text-lg">H</span>
             </div>
             <span className={`text-lg xl:text-xl font-bold ${isDark ? 'text-white' : 'text-gray-800'} ${textAlignClass} tracking-wide hidden sm:block`}>HotelOS</span>
