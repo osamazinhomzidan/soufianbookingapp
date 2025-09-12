@@ -850,15 +850,43 @@ export default function Hotel() {
         
           {/* Search and Filter Section */}
           <div className="flex-shrink-0">
-            {/* Enhanced Modern Filter Section */}
-            <div >
-
-               
-               {/* Primary Filter Row */}
-               <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4 gap-1.5 sm:gap-2 md:gap-3 mb-3 sm:mb-4`}>
+            {/* Single Row Filter Section */}
+            <div className="mb-4">
+               {/* All Filters in Single Horizontal Row */}
+               <div className={`flex flex-wrap items-center gap-2 ${
+                 screenWidth < 640 
+                   ? 'gap-1.5' 
+                   : screenWidth < 768
+                   ? 'gap-2'
+                   : screenWidth < 1024
+                   ? 'gap-2.5'
+                   : screenWidth < 1366
+                   ? 'gap-3'
+                   : screenWidth < 1920
+                   ? 'gap-3.5'
+                   : 'gap-4'
+               }`}>
                 {/* Name Filter */}
-                 <div className="relative">
-                   <svg className={`absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 pointer-events-none z-10 ${
+                 <div className={`relative flex-1 min-w-0 ${
+                   screenWidth < 640 
+                     ? 'min-w-[120px]' 
+                     : screenWidth < 768
+                     ? 'min-w-[140px]'
+                     : screenWidth < 1024
+                     ? 'min-w-[160px]'
+                     : screenWidth < 1366
+                     ? 'min-w-[180px]'
+                     : 'min-w-[200px]'
+                 }`}>
+                   <svg className={`absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 ${
+                     screenWidth < 640 
+                       ? 'w-3 h-3' 
+                       : screenWidth < 768
+                       ? 'w-3.5 h-3.5'
+                       : screenWidth < 1024
+                       ? 'w-4 h-4'
+                       : 'w-4 h-4'
+                   } pointer-events-none z-10 ${
                      isDark ? 'text-gray-400' : 'text-slate-400'
                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -867,18 +895,44 @@ export default function Hotel() {
                      type="text"
                      value={nameFilter}
                      onChange={(e) => setNameFilter(e.target.value)}
-                     className={`w-full pl-8 sm:pl-10 pr-2 sm:pr-3 py-1.5 sm:py-2 border rounded-md focus:outline-none focus:border-blue-500 text-xs sm:text-sm transition-all duration-200 ${
+                     className={`w-full ${
+                       screenWidth < 640 
+                         ? 'pl-7 pr-2 py-1.5 text-xs' 
+                         : screenWidth < 768
+                         ? 'pl-8 pr-2 py-1.5 text-xs'
+                         : screenWidth < 1024
+                         ? 'pl-9 pr-3 py-2 text-sm'
+                         : 'pl-10 pr-3 py-2 text-sm'
+                     } border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
                        isDark 
-                         ? 'bg-gray-700 border-gray-600 placeholder-gray-400 text-white' 
-                         : 'bg-white border-gray-300 placeholder-gray-500 text-gray-900'
+                         ? 'bg-gray-700/50 border-gray-600 placeholder-gray-400 text-white hover:bg-gray-700' 
+                         : 'bg-white/80 border-gray-300 placeholder-gray-500 text-gray-900 hover:bg-white'
                      }`}
                      placeholder={t('hotels.searchByName')}
                    />
                  </div>
 
                 {/* Code Filter */}
-                 <div className="relative">
-                   <svg className={`absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 pointer-events-none z-10 ${
+                 <div className={`relative flex-1 min-w-0 ${
+                   screenWidth < 640 
+                     ? 'min-w-[100px]' 
+                     : screenWidth < 768
+                     ? 'min-w-[120px]'
+                     : screenWidth < 1024
+                     ? 'min-w-[140px]'
+                     : screenWidth < 1366
+                     ? 'min-w-[160px]'
+                     : 'min-w-[180px]'
+                 }`}>
+                   <svg className={`absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 ${
+                     screenWidth < 640 
+                       ? 'w-3 h-3' 
+                       : screenWidth < 768
+                       ? 'w-3.5 h-3.5'
+                       : screenWidth < 1024
+                       ? 'w-4 h-4'
+                       : 'w-4 h-4'
+                   } pointer-events-none z-10 ${
                      isDark ? 'text-gray-400' : 'text-slate-400'
                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
@@ -887,18 +941,44 @@ export default function Hotel() {
                      type="text"
                      value={codeFilter}
                      onChange={(e) => setCodeFilter(e.target.value)}
-                     className={`w-full pl-8 sm:pl-10 pr-2 sm:pr-3 py-1.5 sm:py-2 border rounded-md focus:outline-none focus:border-blue-500 text-xs sm:text-sm transition-all duration-200 ${
+                     className={`w-full ${
+                       screenWidth < 640 
+                         ? 'pl-7 pr-2 py-1.5 text-xs' 
+                         : screenWidth < 768
+                         ? 'pl-8 pr-2 py-1.5 text-xs'
+                         : screenWidth < 1024
+                         ? 'pl-9 pr-3 py-2 text-sm'
+                         : 'pl-10 pr-3 py-2 text-sm'
+                     } border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
                        isDark 
-                         ? 'bg-gray-700 border-gray-600 placeholder-gray-400 text-white' 
-                         : 'bg-white border-gray-300 placeholder-gray-500 text-gray-900'
+                         ? 'bg-gray-700/50 border-gray-600 placeholder-gray-400 text-white hover:bg-gray-700' 
+                         : 'bg-white/80 border-gray-300 placeholder-gray-500 text-gray-900 hover:bg-white'
                      }`}
                      placeholder={t('hotels.searchByCode')}
                    />
                  </div>
 
                 {/* Location Filter */}
-                 <div className="relative">
-                   <svg className={`absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 pointer-events-none z-10 ${
+                 <div className={`relative flex-1 min-w-0 ${
+                   screenWidth < 640 
+                     ? 'min-w-[110px]' 
+                     : screenWidth < 768
+                     ? 'min-w-[130px]'
+                     : screenWidth < 1024
+                     ? 'min-w-[150px]'
+                     : screenWidth < 1366
+                     ? 'min-w-[170px]'
+                     : 'min-w-[190px]'
+                 }`}>
+                   <svg className={`absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 ${
+                     screenWidth < 640 
+                       ? 'w-3 h-3' 
+                       : screenWidth < 768
+                       ? 'w-3.5 h-3.5'
+                       : screenWidth < 1024
+                       ? 'w-4 h-4'
+                       : 'w-4 h-4'
+                   } pointer-events-none z-10 ${
                      isDark ? 'text-gray-400' : 'text-slate-400'
                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -908,18 +988,44 @@ export default function Hotel() {
                      type="text"
                      value={locationFilter}
                      onChange={(e) => setLocationFilter(e.target.value)}
-                     className={`w-full pl-8 sm:pl-10 pr-2 sm:pr-3 py-1.5 sm:py-2 border rounded-md focus:outline-none focus:border-blue-500 text-xs sm:text-sm transition-all duration-200 ${
+                     className={`w-full ${
+                       screenWidth < 640 
+                         ? 'pl-7 pr-2 py-1.5 text-xs' 
+                         : screenWidth < 768
+                         ? 'pl-8 pr-2 py-1.5 text-xs'
+                         : screenWidth < 1024
+                         ? 'pl-9 pr-3 py-2 text-sm'
+                         : 'pl-10 pr-3 py-2 text-sm'
+                     } border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
                        isDark 
-                         ? 'bg-gray-700 border-gray-600 placeholder-gray-400 text-white' 
-                         : 'bg-white border-gray-300 placeholder-gray-500 text-gray-900'
+                         ? 'bg-gray-700/50 border-gray-600 placeholder-gray-400 text-white hover:bg-gray-700' 
+                         : 'bg-white/80 border-gray-300 placeholder-gray-500 text-gray-900 hover:bg-white'
                      }`}
                      placeholder={t('hotels.searchByLocation')}
                    />
                  </div>
 
                 {/* Address Filter */}
-                 <div className="relative">
-                   <svg className={`absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 pointer-events-none z-10 ${
+                 <div className={`relative flex-1 min-w-0 ${
+                   screenWidth < 640 
+                     ? 'min-w-[110px]' 
+                     : screenWidth < 768
+                     ? 'min-w-[130px]'
+                     : screenWidth < 1024
+                     ? 'min-w-[150px]'
+                     : screenWidth < 1366
+                     ? 'min-w-[170px]'
+                     : 'min-w-[190px]'
+                 }`}>
+                   <svg className={`absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 ${
+                     screenWidth < 640 
+                       ? 'w-3 h-3' 
+                       : screenWidth < 768
+                       ? 'w-3.5 h-3.5'
+                       : screenWidth < 1024
+                       ? 'w-4 h-4'
+                       : 'w-4 h-4'
+                   } pointer-events-none z-10 ${
                      isDark ? 'text-gray-400' : 'text-slate-400'
                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -928,129 +1034,259 @@ export default function Hotel() {
                      type="text"
                      value={addressFilter}
                      onChange={(e) => setAddressFilter(e.target.value)}
-                     className={`w-full pl-8 sm:pl-10 pr-2 sm:pr-3 py-1.5 sm:py-2 border rounded-md focus:outline-none focus:border-blue-500 text-xs sm:text-sm transition-all duration-200 ${
+                     className={`w-full ${
+                       screenWidth < 640 
+                         ? 'pl-7 pr-2 py-1.5 text-xs' 
+                         : screenWidth < 768
+                         ? 'pl-8 pr-2 py-1.5 text-xs'
+                         : screenWidth < 1024
+                         ? 'pl-9 pr-3 py-2 text-sm'
+                         : 'pl-10 pr-3 py-2 text-sm'
+                     } border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
                        isDark 
-                         ? 'bg-gray-700 border-gray-600 placeholder-gray-400 text-white' 
-                         : 'bg-white border-gray-300 placeholder-gray-500 text-gray-900'
+                         ? 'bg-gray-700/50 border-gray-600 placeholder-gray-400 text-white hover:bg-gray-700' 
+                         : 'bg-white/80 border-gray-300 placeholder-gray-500 text-gray-900 hover:bg-white'
                      }`}
                      placeholder="Search by address"
                    />
                  </div>
+                {/* Rooms Filter */}
+                 <div className={`relative flex-1 min-w-0 ${
+                   screenWidth < 640 
+                     ? 'min-w-[100px]' 
+                     : screenWidth < 768
+                     ? 'min-w-[120px]'
+                     : screenWidth < 1024
+                     ? 'min-w-[140px]'
+                     : screenWidth < 1366
+                     ? 'min-w-[160px]'
+                     : 'min-w-[180px]'
+                 }`}>
+                   <svg className={`absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 ${
+                     screenWidth < 640 
+                       ? 'w-3 h-3' 
+                       : screenWidth < 768
+                       ? 'w-3.5 h-3.5'
+                       : screenWidth < 1024
+                       ? 'w-4 h-4'
+                       : 'w-4 h-4'
+                   } pointer-events-none z-10 ${
+                     isDark ? 'text-gray-400' : 'text-slate-400'
+                   }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                   </svg>
+                   <select
+                     value={hasRoomsFilter}
+                     onChange={(e) => setHasRoomsFilter(e.target.value)}
+                     className={`w-full ${
+                       screenWidth < 640 
+                         ? 'pl-7 pr-6 py-1.5 text-xs' 
+                         : screenWidth < 768
+                         ? 'pl-8 pr-7 py-1.5 text-xs'
+                         : screenWidth < 1024
+                         ? 'pl-9 pr-8 py-2 text-sm'
+                         : 'pl-10 pr-9 py-2 text-sm'
+                     } border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer ${
+                       isDark 
+                         ? 'bg-gray-700/50 border-gray-600 text-white hover:bg-gray-700' 
+                         : 'bg-white/80 border-gray-300 text-gray-900 hover:bg-white'
+                     }`}
+                   >
+                     <option value="">{t('hotels.allHotels')}</option>
+                     <option value="true">{t('hotels.hotelsWithRooms')}</option>
+                     <option value="false">{t('hotels.hotelsWithoutRooms')}</option>
+                   </select>
+                   <svg className={`absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 ${
+                     screenWidth < 640 
+                       ? 'w-3 h-3' 
+                       : screenWidth < 768
+                       ? 'w-3 h-3'
+                       : screenWidth < 1024
+                       ? 'w-4 h-4'
+                       : 'w-4 h-4'
+                   } pointer-events-none ${
+                     isDark ? 'text-gray-400' : 'text-slate-400'
+                   }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
+                   </svg>
+                 </div>
+
+                {/* Room Count Filters */}
+                {hasRoomsFilter !== 'false' && (
+                  <>
+                    <div className={`relative flex-1 min-w-0 ${
+                      screenWidth < 640 
+                        ? 'min-w-[80px]' 
+                        : screenWidth < 768
+                        ? 'min-w-[90px]'
+                        : screenWidth < 1024
+                        ? 'min-w-[100px]'
+                        : screenWidth < 1366
+                        ? 'min-w-[110px]'
+                        : 'min-w-[120px]'
+                    }`}>
+                      <input
+                        type="number"
+                        min="0"
+                        value={minRoomCountFilter}
+                        onChange={(e) => setMinRoomCountFilter(e.target.value)}
+                        className={`w-full ${
+                          screenWidth < 640 
+                            ? 'px-2 py-1.5 text-xs' 
+                            : screenWidth < 768
+                            ? 'px-2 py-1.5 text-xs'
+                            : screenWidth < 1024
+                            ? 'px-3 py-2 text-sm'
+                            : 'px-3 py-2 text-sm'
+                        } border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
+                          isDark 
+                            ? 'bg-gray-700/50 border-gray-600 placeholder-gray-400 text-white hover:bg-gray-700' 
+                            : 'bg-white/80 border-gray-300 placeholder-gray-500 text-gray-900 hover:bg-white'
+                        }`}
+                        placeholder="Min rooms"
+                      />
+                    </div>
+                    <div className={`relative flex-1 min-w-0 ${
+                      screenWidth < 640 
+                        ? 'min-w-[80px]' 
+                        : screenWidth < 768
+                        ? 'min-w-[90px]'
+                        : screenWidth < 1024
+                        ? 'min-w-[100px]'
+                        : screenWidth < 1366
+                        ? 'min-w-[110px]'
+                        : 'min-w-[120px]'
+                    }`}>
+                      <input
+                        type="number"
+                        min="0"
+                        value={maxRoomCountFilter}
+                        onChange={(e) => setMaxRoomCountFilter(e.target.value)}
+                        className={`w-full ${
+                          screenWidth < 640 
+                            ? 'px-2 py-1.5 text-xs' 
+                            : screenWidth < 768
+                            ? 'px-2 py-1.5 text-xs'
+                            : screenWidth < 1024
+                            ? 'px-3 py-2 text-sm'
+                            : 'px-3 py-2 text-sm'
+                        } border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
+                          isDark 
+                            ? 'bg-gray-700/50 border-gray-600 placeholder-gray-400 text-white hover:bg-gray-700' 
+                            : 'bg-white/80 border-gray-300 placeholder-gray-500 text-gray-900 hover:bg-white'
+                        }`}
+                        placeholder="Max rooms"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* Files Filter */}
+                 <div className={`relative flex-1 min-w-0 ${
+                   screenWidth < 640 
+                     ? 'min-w-[100px]' 
+                     : screenWidth < 768
+                     ? 'min-w-[120px]'
+                     : screenWidth < 1024
+                     ? 'min-w-[140px]'
+                     : screenWidth < 1366
+                     ? 'min-w-[160px]'
+                     : 'min-w-[180px]'
+                 }`}>
+                   <svg className={`absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 ${
+                     screenWidth < 640 
+                       ? 'w-3 h-3' 
+                       : screenWidth < 768
+                       ? 'w-3.5 h-3.5'
+                       : screenWidth < 1024
+                       ? 'w-4 h-4'
+                       : 'w-4 h-4'
+                   } pointer-events-none z-10 ${
+                     isDark ? 'text-gray-400' : 'text-slate-400'
+                   }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                   </svg>
+                   <select
+                     value={hasFilesFilter}
+                     onChange={(e) => setHasFilesFilter(e.target.value)}
+                     className={`w-full ${
+                       screenWidth < 640 
+                         ? 'pl-7 pr-6 py-1.5 text-xs' 
+                         : screenWidth < 768
+                         ? 'pl-8 pr-7 py-1.5 text-xs'
+                         : screenWidth < 1024
+                         ? 'pl-9 pr-8 py-2 text-sm'
+                         : 'pl-10 pr-9 py-2 text-sm'
+                     } border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer ${
+                       isDark 
+                         ? 'bg-gray-700/50 border-gray-600 text-white hover:bg-gray-700' 
+                         : 'bg-white/80 border-gray-300 text-gray-900 hover:bg-white'
+                     }`}
+                   >
+                     <option value="">All Hotels</option>
+                     <option value="true">Hotels with Files</option>
+                     <option value="false">Hotels without Files</option>
+                   </select>
+                   <svg className={`absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 ${
+                     screenWidth < 640 
+                       ? 'w-3 h-3' 
+                       : screenWidth < 768
+                       ? 'w-3 h-3'
+                       : screenWidth < 1024
+                       ? 'w-4 h-4'
+                       : 'w-4 h-4'
+                   } pointer-events-none ${
+                     isDark ? 'text-gray-400' : 'text-slate-400'
+                   }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
+                   </svg>
+                 </div>
+
+                {/* Clear Filters Icon Button */}
+                 <div className="flex-shrink-0">
+                   <button
+                     type="button"
+                     onClick={() => {
+                       setNameFilter('');
+                       setCodeFilter('');
+                       setLocationFilter('');
+                       setAddressFilter('');
+                       setHasFilesFilter('');
+                       setGeneralSearch('');
+                       setHasRoomsFilter('');
+                       setMinRoomCountFilter('');
+                       setMaxRoomCountFilter('');
+                     }}
+                     className={`${
+                       screenWidth < 640 
+                         ? 'p-1.5' 
+                         : screenWidth < 768
+                         ? 'p-2'
+                         : screenWidth < 1024
+                         ? 'p-2'
+                         : 'p-2.5'
+                     } rounded-lg transition-all duration-200 flex items-center justify-center group hover:scale-105 ${
+                       isDark
+                         ? 'bg-red-600/80 hover:bg-red-600 text-white border border-red-500/50 hover:border-red-400'
+                         : 'bg-red-500/90 hover:bg-red-500 text-white border border-red-400/50 hover:border-red-300 shadow-sm hover:shadow-md'
+                     }`}
+                     title="Clear All Filters"
+                   >
+                     <svg className={`${
+                        screenWidth < 640 
+                          ? 'w-3.5 h-3.5' 
+                          : screenWidth < 768
+                          ? 'w-4 h-4'
+                          : screenWidth < 1024
+                          ? 'w-4 h-4'
+                          : 'w-5 h-5'
+                      } transition-transform duration-200 group-hover:rotate-180`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                   </button>
+                 </div>
                </div>
-               
-               {/* Secondary Filter Section */}
-               <div className="mb-3 sm:mb-4">
-                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-6 gap-1.5 sm:gap-2 md:gap-3">
-                     {/* Rooms Filter */}
-                     <div className="relative">
-                       <svg className={`absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 pointer-events-none z-10 ${
-                         isDark ? 'text-gray-400' : 'text-slate-400'
-                       }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                       </svg>
-                       <select
-                         value={hasRoomsFilter}
-                         onChange={(e) => setHasRoomsFilter(e.target.value)}
-                         className={`w-full pl-8 sm:pl-10 pr-6 sm:pr-8 py-1.5 sm:py-2 border rounded-md focus:outline-none focus:border-blue-500 text-xs sm:text-sm cursor-pointer appearance-none transition-all duration-200 ${
-                           isDark 
-                             ? 'bg-gray-700 border-gray-600 text-white' 
-                             : 'bg-white border-gray-300 text-gray-900'
-                         }`}
-                       >
-                         <option value="">{t('hotels.allHotels')}</option>
-                         <option value="true">{t('hotels.hotelsWithRooms')}</option>
-                         <option value="false">{t('hotels.hotelsWithoutRooms')}</option>
-                       </select>
-                       <svg className={`absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 pointer-events-none ${
-                         isDark ? 'text-gray-400' : 'text-slate-400'
-                       }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
-                       </svg>
-                     </div>
-
-                      {/* Room Count Filters */}
-                      {hasRoomsFilter !== 'false' && (
-                        <>
-                          <input
-                            type="number"
-                            min="0"
-                            value={minRoomCountFilter}
-                            onChange={(e) => setMinRoomCountFilter(e.target.value)}
-                            className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 border rounded-md focus:outline-none focus:border-blue-500 text-xs sm:text-sm transition-all duration-200 ${
-                              isDark 
-                                ? 'bg-gray-700 border-gray-600 placeholder-gray-400 text-white' 
-                                : 'bg-white border-gray-300 placeholder-gray-500 text-gray-900'
-                            }`}
-                            placeholder="Min rooms"
-                          />
-                          <input
-                            type="number"
-                            min="0"
-                            value={maxRoomCountFilter}
-                            onChange={(e) => setMaxRoomCountFilter(e.target.value)}
-                            className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 border rounded-md focus:outline-none focus:border-blue-500 text-xs sm:text-sm transition-all duration-200 ${
-                              isDark 
-                                ? 'bg-gray-700 border-gray-600 placeholder-gray-400 text-white' 
-                                : 'bg-white border-gray-300 placeholder-gray-500 text-gray-900'
-                            }`}
-                            placeholder="Max rooms"
-                          />
-                        </>
-                      )}
-
-                      {/* Files Filter */}
-                      <div className="relative">
-                        <svg className={`absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 pointer-events-none ${
-                          isDark ? 'text-gray-400' : 'text-slate-400'
-                        }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <select
-                          value={hasFilesFilter}
-                          onChange={(e) => setHasFilesFilter(e.target.value)}
-                          className={`w-full pl-8 sm:pl-10 pr-6 sm:pr-8 py-1.5 sm:py-2 border rounded-md focus:outline-none focus:border-blue-500 text-xs sm:text-sm cursor-pointer appearance-none transition-all duration-200 ${
-                            isDark 
-                              ? 'bg-gray-700 border-gray-600 text-white' 
-                              : 'bg-white border-gray-300 text-gray-900'
-                          }`}
-                        >
-                          <option value="">All Hotels</option>
-                          <option value="true">Hotels with Files</option>
-                          <option value="false">Hotels without Files</option>
-                        </select>
-                        <svg className={`absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 pointer-events-none ${
-                          isDark ? 'text-gray-400' : 'text-slate-400'
-                        }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
-                
-                      {/* Clear Filters Button */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setNameFilter('');
-                          setCodeFilter('');
-                          setLocationFilter('');
-                          setAddressFilter('');
-                          setHasFilesFilter('');
-                          setGeneralSearch('');
-                          setHasRoomsFilter('');
-                          setMinRoomCountFilter('');
-                          setMaxRoomCountFilter('');
-                        }}
-                        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-md flex items-center justify-center ${
-                          isDark
-                            ? 'bg-gray-700 border-gray-600 text-gray-400 hover:text-gray-300'
-                            : 'bg-white border-gray-300 text-gray-500 hover:text-gray-700'
-                        } border`}
-                        title="Clear All Filters"
-                      >
-                        <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                      </button>
-              </div>
+            </div>
 
                     {/* Selected Hotels Actions */}
                     {selectedHotels.length > 0 && (
@@ -2006,7 +2242,7 @@ export default function Hotel() {
           
         </div>
 
-        </div></div></div></div>
+        </div></div>
       
     </ProtectedRoute>
   );
