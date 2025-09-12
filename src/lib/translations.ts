@@ -21,7 +21,6 @@ export interface Translations {
     hotelsManagement: string;
     roomsManagement: string;
     createReservation: string;
-    allReservations: string;
     allGuests: string;
     security: string;
     logout: string;
@@ -579,16 +578,15 @@ const en: Translations = {
     logo: 'Hotel Management System',
     hotelsManagement: 'Hotels',
     roomsManagement: 'Rooms',
-    createReservation: 'Create Reservation',
-    allReservations: 'Reservations',
-    allGuests: 'Guests',
+    createReservation: 'Reservation',
+    allGuests: 'All Guests',
     security: 'Security',
     logout: 'Logout',
     loggingOut: 'Logging out...',
-    languageToggle: 'Language',
+    languageToggle: 'Toggle Language',
     english: 'English',
     arabic: 'العربية',
-    themeToggle: 'Theme',
+    themeToggle: 'Toggle Theme',
     lightMode: 'Light Mode',
     darkMode: 'Dark Mode',
   },
@@ -873,7 +871,7 @@ const en: Translations = {
     hotelsWithRooms: 'Hotels with Rooms',
     hotelsWithoutRooms: 'Hotels without Rooms',
     roomCount: 'Rooms',
-    agreementCount: 'Agreements',
+    agreementCount: 'Files',
     clearFilters: 'Clear Filters',
     minimumRoomCount: 'Minimum Room Count',
     enterMinimumRooms: 'Enter minimum number of rooms',
@@ -1186,8 +1184,7 @@ const ar: Translations = {
     logo: 'نظام إدارة الفنادق',
     hotelsManagement: 'الفنادق',
     roomsManagement: 'الغرف',
-    createReservation: 'إنشاء حجز',
-    allReservations: 'الحجوزات',
+    createReservation: 'الحجوزات',
     allGuests: 'النزلاء',
     security: 'الأمان',
     logout: 'تسجيل الخروج',
@@ -1480,7 +1477,7 @@ const ar: Translations = {
     hotelsWithRooms: 'الفنادق التي بها غرف',
     hotelsWithoutRooms: 'الفنادق بدون غرف',
     roomCount: 'الغرف',
-    agreementCount: 'الاتفاقيات',
+    agreementCount: 'الملفات',
     clearFilters: 'مسح التصفية',
     minimumRoomCount: 'الحد الأدنى لعدد الغرف',
     enterMinimumRooms: 'أدخل الحد الأدنى لعدد الغرف',

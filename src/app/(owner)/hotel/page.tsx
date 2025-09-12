@@ -460,14 +460,367 @@ export default function Hotel() {
   };
 
   const handlePrint = () => {
-    console.log('Print hotels list');
-    // Handle print logic
+    if (!selectedHotelDetails) {
+      console.log('No hotel selected for printing');
+      return;
+    }
+
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    if (!printWindow) {
+      alert('Please allow popups to print hotel details');
+      return;
+    }
+
+    // Generate print content
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Hotel Details - ${selectedHotelDetails.name}</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 20px;
+              color: #333;
+            }
+            .header {
+              text-align: center;
+              border-bottom: 2px solid #333;
+              padding-bottom: 10px;
+              margin-bottom: 20px;
+            }
+            .hotel-title {
+              font-size: 24px;
+              font-weight: bold;
+              margin: 0;
+            }
+            .hotel-code {
+              font-size: 16px;
+              color: #666;
+              margin: 5px 0;
+            }
+            .section {
+              margin-bottom: 20px;
+            }
+            .section-title {
+              font-size: 18px;
+              font-weight: bold;
+              border-bottom: 1px solid #ccc;
+              padding-bottom: 5px;
+              margin-bottom: 10px;
+            }
+            .info-grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 15px;
+              margin-bottom: 15px;
+            }
+            .info-item {
+              margin-bottom: 10px;
+            }
+            .info-label {
+              font-weight: bold;
+              color: #555;
+            }
+            .info-value {
+              margin-top: 2px;
+            }
+            .description {
+              background-color: #f9f9f9;
+              padding: 10px;
+              border-radius: 5px;
+              margin: 10px 0;
+            }
+            .agreements {
+              margin-top: 20px;
+            }
+            .agreement-item {
+              background-color: #f5f5f5;
+              padding: 10px;
+              margin: 5px 0;
+              border-radius: 5px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+            .agreement-info {
+              flex: 1;
+            }
+            .agreement-name {
+              font-weight: bold;
+            }
+            .agreement-details {
+              font-size: 12px;
+              color: #666;
+            }
+            .footer {
+              margin-top: 30px;
+              text-align: center;
+              font-size: 12px;
+              color: #666;
+              border-top: 1px solid #ccc;
+              padding-top: 10px;
+            }
+            @media print {
+              body { margin: 0; }
+              .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1 class="hotel-title">${selectedHotelDetails.name}</h1>
+            <p class="hotel-code">Code: ${selectedHotelDetails.code}</p>
+          </div>
+
+          <div class="section">
+            <h2 class="section-title">Basic Information</h2>
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">Hotel Name:</div>
+                <div class="info-value">${selectedHotelDetails.name}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Hotel Code:</div>
+                <div class="info-value">${selectedHotelDetails.code}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Alternative Name:</div>
+                <div class="info-value">${selectedHotelDetails.altName || 'N/A'}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Room Count:</div>
+                <div class="info-value">${selectedHotelDetails.roomCount || 0} rooms</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Address:</div>
+                <div class="info-value">${selectedHotelDetails.address || 'N/A'}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Location:</div>
+                <div class="info-value">${selectedHotelDetails.location || 'N/A'}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Created Date:</div>
+                <div class="info-value">${new Date(selectedHotelDetails.createdAt).toLocaleDateString()}</div>
+              </div>
+              ${selectedHotelDetails.createdBy ? `
+              <div class="info-item">
+                <div class="info-label">Created By:</div>
+                <div class="info-value">${selectedHotelDetails.createdBy.firstName && selectedHotelDetails.createdBy.lastName 
+                  ? `${selectedHotelDetails.createdBy.firstName} ${selectedHotelDetails.createdBy.lastName}` 
+                  : selectedHotelDetails.createdBy.username}</div>
+              </div>
+              ` : ''}
+            </div>
+          </div>
+
+          ${(selectedHotelDetails.description || selectedHotelDetails.altDescription) ? `
+          <div class="section">
+            <h2 class="section-title">Description</h2>
+            ${selectedHotelDetails.description ? `
+            <div class="description">
+              <div class="info-label">Description:</div>
+              <div>${selectedHotelDetails.description}</div>
+            </div>
+            ` : ''}
+            ${selectedHotelDetails.altDescription ? `
+            <div class="description">
+              <div class="info-label">Alternative Description:</div>
+              <div>${selectedHotelDetails.altDescription}</div>
+            </div>
+            ` : ''}
+          </div>
+          ` : ''}
+
+          <div class="section">
+            <h2 class="section-title">Agreement Files</h2>
+            <div class="agreements">
+              ${selectedHotelDetails.agreements && selectedHotelDetails.agreements.length > 0 ? 
+                selectedHotelDetails.agreements.map(agreement => `
+                <div class="agreement-item">
+                  <div class="agreement-info">
+                    <div class="agreement-name">${agreement.fileName}</div>
+                    <div class="agreement-details">
+                      ${(agreement.fileSize / 1024).toFixed(1)} KB • Uploaded: ${new Date(agreement.uploadedAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+                `).join('') : 
+                '<p>No agreement files uploaded</p>'
+              }
+            </div>
+          </div>
+
+          <div class="footer">
+            <p>Printed on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    // Write content to print window
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+
+    // Wait for content to load then print
+    printWindow.onload = () => {
+      printWindow.print();
+      printWindow.close();
+    };
   };
 
   const handlePrintSelected = () => {
-    const selectedHotelData = hotels.filter(hotel => selectedHotels.includes(hotel.id));
-    console.log('Print selected hotels:', selectedHotelData);
-    // Handle print selected logic
+    if (selectedHotels.length === 0) {
+      alert('Please select hotels to print');
+      return;
+    }
+
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    if (!printWindow) {
+      alert('Please allow popups to print selected hotels');
+      return;
+    }
+
+    // Generate print content for selected hotels
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Selected Hotels List</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 20px;
+              color: #333;
+            }
+            .header {
+              text-align: center;
+              border-bottom: 2px solid #333;
+              padding-bottom: 10px;
+              margin-bottom: 20px;
+            }
+            .title {
+              font-size: 24px;
+              font-weight: bold;
+              margin: 0;
+            }
+            .subtitle {
+              font-size: 16px;
+              color: #666;
+              margin: 5px 0;
+            }
+            .hotel-item {
+              border: 1px solid #ddd;
+              border-radius: 8px;
+              padding: 15px;
+              margin-bottom: 15px;
+              background-color: #f9f9f9;
+            }
+            .hotel-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 10px;
+            }
+            .hotel-name {
+              font-size: 18px;
+              font-weight: bold;
+              color: #333;
+            }
+            .hotel-code {
+              font-size: 14px;
+              color: #666;
+              background-color: #e9ecef;
+              padding: 2px 8px;
+              border-radius: 4px;
+            }
+            .hotel-details {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 10px;
+              margin-top: 10px;
+            }
+            .detail-item {
+              font-size: 14px;
+            }
+            .detail-label {
+              font-weight: bold;
+              color: #555;
+            }
+            .footer {
+              margin-top: 30px;
+              text-align: center;
+              font-size: 12px;
+              color: #666;
+              border-top: 1px solid #ccc;
+              padding-top: 10px;
+            }
+            @media print {
+              body { margin: 0; }
+              .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1 class="title">Selected Hotels List</h1>
+            <p class="subtitle">${selectedHotels.length} hotel(s) selected</p>
+          </div>
+
+          <div class="hotels-list">
+            ${selectedHotels.map(hotelId => {
+              const hotel = hotels.find(h => h.id === hotelId);
+              if (!hotel) return '';
+              return `
+                <div class="hotel-item">
+                  <div class="hotel-header">
+                    <div class="hotel-name">${hotel.name}</div>
+                    <div class="hotel-code">${hotel.code}</div>
+                  </div>
+                  <div class="hotel-details">
+                    <div class="detail-item">
+                      <span class="detail-label">Alternative Name:</span> ${hotel.altName || 'N/A'}
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Room Count:</span> ${hotel.roomCount || 0} rooms
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Address:</span> ${hotel.address || 'N/A'}
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Location:</span> ${hotel.location || 'N/A'}
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Files:</span> ${hotel.agreementCount || 0} file(s)
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Created:</span> ${new Date(hotel.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <div class="footer">
+            <p>Printed on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    // Write content to print window
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+
+    // Wait for content to load then print
+    printWindow.onload = () => {
+      printWindow.print();
+      printWindow.close();
+    };
   };
 
   const handleDeleteAll = () => {
@@ -477,8 +830,151 @@ export default function Hotel() {
   };
 
   const handlePrintAll = () => {
-    console.log('Print all hotels:', hotels);
-    // Handle print all logic
+    if (hotels.length === 0) {
+      alert('No hotels available to print');
+      return;
+    }
+
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    if (!printWindow) {
+      alert('Please allow popups to print all hotels');
+      return;
+    }
+
+    // Generate print content for all hotels
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>All Hotels List</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 20px;
+              color: #333;
+            }
+            .header {
+              text-align: center;
+              border-bottom: 2px solid #333;
+              padding-bottom: 10px;
+              margin-bottom: 20px;
+            }
+            .title {
+              font-size: 24px;
+              font-weight: bold;
+              margin: 0;
+            }
+            .subtitle {
+              font-size: 16px;
+              color: #666;
+              margin: 5px 0;
+            }
+            .hotel-item {
+              border: 1px solid #ddd;
+              border-radius: 8px;
+              padding: 15px;
+              margin-bottom: 15px;
+              background-color: #f9f9f9;
+            }
+            .hotel-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 10px;
+            }
+            .hotel-name {
+              font-size: 18px;
+              font-weight: bold;
+              color: #333;
+            }
+            .hotel-code {
+              font-size: 14px;
+              color: #666;
+              background-color: #e9ecef;
+              padding: 2px 8px;
+              border-radius: 4px;
+            }
+            .hotel-details {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 10px;
+              margin-top: 10px;
+            }
+            .detail-item {
+              font-size: 14px;
+            }
+            .detail-label {
+              font-weight: bold;
+              color: #555;
+            }
+            .footer {
+              margin-top: 30px;
+              text-align: center;
+              font-size: 12px;
+              color: #666;
+              border-top: 1px solid #ccc;
+              padding-top: 10px;
+            }
+            @media print {
+              body { margin: 0; }
+              .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1 class="title">All Hotels List</h1>
+            <p class="subtitle">Total: ${hotels.length} hotel(s)</p>
+          </div>
+
+          <div class="hotels-list">
+            ${hotels.map(hotel => `
+              <div class="hotel-item">
+                <div class="hotel-header">
+                  <div class="hotel-name">${hotel.name}</div>
+                  <div class="hotel-code">${hotel.code}</div>
+                </div>
+                <div class="hotel-details">
+                  <div class="detail-item">
+                    <span class="detail-label">Alternative Name:</span> ${hotel.altName || 'N/A'}
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Room Count:</span> ${hotel.roomCount || 0} rooms
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Address:</span> ${hotel.address || 'N/A'}
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Location:</span> ${hotel.location || 'N/A'}
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Files:</span> ${hotel.agreementCount || 0} file(s)
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Created:</span> ${new Date(hotel.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="footer">
+            <p>Printed on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    // Write content to print window
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+
+    // Wait for content to load then print
+    printWindow.onload = () => {
+      printWindow.print();
+      printWindow.close();
+    };
   };
 
   const handleExit = () => {
@@ -845,7 +1341,7 @@ export default function Hotel() {
               <div className={`border rounded-lg p-3 sm:p-4 h-full flex flex-col ${
                 isDark 
                   ? 'bg-gray-800 border-gray-700' 
-                  : 'bg-white border-gray-200'
+                  : 'bg-gradient-to-br from-white/95 to-blue-50/95'
               }`}>
         
           {/* Search and Filter Section */}
@@ -1436,9 +1932,7 @@ export default function Hotel() {
                     <div className={`text-center flex items-center justify-center gap-2 ${
                       isDark ? 'text-gray-200' : 'text-slate-700'
                     }`}>
-                      <svg className="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
-                      </svg>
+                      
                       {t('hotels.roomCount')}
                     </div>
                     <div className={`text-center flex items-center justify-center gap-2 ${
@@ -1699,20 +2193,7 @@ export default function Hotel() {
                               ? 'bg-blue-900/30 text-blue-300 border border-blue-400/40' 
                               : 'bg-blue-100 text-blue-800 border border-blue-300'
                           }`}>
-                            <svg className={`mr-0.5 ${
-                              screenWidth < 640 
-                                ? 'w-1.5 h-1.5'
-                                : screenWidth < 768
-                                ? 'w-2 h-2'
-                                : screenWidth < 1024
-                                ? 'w-2 h-2'
-                                : screenWidth > 1920
-                                ? 'w-3 h-3'
-                                : 'w-2 h-2'
-                            }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 15v-4a2 2 0 012-2h4a2 2 0 012 2v4" />
-                            </svg>
+                            
                             {hotel.roomCount || 0}
                           </span>
                         </div>
@@ -1942,302 +2423,321 @@ export default function Hotel() {
 
           {/* Hotel Details Modal */}
           {selectedHotelDetails && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-300">
-              <div className={`rounded-2xl shadow-2xl p-6 sm:p-8 max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto transform transition-all duration-300 animate-in slide-in-from-bottom-4 zoom-in-95 ${
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+              <div className={`w-full max-w-6xl h-[90vh] rounded-lg shadow-xl ${
                 isDark 
-                  ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-600/50 shadow-gray-900/50' 
-                  : 'bg-gradient-to-br from-white to-gray-50/50 border border-gray-200/60 shadow-gray-900/20'
+                  ? 'bg-gray-900 border border-gray-700' 
+                  : 'bg-white border border-gray-200'
               }`}>
-               <div className="flex items-center justify-between mb-8">
-                 <h3 className={`text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent ${
-                   isDark 
-                     ? 'from-blue-400 to-purple-400' 
-                     : 'from-blue-600 to-purple-600'
-                 }`}>
-                   {t('hotels.hotelDetails')}
-                 </h3>
-                 <button
-                   onClick={() => setSelectedHotelDetails(null)}
-                   className={`p-2 rounded-xl transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-gray-300/50 ${
-                     isDark 
-                       ? 'hover:bg-gray-700/50 text-gray-400 hover:text-gray-200' 
-                       : 'hover:bg-gray-100 text-gray-500 hover:text-gray-700'
-                   }`}
-                 >
-                   <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                   </svg>
-                 </button>
-               </div>
-               
-               <div className="space-y-6">
-                 {/* Basic Information */}
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                   <div className="space-y-3">
-                     <label className={`block text-sm font-semibold ${
-                       isDark ? 'text-gray-300' : 'text-gray-700'
-                     }`}>
-                       {t('hotels.hotelName')}
-                     </label>
-                     <div className={`px-4 py-3 border rounded-xl transition-colors ${
-                       isDark 
-                         ? 'border-gray-600/50 bg-gray-700/30 text-gray-200' 
-                         : 'border-gray-200/60 bg-gray-50/50 text-gray-800'
-                     }`}>
-                       {selectedHotelDetails.name}
-                     </div>
-                   </div>
-                   
-                   <div className="space-y-3">
-                     <label className={`block text-sm font-semibold ${
-                       isDark ? 'text-gray-300' : 'text-gray-700'
-                     }`}>
-                       {t('hotels.hotelCode')}
-                     </label>
-                     <div className={`px-4 py-3 border rounded-xl transition-colors ${
-                       isDark 
-                         ? 'border-gray-600/50 bg-gray-700/30 text-gray-200' 
-                         : 'border-gray-200/60 bg-gray-50/50 text-gray-800'
-                     }`}>
-                       {selectedHotelDetails.code}
-                     </div>
-                   </div>
-                   
-                   <div className="space-y-3">
-                     <label className={`block text-sm font-semibold ${
-                       isDark ? 'text-gray-300' : 'text-gray-700'
-                     }`}>
-                       {t('hotels.altHotelName')}
-                     </label>
-                     <div className={`px-4 py-3 border rounded-xl transition-colors ${
-                       isDark 
-                         ? 'border-gray-600/50 bg-gray-700/30 text-gray-200' 
-                         : 'border-gray-200/60 bg-gray-50/50 text-gray-800'
-                     }`}>
-                       {selectedHotelDetails.altName || '-'}
-                     </div>
-                   </div>
-                   
-                   <div className="space-y-3">
-                     <label className={`block text-sm font-semibold ${
-                       isDark ? 'text-gray-300' : 'text-gray-700'
-                     }`}>
-                       {t('hotels.hotelAddress')}
-                     </label>
-                     <div className={`px-4 py-3 border rounded-xl transition-colors ${
-                       isDark 
-                         ? 'border-gray-600/50 bg-gray-700/30 text-gray-200' 
-                         : 'border-gray-200/60 bg-gray-50/50 text-gray-800'
-                     }`}>
-                       {selectedHotelDetails.address || '-'}
-                     </div>
-                   </div>
-                   
-                   <div className="space-y-3">
-                     <label className={`block text-sm font-semibold ${
-                       isDark ? 'text-gray-300' : 'text-gray-700'
-                     }`}>
-                       {t('hotels.location')}
-                     </label>
-                     <div className={`px-4 py-3 border rounded-xl transition-colors ${
-                       isDark 
-                         ? 'border-gray-600/50 bg-gray-700/30 text-gray-200' 
-                         : 'border-gray-200/60 bg-gray-50/50 text-gray-800'
-                     }`}>
-                       {selectedHotelDetails.location || '-'}
-                     </div>
-                   </div>
-                   
-                   <div className="space-y-3">
-                     <label className={`block text-sm font-semibold ${
-                       isDark ? 'text-gray-300' : 'text-gray-700'
-                     }`}>
-                       {t('hotels.roomCount')}
-                     </label>
-                     <div className={`px-4 py-3 border rounded-xl transition-colors ${
-                       isDark 
-                         ? 'border-gray-600/50 bg-gray-700/30 text-gray-200' 
-                         : 'border-gray-200/60 bg-gray-50/50 text-gray-800'
-                     }`}>
-                       <span className={`inline-flex items-center px-3 py-1 rounded-lg text-sm font-semibold shadow-sm ${
-                         isDark 
-                           ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' 
-                           : 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
-                       }`}>
-                         {selectedHotelDetails.roomCount || 0}
-                       </span>
-                     </div>
-                   </div>
-                   
-                   <div className="space-y-3">
-                     <label className={`block text-sm font-semibold ${
-                       isDark ? 'text-gray-300' : 'text-gray-700'
-                     }`}>
-                       {t('hotels.createdDate')}
-                     </label>
-                     <div className={`px-4 py-3 border rounded-xl transition-colors ${
-                       isDark 
-                         ? 'border-gray-600/50 bg-gray-700/30 text-gray-200' 
-                         : 'border-gray-200/60 bg-gray-50/50 text-gray-800'
-                     }`}>
-                       {new Date(selectedHotelDetails.createdAt).toLocaleDateString()}
-                     </div>
-                   </div>
-                   
-                   {selectedHotelDetails.createdBy && (
-                     <div className="space-y-3">
-                       <label className={`block text-sm font-semibold ${
-                         isDark ? 'text-gray-300' : 'text-gray-700'
-                       }`}>
-                         Created By
-                       </label>
-                       <div className={`px-4 py-3 border rounded-xl transition-colors ${
-                         isDark 
-                           ? 'border-gray-600/50 bg-gray-700/30 text-gray-200' 
-                           : 'border-gray-200/60 bg-gray-50/50 text-gray-800'
-                       }`}>
-                         {selectedHotelDetails.createdBy.firstName && selectedHotelDetails.createdBy.lastName 
-                           ? `${selectedHotelDetails.createdBy.firstName} ${selectedHotelDetails.createdBy.lastName}` 
-                           : selectedHotelDetails.createdBy.username}
-                       </div>
-                     </div>
-                   )}
-                 </div>
-                 
-                 {/* Description Section */}
-                 {(selectedHotelDetails.description || selectedHotelDetails.altDescription) && (
-                   <div className="space-y-4">
-                     <h4 className={`text-lg font-bold pb-3 border-b ${
-                       isDark 
-                         ? 'text-gray-200 border-gray-600/50' 
-                         : 'text-gray-900 border-gray-200/60'
-                     }`}>
-                       {t('hotels.hotelDescription')}
-                     </h4>
-                     
-                     {selectedHotelDetails.description && (
-                       <div className="space-y-3">
-                         <label className={`block text-sm font-semibold ${
-                           isDark ? 'text-gray-300' : 'text-gray-700'
-                         }`}>
-                           {t('hotels.hotelDescription')}
-                         </label>
-                         <div className={`px-4 py-3 border rounded-xl transition-colors whitespace-pre-wrap ${
-                           isDark 
-                             ? 'border-gray-600/50 bg-gray-700/30 text-gray-200' 
-                             : 'border-gray-200/60 bg-gray-50/50 text-gray-800'
-                         }`}>
-                           {selectedHotelDetails.description}
-                         </div>
-                       </div>
-                     )}
-                     
-                     {selectedHotelDetails.altDescription && (
-                       <div className="space-y-3">
-                         <label className={`block text-sm font-semibold ${
-                           isDark ? 'text-gray-300' : 'text-gray-700'
-                         }`}>
-                           {t('hotels.altHotelDescription')}
-                         </label>
-                         <div className={`px-4 py-3 border rounded-xl transition-colors whitespace-pre-wrap ${
-                           isDark 
-                             ? 'border-gray-600/50 bg-gray-700/30 text-gray-200' 
-                             : 'border-gray-200/60 bg-gray-50/50 text-gray-800'
-                         }`}>
-                           {selectedHotelDetails.altDescription}
-                         </div>
-                       </div>
-                     )}
-                   </div>
-                 )}
-                 
-                 {/* Agreement Files Section */}
-                 <div className="space-y-6">
-                   <div className="flex items-center space-x-3">
-                     <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md">
-                       <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                       </svg>
-                     </div>
-                     <h4 className="text-xl font-bold text-slate-800">
-                       {t('hotels.agreementFiles')}
-                     </h4>
-                   </div>
-                   
-                   {selectedHotelDetails.agreements && selectedHotelDetails.agreements.length > 0 ? (
-                     <div className="space-y-4">
-                       {selectedHotelDetails.agreements.map((agreement) => (
-                         <div key={agreement.id} className="group flex items-center justify-between p-5 bg-gradient-to-r from-slate-50 to-blue-50/30 border border-slate-200 rounded-2xl hover:shadow-lg hover:border-blue-300 transition-all duration-300">
-                           <div className="flex items-center space-x-4">
-                             <div className="flex-shrink-0">
-                               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow duration-300">
-                                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                 </svg>
-                               </div>
-                             </div>
-                             <div className="flex-1 min-w-0">
-                               <p className="text-base font-bold text-slate-800 truncate group-hover:text-blue-700 transition-colors duration-300">
-                                 {agreement.fileName}
-                               </p>
-                               <p className="text-sm font-medium text-slate-500 mt-1">
-                                 {(agreement.fileSize / 1024).toFixed(1)} KB • {new Date(agreement.uploadedAt).toLocaleDateString()}
-                               </p>
-                             </div>
-                           </div>
-                           <a
-                             href={`/api/hotels/${selectedHotelDetails.id}/agreements/${agreement.id}/download`}
-                             download
-                             className="inline-flex items-center px-5 py-3 text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 group-hover:scale-105"
-                           >
-                             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                             </svg>
-                             Download
-                           </a>
-                         </div>
-                       ))}
-                     </div>
-                   ) : (
-                     <div className="text-center py-12 bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl border-2 border-dashed border-slate-300">
-                       <div className="w-16 h-16 bg-gradient-to-br from-slate-400 to-gray-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
-                         <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                         </svg>
-                       </div>
-                       <p className="text-lg font-bold text-slate-600">No agreement files uploaded</p>
-                       <p className="text-sm font-medium text-slate-500 mt-2">Agreement files will appear here once uploaded</p>
-                     </div>
-                   )}
-                 </div>
-                 
-                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 pt-4">
-                   <button
-                     onClick={() => handleEditHotel(selectedHotelDetails.id)}
-                     className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md font-medium text-sm sm:text-base min-h-[2.75rem] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-300"
-                   >
-                     {t('common.edit')}
-                   </button>
-                   <button
-                     onClick={() => {
-                       handleDeleteHotel(selectedHotelDetails.id);
-                       setSelectedHotelDetails(null);
-                     }}
-                     className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-red-500 hover:bg-red-600 text-white rounded-md font-medium text-sm sm:text-base min-h-[2.75rem] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-300"
-                   >
-                     {t('common.delete')}
-                   </button>
-                   <button
-                     onClick={handlePrint}
-                     className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-md font-medium text-sm sm:text-base min-h-[2.75rem] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                   >
-                     {t('hotels.print')}
-                   </button>
-                 </div>
-               </div>
-             </div>
-           </div>
-         )}
+                {/* Header */}
+                <div className={`flex items-center justify-between p-6 border-b ${
+                  isDark ? 'border-gray-700' : 'border-gray-200'
+                }`}>
+                  <h3 className={`text-xl font-semibold ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    {t('hotels.hotelDetails')}
+                  </h3>
+                  <button
+                    onClick={() => setSelectedHotelDetails(null)}
+                    className={`p-2 rounded-md ${
+                      isDark 
+                        ? 'hover:bg-gray-800 text-gray-400 hover:text-gray-200' 
+                        : 'hover:bg-gray-100 text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                
+                {/* Content */}
+                <div className="flex h-[calc(90vh-140px)]">
+                  {/* Left Panel - Basic Information */}
+                  <div className={`w-1/2 p-6 border-r ${
+                    isDark ? 'border-gray-700' : 'border-gray-200'
+                  }`}>
+                    <h4 className={`text-lg font-medium mb-4 ${
+                      isDark ? 'text-white' : 'text-gray-900'
+                    }`}>
+                      Basic Information
+                    </h4>
+                    
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${
+                            isDark ? 'text-gray-400' : 'text-gray-600'
+                          }`}>
+                            {t('hotels.hotelName')}
+                          </label>
+                          <div className={`text-sm ${
+                            isDark ? 'text-gray-200' : 'text-gray-900'
+                          }`}>
+                            {selectedHotelDetails.name}
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${
+                            isDark ? 'text-gray-400' : 'text-gray-600'
+                          }`}>
+                            {t('hotels.hotelCode')}
+                          </label>
+                          <div className={`text-sm ${
+                            isDark ? 'text-gray-200' : 'text-gray-900'
+                          }`}>
+                            {selectedHotelDetails.code}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${
+                            isDark ? 'text-gray-400' : 'text-gray-600'
+                          }`}>
+                            {t('hotels.altHotelName')}
+                          </label>
+                          <div className={`text-sm ${
+                            isDark ? 'text-gray-200' : 'text-gray-900'
+                          }`}>
+                            {selectedHotelDetails.altName || '-'}
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${
+                            isDark ? 'text-gray-400' : 'text-gray-600'
+                          }`}>
+                            {t('hotels.roomCount')}
+                          </label>
+                          <div className={`text-sm font-medium ${
+                            isDark ? 'text-blue-400' : 'text-blue-600'
+                          }`}>
+                            {selectedHotelDetails.roomCount || 0} rooms
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label className={`block text-xs font-medium mb-1 ${
+                          isDark ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                          {t('hotels.hotelAddress')}
+                        </label>
+                        <div className={`text-sm ${
+                          isDark ? 'text-gray-200' : 'text-gray-900'
+                        }`}>
+                          {selectedHotelDetails.address || '-'}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label className={`block text-xs font-medium mb-1 ${
+                          isDark ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                          {t('hotels.location')}
+                        </label>
+                        <div className={`text-sm ${
+                          isDark ? 'text-gray-200' : 'text-gray-900'
+                        }`}>
+                          {selectedHotelDetails.location || '-'}
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${
+                            isDark ? 'text-gray-400' : 'text-gray-600'
+                          }`}>
+                            {t('hotels.createdDate')}
+                          </label>
+                          <div className={`text-sm ${
+                            isDark ? 'text-gray-200' : 'text-gray-900'
+                          }`}>
+                            {new Date(selectedHotelDetails.createdAt).toLocaleDateString()}
+                          </div>
+                        </div>
+                        
+                        {selectedHotelDetails.createdBy && (
+                          <div>
+                            <label className={`block text-xs font-medium mb-1 ${
+                              isDark ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                              Created By
+                            </label>
+                            <div className={`text-sm ${
+                              isDark ? 'text-gray-200' : 'text-gray-900'
+                            }`}>
+                              {selectedHotelDetails.createdBy.firstName && selectedHotelDetails.createdBy.lastName 
+                                ? `${selectedHotelDetails.createdBy.firstName} ${selectedHotelDetails.createdBy.lastName}` 
+                                : selectedHotelDetails.createdBy.username}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Description Section */}
+                    {(selectedHotelDetails.description || selectedHotelDetails.altDescription) && (
+                      <div className="mt-6">
+                        <h5 className={`text-sm font-medium mb-3 ${
+                          isDark ? 'text-white' : 'text-gray-900'
+                        }`}>
+                          {t('hotels.hotelDescription')}
+                        </h5>
+                        
+                        {selectedHotelDetails.description && (
+                          <div className="mb-3">
+                            <label className={`block text-xs font-medium mb-1 ${
+                              isDark ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                              {t('hotels.hotelDescription')}
+                            </label>
+                            <div className={`text-sm p-3 rounded border ${
+                              isDark 
+                                ? 'border-gray-700 bg-gray-800 text-gray-200' 
+                                : 'border-gray-200 bg-gray-50 text-gray-800'
+                            }`}>
+                              {selectedHotelDetails.description}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {selectedHotelDetails.altDescription && (
+                          <div>
+                            <label className={`block text-xs font-medium mb-1 ${
+                              isDark ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                              {t('hotels.altHotelDescription')}
+                            </label>
+                            <div className={`text-sm p-3 rounded border ${
+                              isDark 
+                                ? 'border-gray-700 bg-gray-800 text-gray-200' 
+                                : 'border-gray-200 bg-gray-50 text-gray-800'
+                            }`}>
+                              {selectedHotelDetails.altDescription}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Right Panel - Agreement Files */}
+                  <div className="w-1/2 p-6">
+                    <h4 className={`text-lg font-medium mb-4 ${
+                      isDark ? 'text-white' : 'text-gray-900'
+                    }`}>
+                      {t('hotels.agreementFiles')}
+                    </h4>
+                    
+                    <div className="h-[calc(100%-2rem)]">
+                      {selectedHotelDetails.agreements && selectedHotelDetails.agreements.length > 0 ? (
+                        <div className="space-y-3 h-full overflow-y-auto pr-2">
+                          {selectedHotelDetails.agreements.map((agreement) => (
+                            <div key={agreement.id} className={`flex items-center justify-between p-4 border rounded-lg ${
+                              isDark 
+                                ? 'border-gray-700 bg-gray-800' 
+                                : 'border-gray-200 bg-gray-50'
+                            }`}>
+                              <div className="flex items-center space-x-3 flex-1 min-w-0">
+                                <div className={`w-8 h-8 rounded flex items-center justify-center flex-shrink-0 ${
+                                  isDark ? 'bg-blue-600' : 'bg-blue-500'
+                                }`}>
+                                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                  </svg>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className={`text-sm font-medium truncate ${
+                                    isDark ? 'text-gray-200' : 'text-gray-900'
+                                  }`}>
+                                    {agreement.fileName}
+                                  </p>
+                                  <p className={`text-xs ${
+                                    isDark ? 'text-gray-400' : 'text-gray-500'
+                                  }`}>
+                                    {(agreement.fileSize / 1024).toFixed(1)} KB • {new Date(agreement.uploadedAt).toLocaleDateString()}
+                                  </p>
+                                </div>
+                              </div>
+                              <a
+                                href={`/api/hotels/${selectedHotelDetails.id}/agreements/${agreement.id}/download`}
+                                download
+                                className={`ml-3 px-3 py-1.5 text-xs font-medium text-white rounded ${
+                                  isDark 
+                                    ? 'bg-blue-600 hover:bg-blue-700' 
+                                    : 'bg-blue-500 hover:bg-blue-600'
+                                }`}
+                              >
+                                Download
+                              </a>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className={`flex flex-col items-center justify-center h-full border-2 border-dashed rounded-lg ${
+                          isDark 
+                            ? 'border-gray-700 bg-gray-800/50' 
+                            : 'border-gray-300 bg-gray-50'
+                        }`}>
+                          <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-3 ${
+                            isDark ? 'bg-gray-700' : 'bg-gray-200'
+                          }`}>
+                            <svg className={`w-6 h-6 ${
+                              isDark ? 'text-gray-400' : 'text-gray-500'
+                            }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </div>
+                          <p className={`text-sm font-medium ${
+                            isDark ? 'text-gray-300' : 'text-gray-600'
+                          }`}>
+                            No agreement files uploaded
+                          </p>
+                          <p className={`text-xs mt-1 ${
+                            isDark ? 'text-gray-400' : 'text-gray-500'
+                          }`}>
+                            Files will appear here once uploaded
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Footer */}
+                <div className={`flex items-center justify-end gap-3 p-6 border-t ${
+                  isDark ? 'border-gray-700' : 'border-gray-200'
+                }`}>
+                  <button
+                    onClick={() => handleEditHotel(selectedHotelDetails.id)}
+                    className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded text-sm font-medium"
+                  >
+                    {t('common.edit')}
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleDeleteHotel(selectedHotelDetails.id);
+                      setSelectedHotelDetails(null);
+                    }}
+                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded text-sm font-medium"
+                  >
+                    {t('common.delete')}
+                  </button>
+                  <button
+                    onClick={handlePrint}
+                    className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm font-medium"
+                  >
+                    {t('hotels.print')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           </div>
           
         </div>
