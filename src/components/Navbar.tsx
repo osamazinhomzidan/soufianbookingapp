@@ -59,9 +59,9 @@ const Navbar = ({ isOpen, onToggle }: NavbarProps) => {
       isActive: pathname.startsWith('/booking')
     },
     {
-      title: t('sidebar.allGuests'),
-      href: '/guests',
-      icon: UsersIcon,
+        title: t('sidebar.allGuests'),
+        href: '/guests',
+        icon: UsersIcon,
       isActive: pathname === '/guests'
     },
     {

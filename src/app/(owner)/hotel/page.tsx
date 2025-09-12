@@ -1113,7 +1113,7 @@ export default function Hotel() {
                   <svg className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 z-10 ${
                     isDark ? 'text-gray-300' : 'text-gray-600'
                   }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
                   </svg>
                   <input
                     type="text"
@@ -1160,7 +1160,7 @@ export default function Hotel() {
                   <svg className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 z-10 ${
                     isDark ? 'text-gray-300' : 'text-gray-600'
                   }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                   </svg>
                   <input
                     type="text"
@@ -2423,8 +2423,8 @@ export default function Hotel() {
 
           {/* Hotel Details Modal */}
           {selectedHotelDetails && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className={`w-full max-w-6xl h-[90vh] rounded-lg shadow-xl ${
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-2 sm:p-4">
+              <div className={`w-full max-w-5xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl h-[92vh] sm:h-[90vh] rounded-lg shadow-xl ${
                 isDark 
                   ? 'bg-gray-900 border border-gray-700' 
                   : 'bg-white border border-gray-200'
@@ -2453,9 +2453,9 @@ export default function Hotel() {
                 </div>
                 
                 {/* Content */}
-                <div className="flex h-[calc(90vh-140px)]">
+                <div className="flex flex-col lg:flex-row h-[calc(92vh-140px)] sm:h-[calc(90vh-140px)]">
                   {/* Left Panel - Basic Information */}
-                  <div className={`w-1/2 p-6 border-r ${
+                  <div className={`w-full lg:w-1/2 p-4 sm:p-6 border-b lg:border-b-0 lg:border-r ${
                     isDark ? 'border-gray-700' : 'border-gray-200'
                   }`}>
                     <h4 className={`text-lg font-medium mb-4 ${
@@ -2465,7 +2465,7 @@ export default function Hotel() {
                     </h4>
                     
                     <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div>
                           <label className={`block text-xs font-medium mb-1 ${
                             isDark ? 'text-gray-400' : 'text-gray-600'
@@ -2493,7 +2493,7 @@ export default function Hotel() {
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div>
                           <label className={`block text-xs font-medium mb-1 ${
                             isDark ? 'text-gray-400' : 'text-gray-600'
@@ -2547,7 +2547,7 @@ export default function Hotel() {
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div>
                           <label className={`block text-xs font-medium mb-1 ${
                             isDark ? 'text-gray-400' : 'text-gray-600'
@@ -2627,7 +2627,7 @@ export default function Hotel() {
                   </div>
                   
                   {/* Right Panel - Agreement Files */}
-                  <div className="w-1/2 p-6">
+                  <div className="w-full lg:w-1/2 p-4 sm:p-6">
                     <h4 className={`text-lg font-medium mb-4 ${
                       isDark ? 'text-white' : 'text-gray-900'
                     }`}>
@@ -2710,30 +2710,32 @@ export default function Hotel() {
                 </div>
                 
                 {/* Footer */}
-                <div className={`flex items-center justify-end gap-3 p-6 border-t ${
+                <div className={`flex flex-col sm:flex-row items-stretch sm:items-center justify-between sm:justify-end gap-2 sm:gap-3 p-4 sm:p-6 border-t ${
                   isDark ? 'border-gray-700' : 'border-gray-200'
                 }`}>
-                  <button
-                    onClick={() => handleEditHotel(selectedHotelDetails.id)}
-                    className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded text-sm font-medium"
-                  >
-                    {t('common.edit')}
-                  </button>
-                  <button
-                    onClick={() => {
-                      handleDeleteHotel(selectedHotelDetails.id);
-                      setSelectedHotelDetails(null);
-                    }}
-                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded text-sm font-medium"
-                  >
-                    {t('common.delete')}
-                  </button>
-                  <button
-                    onClick={handlePrint}
-                    className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm font-medium"
-                  >
-                    {t('hotels.print')}
-                  </button>
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+                    <button
+                      onClick={() => handleEditHotel(selectedHotelDetails.id)}
+                      className="px-4 py-2.5 sm:py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded text-sm font-medium transition-colors duration-200 flex-1 sm:flex-none"
+                    >
+                      {t('common.edit')}
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleDeleteHotel(selectedHotelDetails.id);
+                        setSelectedHotelDetails(null);
+                      }}
+                      className="px-4 py-2.5 sm:py-2 bg-red-500 hover:bg-red-600 text-white rounded text-sm font-medium transition-colors duration-200 flex-1 sm:flex-none"
+                    >
+                      {t('common.delete')}
+                    </button>
+                    <button
+                      onClick={handlePrint}
+                      className="px-4 py-2.5 sm:py-2 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm font-medium transition-colors duration-200 flex-1 sm:flex-none"
+                    >
+                      {t('hotels.print')}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
