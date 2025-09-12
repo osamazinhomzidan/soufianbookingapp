@@ -1278,12 +1278,12 @@ export default function Hotel() {
                      <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
                        isDark ? 'text-gray-200' : 'text-slate-800'
                      }`}>
-                       Description
+                       {t('hotels.hotelDescription')}
                      </th>
                      <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
                        isDark ? 'text-gray-200' : 'text-slate-800'
                      }`}>
-                       Alt Description
+                       {t('hotels.altHotelDescription')}
                      </th>
                      <th className={`text-left py-5 px-6 font-bold text-sm uppercase tracking-wide ${
                        isDark ? 'text-gray-200' : 'text-slate-800'
