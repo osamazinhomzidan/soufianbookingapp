@@ -51,6 +51,7 @@ export interface Translations {
     previous: string;
     submit: string;
     reset: string;
+    clear: string;
     confirm: string;
     yes: string;
     no: string;
@@ -348,8 +349,13 @@ export interface Translations {
     errorFetchingRoom: string;
     roomDeletedSuccessfully: string;
     errorDeletingRoom: string;
+    errorUpdatingRoom: string;
     noRoomsSelected: string;
+    selectedRoom: string;
     selectedRoomsDeleted: string;
+    purchasePrice: string;
+    availableFrom: string;
+    availableTo: string;
     partialDeleteSuccess: string;
     errorDeletingSelectedRooms: string;
     printingSelectedRooms: string;
@@ -419,6 +425,8 @@ export interface Translations {
     confirmDeleteSelectedRooms: string;
     selectedRoomsDeletedSuccessfully: string;
     errorDeletingRooms: string;
+    view: string;
+    delete: string;
   };
   
   // Layout and navigation
@@ -616,6 +624,7 @@ const en: Translations = {
     previous: 'Previous',
     submit: 'Submit',
     reset: 'Reset',
+    clear: 'Clear',
     confirm: 'Confirm',
     yes: 'Yes',
     no: 'No',
@@ -699,7 +708,7 @@ const en: Translations = {
     selectHotelFirst: 'Select hotel first',
     roomsAvailable: 'rooms available',
     notAvailable: 'Not available',
-    numberOfRooms: 'Number of Rooms',
+    numberOfRooms: 'Rooms Num',
     selectRoomTypeFirst: 'Select room type first',
     room: 'room',
     rooms: 'rooms',
@@ -723,7 +732,7 @@ const en: Translations = {
     arrivalLabel: 'Arrival:',
     departureLabel: 'Departure:',
     nightsLabel: 'Nights:',
-    numberOfRoomsLabel: 'Number of Rooms:',
+    numberOfRoomsLabel: 'Rooms Num:',
     totalLabel: 'Total:',
     nameLabel: 'Name:',
     emailLabel: 'Email:',
@@ -883,9 +892,9 @@ const en: Translations = {
     agreementCount: 'Files',
     clearFilters: 'Clear Filters',
     minimumRoomCount: 'Minimum Room Count',
-    enterMinimumRooms: 'Enter minimum number of rooms',
+    enterMinimumRooms: 'Enter minimum Rooms Num',
     maximumRoomCount: 'Maximum Room Count',
-    enterMaximumRooms: 'Enter maximum number of rooms',
+    enterMaximumRooms: 'Enter maximum Rooms Num',
     selectedHotel: 'Business Executive Hotel',
   },
   
@@ -924,7 +933,7 @@ const en: Translations = {
     selectHotel: 'Select Hotel',
     roomDescription: 'Room Description',
     altDescription: 'Alt Description',
-    numberOfRooms: 'Number of Rooms',
+    numberOfRooms: 'Rooms Num',
     basePricePerNight: 'Base Price',
     enableAlternativePrice: 'Enable Alternative Price',
     alternativePrice: 'Alternative Price',
@@ -941,11 +950,11 @@ const en: Translations = {
     createdDate: 'Created Date',
     enterRoomType: 'Enter room type',
     detailedRoomDescription: 'Detailed room description',
-    descriptionOtherLanguage: 'Description in other language',
+    descriptionOtherLanguage: 'alt Description',
     roomQuantity: 'Room quantity',
     enterPriceSAR: 'Enter price in SAR',
     enterAlternativePriceSAR: 'Enter alternative price in SAR',
-    roomQuantityPlaceholder: 'Number of rooms',
+    roomQuantityPlaceholder: 'Rooms Num',
     roomTypePlaceholder: 'Type',
     purchasePricePlaceholder: 'Purchase',
     sellingPricePlaceholder: 'Selling',
@@ -962,7 +971,9 @@ const en: Translations = {
     errorFetchingRoom: 'Error fetching room data',
     roomDeletedSuccessfully: 'Room deleted successfully',
     errorDeletingRoom: 'Error deleting room',
-    noRoomsSelected: 'No rooms selected',
+    errorUpdatingRoom: 'Error updating room',
+    noRoomsSelected: 'No rooms selected for deletion',
+    selectedRoom: 'Selected Room',
     selectedRoomsDeleted: '{{count}} selected rooms deleted successfully',
     partialDeleteSuccess: '{{success}} rooms deleted, {{failed}} failed to delete',
     errorDeletingSelectedRooms: 'Error deleting selected rooms',
@@ -1001,7 +1012,7 @@ const en: Translations = {
     hotelSelection: 'Hotel Selection',
     roomTypePlaceholder: 'Enter room type',
     roomDescriptionPlaceholder: 'Detailed room description',
-    altDescriptionPlaceholder: 'Description in other language',
+    altDescriptionPlaceholder: 'Alt Description',
     basePricePlaceholder: 'Enter price in SAR',
     alternativePricePlaceholder: 'Enter alternative price in SAR',
     seasonalPriceNote: 'Seasonal pricing can be configured later for different periods',
@@ -1013,7 +1024,7 @@ const en: Translations = {
     roomDetails: 'Room Details',
     price: 'Price',
     enterRoomDescription: 'Detailed room description',
-    enterAltDescription: 'Description in other language',
+    enterAltDescription: 'Alt Description',
     enterBasePrice: 'Enter price in SAR',
     enterAlternativePrice: 'Enter alternative price in SAR',
     alternativePriceDescription: 'Seasonal pricing can be configured later for different periods',
@@ -1037,6 +1048,8 @@ const en: Translations = {
     confirmDeleteSelectedRooms: 'Are you sure you want to delete {{count}} selected room(s)?',
     selectedRoomsDeletedSuccessfully: 'Selected rooms deleted successfully',
     errorDeletingRooms: 'Error deleting selected rooms',
+    view: 'View',
+    delete: 'Delete',
   },
   
   layout: {
@@ -1230,6 +1243,7 @@ const ar: Translations = {
     previous: 'السابق',
     submit: 'إرسال',
     reset: 'إعادة تعيين',
+    clear: 'مسح',
     confirm: 'تأكيد',
     yes: 'نعم',
     no: 'لا',
@@ -1576,7 +1590,9 @@ const ar: Translations = {
     errorFetchingRoom: 'خطأ في جلب بيانات الغرفة',
     roomDeletedSuccessfully: 'تم حذف الغرفة بنجاح',
     errorDeletingRoom: 'خطأ في حذف الغرفة',
-    noRoomsSelected: 'لم يتم تحديد أي غرف',
+    errorUpdatingRoom: 'خطأ في تحديث الغرفة',
+    noRoomsSelected: 'لم يتم تحديد غرف للحذف',
+    selectedRoom: 'الغرفة المحددة',
     selectedRoomsDeleted: 'تم حذف {{count}} غرفة محددة بنجاح',
     partialDeleteSuccess: 'تم حذف {{success}} غرفة، فشل في حذف {{failed}} غرفة',
     errorDeletingSelectedRooms: 'خطأ في حذف الغرف المحددة',
@@ -1629,6 +1645,8 @@ const ar: Translations = {
     confirmDeleteSelectedRooms: 'هل أنت متأكد من حذف {{count}} غرفة محددة؟',
     selectedRoomsDeletedSuccessfully: 'تم حذف الغرف المحددة بنجاح',
     errorDeletingRooms: 'خطأ في حذف الغرف المحددة',
+    view: 'عرض',
+    delete: 'حذف',
     roomTypePlaceholder: 'أدخل نوع الغرفة',
     roomDescriptionPlaceholder: 'وصف مفصل للغرفة',
     altDescriptionPlaceholder: 'الوصف بلغة أخرى',

@@ -123,6 +123,16 @@ export default function Room() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Clear messages after 5 seconds
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
   
   // Multiple room forms state
   const [roomForms, setRoomForms] = useState<RoomFormData[]>(() => {
@@ -137,7 +147,7 @@ export default function Room() {
       alternativePrice: '',
       availableFrom: '',
       availableTo: '',
-      quantity: '1',
+      quantity: '',
       boardType: 'Room only',
       hasAlternativePrice: true
     }];
@@ -170,10 +180,8 @@ export default function Room() {
   const [createdByFilter, setCreatedByFilter] = useState('');
   
   const [selectedRooms, setSelectedRooms] = useState<string[]>([]);
-  const [selectedRoomDetails, setSelectedRoomDetails] = useState<Room | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-  
-  // Edit room state
+  const [selectedRoomDetails, setSelectedRoomDetails] = useState<Room | null>(null);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const [editFormData, setEditFormData] = useState<RoomFormData | null>(null);
   const [editFormErrors, setEditFormErrors] = useState<string[]>([]);
@@ -603,6 +611,184 @@ export default function Room() {
     }
   };
 
+  const handlePrintRoom = async (id: string) => {
+    try {
+      const response = await fetch(`/api/rooms/${id}`);
+      const result: ApiResponse<Room> = await response.json();
+      
+      if (!result.success || !result.data) {
+        alert(result.message || t('rooms.errorFetchingRoom'));
+        return;
+      }
+
+      const room = result.data;
+      
+      // Create a new window for printing
+      const printWindow = window.open('', '_blank', 'width=800,height=600');
+      if (!printWindow) {
+        alert('Please allow popups to print room details');
+        return;
+      }
+
+      // Generate print content
+      const printContent = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Room Details - ${room.roomType}</title>
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                color: #333;
+              }
+              .header {
+                text-align: center;
+                border-bottom: 2px solid #333;
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+              }
+              .room-title {
+                font-size: 24px;
+                font-weight: bold;
+                margin: 0;
+              }
+              .hotel-name {
+                font-size: 16px;
+                color: #666;
+                margin: 5px 0;
+              }
+              .section {
+                margin-bottom: 20px;
+              }
+              .section-title {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 10px;
+                color: #333;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 5px;
+              }
+              .info-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 8px;
+                padding: 5px 0;
+              }
+              .info-label {
+                font-weight: bold;
+                width: 40%;
+              }
+              .info-value {
+                width: 60%;
+              }
+              .description {
+                background-color: #f9f9f9;
+                padding: 10px;
+                border-radius: 5px;
+                margin-top: 10px;
+              }
+              @media print {
+                body { margin: 0; }
+                .no-print { display: none; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1 class="room-title">${room.roomType}</h1>
+              <p class="hotel-name">${room.hotel?.name || room.hotelName || t('rooms.unknownHotel')}</p>
+            </div>
+            
+            <div class="section">
+              <h2 class="section-title">${t('rooms.roomDetails')}</h2>
+              <div class="info-row">
+                <span class="info-label">${t('rooms.roomType')}:</span>
+                <span class="info-value">${room.roomType}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">${t('rooms.boardType')}:</span>
+                <span class="info-value">${room.boardType}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">${t('rooms.quantity')}:</span>
+                <span class="info-value">${room.quantity}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">${t('rooms.status')}:</span>
+                <span class="info-value">${room.isActive ? t('common.active') : t('common.inactive')}</span>
+              </div>
+            </div>
+            
+            <div class="section">
+              <h2 class="section-title">${t('rooms.pricingAvailability')}</h2>
+              <div class="info-row">
+                <span class="info-label">${t('rooms.purchasePrice')}:</span>
+                <span class="info-value">SAR ${room.purchasePrice}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">${t('rooms.basePrice')}:</span>
+                <span class="info-value">SAR ${room.basePrice}</span>
+              </div>
+              ${room.alternativePrice ? `
+              <div class="info-row">
+                <span class="info-label">${t('rooms.alternativePrice')}:</span>
+                <span class="info-value">SAR ${room.alternativePrice}</span>
+              </div>` : ''}
+              ${room.availableFrom ? `
+              <div class="info-row">
+                <span class="info-label">${t('rooms.availableFrom')}:</span>
+                <span class="info-value">${new Date(room.availableFrom).toLocaleDateString()}</span>
+              </div>` : ''}
+              ${room.availableTo ? `
+              <div class="info-row">
+                <span class="info-label">${t('rooms.availableTo')}:</span>
+                <span class="info-value">${new Date(room.availableTo).toLocaleDateString()}</span>
+              </div>` : ''}
+            </div>
+            
+            ${room.roomTypeDescription ? `
+            <div class="section">
+              <h2 class="section-title">${t('rooms.description')}</h2>
+              <div class="description">${room.roomTypeDescription}</div>
+            </div>` : ''}
+            
+            ${room.altDescription ? `
+            <div class="section">
+              <h2 class="section-title">${t('rooms.altDescription')}</h2>
+              <div class="description">${room.altDescription}</div>
+            </div>` : ''}
+            
+            <div class="section">
+              <h2 class="section-title">${t('common.details')}</h2>
+              <div class="info-row">
+                <span class="info-label">${t('common.createdDate')}:</span>
+                <span class="info-value">${new Date(room.createdAt).toLocaleDateString()}</span>
+              </div>
+              ${room.createdBy ? `
+              <div class="info-row">
+                <span class="info-label">${t('rooms.createdBy')}:</span>
+                <span class="info-value">${room.createdBy.firstName || ''} ${room.createdBy.lastName || ''} (${room.createdBy.username})</span>
+              </div>` : ''}
+            </div>
+            
+            <script>
+              window.onload = function() {
+                window.print();
+              }
+            </script>
+          </body>
+        </html>
+      `;
+
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+    } catch (error) {
+      console.error('Error printing room:', error);
+      alert(t('rooms.errorFetchingRoom'));
+    }
+  };
+
   const handleSelectRoom = (id: string) => {
     setSelectedRooms(prev => 
       prev.includes(id) 
@@ -668,6 +854,9 @@ export default function Room() {
     setSelectedRoom(room);
     setEditingRoom(room);
     
+    // Clear all selections and select only the current room
+    setSelectedRooms([room.id]);
+    
     // Populate edit form with room data
     setEditFormData({
       id: room.id,
@@ -685,6 +874,16 @@ export default function Room() {
     });
     
     setEditFormErrors([]);
+  };
+
+
+
+  // Handle clear/cancel edit
+  const handleClearEdit = () => {
+    setEditingRoom(null);
+    setEditFormData(null);
+    setEditFormErrors([]);
+    setSelectedRoom(null);
   };
 
   const handleDeleteRoom = async (id: string) => {
@@ -832,11 +1031,7 @@ export default function Room() {
     setEditFormErrors(validation.errors);
   };
 
-  const handleCancelEdit = () => {
-    setEditingRoom(null);
-    setEditFormData(null);
-    setEditFormErrors([]);
-  };
+
 
   return (
     <ProtectedRoute requiredRole="OWNER">
@@ -872,7 +1067,7 @@ export default function Room() {
 
               {/* Message Display - Hotel Page Style */}
               {message && (
-                <div className={`mb-10 p-6 rounded-2xl border-2 shadow-lg backdrop-blur-md transition-all duration-300 ${
+                <div className={`mb-10 p-6 rounded-2xl border-2 shadow-lg backdrop-blur-md transition-all duration-300 relative ${
                   message.type === 'success'
                     ? isDark 
                       ? 'bg-emerald-900/90 border-emerald-600/60 text-emerald-100' 
@@ -881,7 +1076,23 @@ export default function Room() {
                       ? 'bg-red-900/90 border-red-600/60 text-red-100' 
                       : 'bg-red-50/90 border-red-300/60 text-red-900'
                 }`}>
-                  <div className="flex items-center space-x-4">
+                  {/* Close Button */}
+                  <button
+                    onClick={() => setMessage(null)}
+                    className={`absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 ${
+                      message.type === 'success'
+                        ? isDark 
+                          ? 'bg-emerald-800/60 hover:bg-emerald-700/80 text-emerald-200' 
+                          : 'bg-emerald-200/60 hover:bg-emerald-300/80 text-emerald-700'
+                        : isDark 
+                          ? 'bg-red-800/60 hover:bg-red-700/80 text-red-200' 
+                          : 'bg-red-200/60 hover:bg-red-300/80 text-red-700'
+                    }`}
+                  >
+                    <XMarkIcon className="w-5 h-5" />
+                  </button>
+                  
+                  <div className="flex items-center space-x-4 pr-8">
                     <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-md ${
                       message.type === 'success' 
                         ? isDark ? 'bg-emerald-800' : 'bg-emerald-100'
@@ -985,9 +1196,208 @@ export default function Room() {
                 )}
               </div>
               {/* Multiple Room Forms */}
-              {selectedHotelForMultiple && (
-                <form onSubmit={handleAddMultipleRooms} className="space-y-4 max-w-6xl mx-auto">
-                  {roomForms.map((roomForm, index) => (
+              {(selectedHotelForMultiple || editingRoom) && (
+                <form onSubmit={editingRoom ? handleUpdateRoom : handleAddMultipleRooms} className="space-y-4 max-w-6xl mx-auto">
+                  {editingRoom && editFormData ? (
+                    // Single edit form when editing
+                    <div className={`border rounded-lg shadow-sm hover:shadow-md transition-all duration-200 p-3 relative ${
+                      isDark 
+                        ? 'bg-gray-800/50 border-gray-700/60' 
+                        : 'bg-white/80 border-slate-200/60'
+                    }`}>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {/* Room Type */}
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${
+                            isDark ? 'text-gray-300' : 'text-slate-600'
+                          }`}>
+                            {t('rooms.roomType')} <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={editFormData.roomType}
+                            onChange={(e) => updateEditFormField('roomType', e.target.value)}
+                            className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors ${
+                              isDark ? 'bg-gray-700/50 border-gray-600 text-gray-200' : 'bg-white border-slate-300 text-slate-900'
+                            }`}
+                            placeholder={t('rooms.roomTypePlaceholder')}
+                          />
+                        </div>
+
+                        {/* Board Type */}
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${
+                            isDark ? 'text-gray-300' : 'text-slate-600'
+                          }`}>
+                            {t('rooms.boardType')} <span className="text-red-500">*</span>
+                          </label>
+                          <select
+                            value={editFormData.boardType}
+                            onChange={(e) => updateEditFormField('boardType', e.target.value as RoomFormData['boardType'])}
+                            className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors ${
+                              isDark ? 'bg-gray-700/50 border-gray-600 text-gray-200' : 'bg-white border-slate-300 text-slate-900'
+                            }`}
+                          >
+                            <option value="Room only">{t('rooms.roomOnly')}</option>
+                            <option value="Bed & breakfast">{t('rooms.bedBreakfast')}</option>
+                            <option value="Half board">{t('rooms.halfBoard')}</option>
+                            <option value="Full board">{t('rooms.fullBoard')}</option>
+                          </select>
+                        </div>
+
+                        {/* Room Description */}
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${
+                            isDark ? 'text-gray-300' : 'text-slate-600'
+                          }`}>
+                            {t('rooms.roomDescription')} <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={editFormData.roomTypeDescription}
+                            onChange={(e) => updateEditFormField('roomTypeDescription', e.target.value)}
+                            className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors ${
+                              isDark ? 'bg-gray-700/50 border-gray-600 text-gray-200' : 'bg-white border-slate-300 text-slate-900'
+                            }`}
+                            placeholder={t('rooms.roomDescriptionPlaceholder')}
+                          />
+                        </div>
+
+                        {/* Alternative Description */}
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${
+                            isDark ? 'text-gray-300' : 'text-slate-600'
+                          }`}>
+                            {t('rooms.altDescription')}
+                          </label>
+                          <input
+                            type="text"
+                            value={editFormData.altDescription}
+                            onChange={(e) => updateEditFormField('altDescription', e.target.value)}
+                            className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors ${
+                              isDark ? 'bg-gray-700/50 border-gray-600 text-gray-200' : 'bg-white border-slate-300 text-slate-900'
+                            }`}
+                            placeholder={t('rooms.altDescriptionPlaceholder')}
+                          />
+                        </div>
+
+                        {/* Purchase Price */}
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${
+                            isDark ? 'text-gray-300' : 'text-slate-600'
+                          }`}>
+                            {t('rooms.purchasePrice')} <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={editFormData.purchasePrice}
+                            onChange={(e) => updateEditFormField('purchasePrice', e.target.value)}
+                            className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors ${
+                              isDark ? 'bg-gray-700/50 border-gray-600 text-gray-200' : 'bg-white border-slate-300 text-slate-900'
+                            }`}
+                            placeholder="0.00"
+                          />
+                        </div>
+
+                        {/* Base Price */}
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${
+                            isDark ? 'text-gray-300' : 'text-slate-600'
+                          }`}>
+                            {t('rooms.basePrice')} <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={editFormData.basePrice}
+                            onChange={(e) => updateEditFormField('basePrice', e.target.value)}
+                            className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors ${
+                              isDark ? 'bg-gray-700/50 border-gray-600 text-gray-200' : 'bg-white border-slate-300 text-slate-900'
+                            }`}
+                            placeholder="0.00"
+                          />
+                        </div>
+
+                        {/* Alternative Price */}
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${
+                            isDark ? 'text-gray-300' : 'text-slate-600'
+                          }`}>
+                            {t('rooms.alternativePrice')}
+                          </label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={editFormData.alternativePrice}
+                            onChange={(e) => updateEditFormField('alternativePrice', e.target.value)}
+                            className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors ${
+                              isDark ? 'bg-gray-700/50 border-gray-600 text-gray-200' : 'bg-white border-slate-300 text-slate-900'
+                            }`}
+                            placeholder="0.00"
+                          />
+                        </div>
+
+                        {/* Quantity */}
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${
+                            isDark ? 'text-gray-300' : 'text-slate-600'
+                          }`}>
+                            {t('rooms.quantity')} <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            value={editFormData.quantity}
+                            onChange={(e) => updateEditFormField('quantity', e.target.value)}
+                            className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors ${
+                              isDark ? 'bg-gray-700/50 border-gray-600 text-gray-200' : 'bg-white border-slate-300 text-slate-900'
+                            }`}
+                            placeholder="1"
+                          />
+                        </div>
+
+                        {/* Available From */}
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${
+                            isDark ? 'text-gray-300' : 'text-slate-600'
+                          }`}>
+                            {t('rooms.availableFrom')}
+                          </label>
+                          <input
+                            type="date"
+                            value={editFormData.availableFrom}
+                            onChange={(e) => updateEditFormField('availableFrom', e.target.value)}
+                            className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors ${
+                              isDark ? 'bg-gray-700/50 border-gray-600 text-gray-200' : 'bg-white border-slate-300 text-slate-900'
+                            }`}
+                          />
+                        </div>
+
+                        {/* Available To */}
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${
+                            isDark ? 'text-gray-300' : 'text-slate-600'
+                          }`}>
+                            {t('rooms.availableTo')}
+                          </label>
+                          <input
+                            type="date"
+                            value={editFormData.availableTo}
+                            onChange={(e) => updateEditFormField('availableTo', e.target.value)}
+                            className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors ${
+                              isDark ? 'bg-gray-700/50 border-gray-600 text-gray-200' : 'bg-white border-slate-300 text-slate-900'
+                            }`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    // Multiple room forms when adding
+                    roomForms.map((roomForm, index) => (
                     <div key={roomForm.id} className={`border rounded-lg shadow-sm hover:shadow-md transition-all duration-200 p-3 relative ${
                       isDark 
                         ? 'bg-gray-800/40 border-gray-600/50 hover:bg-gray-800/60' 
@@ -1314,24 +1724,30 @@ export default function Room() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                  )))
+                  }
 
                   {/* Action Buttons - Minimalistic Style */}
                   <div className="flex flex-wrap gap-4 mt-6">
                     <button
                       type="submit"
                       className={`flex-1 px-6 py-2.5 font-medium text-sm rounded-lg transition-all duration-200 focus:ring-2 focus:ring-offset-1 ${
-                        !selectedHotelForMultiple || roomForms.length === 0 || loading || isValidating
-                          ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                          : 'bg-blue-600 text-white focus:ring-blue-500/50 hover:bg-blue-700'
+                        editingRoom 
+                          ? (loading ? 'bg-gray-400 text-gray-200 cursor-not-allowed' : 'bg-green-600 text-white focus:ring-green-500/50 hover:bg-green-700')
+                          : (!selectedHotelForMultiple || roomForms.length === 0 || loading || isValidating
+                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                            : 'bg-blue-600 text-white focus:ring-blue-500/50 hover:bg-blue-700')
                       }`}
-                      disabled={!selectedHotelForMultiple || roomForms.length === 0 || loading || isValidating}
+                      disabled={editingRoom ? loading : (!selectedHotelForMultiple || roomForms.length === 0 || loading || isValidating)}
                     >
-                      {loading ? t('rooms.addingRooms') : isValidating ? t('rooms.validatingRooms') : (roomForms.length === 1 ? t('rooms.addRoom') : tInterpolate('rooms.addRoomsCount', { count: roomForms.length }))}
+                      {editingRoom 
+                        ? (loading ? t('common.updating') : t('rooms.updateRoom'))
+                        : (loading ? t('rooms.addingRooms') : isValidating ? t('rooms.validatingRooms') : (roomForms.length === 1 ? t('rooms.addRoom') : tInterpolate('rooms.addRoomsCount', { count: roomForms.length })))
+                      }
                     </button>
                     <button
                       type="button"
-                      onClick={resetMultipleRoomForms}
+                      onClick={editingRoom ? handleClearEdit : resetMultipleRoomForms}
                       className={`flex-1 px-6 py-2.5 font-medium text-sm rounded-lg transition-all duration-200 focus:ring-2 focus:ring-offset-1 ${
                         isDark 
                           ? 'bg-gray-700 hover:bg-gray-600 text-gray-200 focus:ring-gray-500/50' 
@@ -1340,10 +1756,40 @@ export default function Room() {
                     >
                       <div className="flex items-center justify-center space-x-2">
                           <XMarkIcon className="w-4 h-4" />
-                          <span>{t('common.reset')}</span>
+                          <span>{editingRoom ? t('common.clear') : t('common.reset')}</span>
                         </div>
                     </button>
                   </div>
+                  
+                  {/* Selected Room Action Buttons */}
+                  {selectedRoom && (
+                    <div className="mt-4 pt-4 border-t border-gray-300 dark:border-gray-600">
+                      
+                      <div className="grid grid-cols-3 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleViewRoom(selectedRoom.id)}
+                          className={`py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white focus:ring-blue-300/50`}
+                        >
+                          {t('rooms.view')}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handlePrintRoom(selectedRoom.id)}
+                          className={`py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white focus:ring-green-300/50`}
+                        >
+                          {t('rooms.print')}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteRoom(selectedRoom.id)}
+                          className={`py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white focus:ring-red-300/50`}
+                        >
+                          {t('rooms.delete')}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </form>
               )}
             </div>
@@ -1609,49 +2055,7 @@ export default function Room() {
                 </div>
               )}
 
-              {/* Selected Room Action Buttons */}
-              {selectedRoom && (
-                <div className={`flex flex-wrap gap-3 p-4 border rounded-xl mb-6 transition-colors duration-300 ${
-                  isDark ? 'bg-green-900/30 border-green-800/50' : 'bg-green-50/50 border-green-200/50'
-                }`}>
-                  <div className={`flex items-center space-x-2 font-medium transition-colors duration-300 ${
-                    isDark ? 'text-green-300' : 'text-green-700'
-                  }`}>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{t('rooms.selectedRoom')}: {selectedRoom.roomType}</span>
-                  </div>
-                  <button
-                    onClick={() => handleViewRoom(selectedRoom.id)}
-                    className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transition-all duration-200 flex items-center space-x-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    <span>{t('rooms.view')}</span>
-                  </button>
-                  <button
-                    onClick={() => handlePrintRoom(selectedRoom.id)}
-                    className="px-4 py-2 bg-slate-500 hover:bg-slate-600 text-white text-sm rounded-lg transition-all duration-200 flex items-center space-x-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                    </svg>
-                    <span>{t('rooms.print')}</span>
-                  </button>
-                  <button
-                    onClick={() => handleDeleteRoom(selectedRoom.id)}
-                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg transition-all duration-200 flex items-center space-x-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    <span>{t('rooms.delete')}</span>
-                  </button>
-                </div>
-              )}
+
 
               {/* Rooms Table */}
               <div className={`rounded-lg border transition-colors duration-300 ${
@@ -1835,6 +2239,7 @@ export default function Room() {
                               type="checkbox"
                               checked={selectedRooms.includes(room.id)}
                               onChange={() => handleSelectRoom(room.id)}
+                              onClick={(e) => e.stopPropagation()}
                               className={`w-4 h-4 text-blue-600 rounded focus:ring-blue-500 focus:ring-2 transition-colors duration-300 ${
                                 isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
                               }`}
@@ -2007,6 +2412,8 @@ export default function Room() {
                   </div>
                 )}
               </div>
+
+              
             </div>
           </div>
         </div>
@@ -2234,401 +2641,8 @@ export default function Room() {
           </div>
         )}
 
-        {/* Edit Room Modal */}
-        {editingRoom && editFormData && (
-          <div className={`fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4 ${
-            isDark ? 'bg-black/70' : 'bg-black/50'
-          }`}>
-            <div className={`backdrop-blur-xl border rounded-3xl shadow-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto ${
-              isDark 
-                ? 'bg-gray-800/95 border-gray-700/50' 
-                : 'bg-white/90 border-white/20'
-            }`}>
-              <div className="flex items-center justify-between mb-6">
-                <h3 className={`text-2xl font-semibold ${
-                  isDark ? 'text-gray-100' : 'text-gray-900'
-                }`}>
-                  {t('rooms.editRoom')}
-                </h3>
-                <button
-                  onClick={handleCancelEdit}
-                  className={`p-2 rounded-xl transition-colors ${
-                    isDark 
-                      ? 'hover:bg-gray-700/50 text-gray-400 hover:text-gray-200' 
-                      : 'hover:bg-gray-100/50 text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <XMarkIcon className="w-6 h-6" />
-                </button>
-              </div>
-              
-              <form onSubmit={handleUpdateRoom} className="space-y-6">
-                {/* Form Validation Errors */}
-                {editFormErrors.length > 0 && (
-                  <div className={`border-2 rounded-2xl p-6 shadow-lg ${
-                    isDark 
-                      ? 'bg-red-900/20 border-red-700/60' 
-                      : 'bg-red-50/90 border-red-300/60'
-                  }`}>
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-md ${
-                        isDark ? 'bg-red-800/50' : 'bg-red-100'
-                      }`}>
-                        <svg className={`w-6 h-6 ${
-                          isDark ? 'text-red-400' : 'text-red-600'
-                        }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </div>
-                      <h4 className={`font-bold text-lg ${
-                        isDark ? 'text-red-300' : 'text-red-900'
-                      }`}>{t('validation.pleaseFixErrors')}</h4>
-                    </div>
-                    <ul className={`list-disc list-inside space-y-2 font-medium ${
-                      isDark ? 'text-red-400' : 'text-red-800'
-                    }`}>
-                      {editFormErrors.map((error, index) => (
-                        <li key={index}>{error}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Room Type */}
-                  <div>
-                    <label className={`block text-base font-bold mb-4 ${
-                      isDark ? 'text-gray-200' : 'text-slate-700'
-                    }`}>
-                      {t('rooms.roomType')} <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <HomeIcon className="w-6 h-6 text-blue-500" />
-                      </div>
-                      <input
-                        type="text"
-                        value={editFormData.roomType}
-                        onChange={(e) => updateEditFormField('roomType', e.target.value)}
-                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
-                          editFormErrors.some(error => error.includes('room type') || error.includes('Room type')) 
-                            ? `border-red-500 focus:ring-red-500/30 ${
-                                isDark ? 'bg-red-900/20 text-gray-200' : 'bg-red-50/80 text-slate-900'
-                              }` 
-                            : `border-slate-300 focus:ring-blue-500/30 ${
-                                isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900'
-                              }`
-                        }`}
-                        placeholder={t('rooms.roomTypePlaceholder')}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Room Description */}
-                  <div>
-                    <label className={`block text-base font-bold mb-4 ${
-                      isDark ? 'text-gray-200' : 'text-slate-700'
-                    }`}>
-                      {t('rooms.roomDescription')} <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <DocumentTextIcon className="w-6 h-6 text-green-500" />
-                      </div>
-                      <input
-                        type="text"
-                        value={editFormData.roomTypeDescription}
-                        onChange={(e) => updateEditFormField('roomTypeDescription', e.target.value)}
-                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
-                          editFormErrors.some(error => error.includes('description') || error.includes('Description')) 
-                            ? `border-red-500 focus:ring-red-500/30 ${
-                                isDark ? 'bg-red-900/20 text-gray-200' : 'bg-red-50/80 text-slate-900'
-                              }` 
-                            : `border-slate-300 focus:ring-blue-500/30 ${
-                                isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900'
-                              }`
-                        }`}
-                        placeholder={t('rooms.roomDescriptionPlaceholder')}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Purchase Price */}
-                  <div>
-                    <label className={`block text-base font-bold mb-4 ${
-                      isDark ? 'text-gray-200' : 'text-slate-700'
-                    }`}>
-                      {t('rooms.purchasePrice')} <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <CurrencyDollarIcon className="w-6 h-6 text-green-500" />
-                      </div>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={editFormData.purchasePrice}
-                        onChange={(e) => updateEditFormField('purchasePrice', e.target.value)}
-                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
-                          editFormErrors.some(error => error.includes('purchase') || error.includes('Purchase')) 
-                            ? `border-red-500 focus:ring-red-500/30 ${
-                                isDark ? 'bg-red-900/20 text-gray-200' : 'bg-red-50/80 text-slate-900'
-                              }` 
-                            : `border-slate-300 focus:ring-blue-500/30 ${
-                                isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900'
-                              }`
-                        }`}
-                        placeholder="0.00"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Base Price */}
-                  <div>
-                    <label className={`block text-base font-bold mb-4 ${
-                      isDark ? 'text-gray-200' : 'text-slate-700'
-                    }`}>
-                      {t('rooms.basePrice')} <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <CurrencyDollarIcon className="w-6 h-6 text-blue-500" />
-                      </div>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={editFormData.basePrice}
-                        onChange={(e) => updateEditFormField('basePrice', e.target.value)}
-                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
-                          editFormErrors.some(error => error.includes('base') || error.includes('Base')) 
-                            ? `border-red-500 focus:ring-red-500/30 ${
-                                isDark ? 'bg-red-900/20 text-gray-200' : 'bg-red-50/80 text-slate-900'
-                              }` 
-                            : `border-slate-300 focus:ring-blue-500/30 ${
-                                isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900'
-                              }`
-                        }`}
-                        placeholder="0.00"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Alternative Price */}
-                  <div>
-                    <label className={`block text-base font-bold mb-4 ${
-                      isDark ? 'text-gray-200' : 'text-slate-700'
-                    }`}>
-                      {t('rooms.alternativePrice')}
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <CurrencyDollarIcon className="w-6 h-6 text-orange-500" />
-                      </div>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={editFormData.alternativePrice}
-                        onChange={(e) => updateEditFormField('alternativePrice', e.target.value)}
-                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
-                          isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900 border-slate-300'
-                        }`}
-                        placeholder="0.00"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Quantity */}
-                  <div>
-                    <label className={`block text-base font-bold mb-4 ${
-                      isDark ? 'text-gray-200' : 'text-slate-700'
-                    }`}>
-                      {t('rooms.quantity')} <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <HashtagIcon className="w-6 h-6 text-purple-500" />
-                      </div>
-                      <input
-                        type="number"
-                        min="1"
-                        value={editFormData.quantity}
-                        onChange={(e) => updateEditFormField('quantity', e.target.value)}
-                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
-                          editFormErrors.some(error => error.includes('quantity') || error.includes('Quantity')) 
-                            ? `border-red-500 focus:ring-red-500/30 ${
-                                isDark ? 'bg-red-900/20 text-gray-200' : 'bg-red-50/80 text-slate-900'
-                              }` 
-                            : `border-slate-300 focus:ring-blue-500/30 ${
-                                isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900'
-                              }`
-                        }`}
-                        placeholder="1"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Board Type */}
-                <div>
-                  <label className={`block text-base font-bold mb-4 ${
-                    isDark ? 'text-gray-200' : 'text-slate-700'
-                  }`}>
-                    {t('rooms.boardType')} <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Cog6ToothIcon className="w-6 h-6 text-indigo-500" />
-                    </div>
-                    <select
-                      value={editFormData.boardType}
-                      onChange={(e) => updateEditFormField('boardType', e.target.value as RoomFormData['boardType'])}
-                      className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
-                        isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900 border-slate-300'
-                      }`}
-                    >
-                      <option value="Room only">{t('rooms.roomOnly')}</option>
-                      <option value="Bed & breakfast">{t('rooms.bedBreakfast')}</option>
-                      <option value="Half board">{t('rooms.halfBoard')}</option>
-                      <option value="Full board">{t('rooms.fullBoard')}</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Availability Dates */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className={`block text-base font-bold mb-4 ${
-                      isDark ? 'text-gray-200' : 'text-slate-700'
-                    }`}>
-                      {t('rooms.availableFrom')}
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <CalendarDaysIcon className="w-6 h-6 text-emerald-500" />
-                      </div>
-                      <input
-                        type="date"
-                        value={editFormData.availableFrom}
-                        onChange={(e) => updateEditFormField('availableFrom', e.target.value)}
-                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
-                          editFormErrors.some(error => error.includes('date') || error.includes('Date') || error.includes('availability')) 
-                            ? `border-red-500 focus:ring-red-500/30 ${
-                                isDark ? 'bg-red-900/20 text-gray-200' : 'bg-red-50/80 text-slate-900'
-                              }` 
-                            : `border-slate-300 focus:ring-blue-500/30 ${
-                                isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900'
-                              }`
-                        }`}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className={`block text-base font-bold mb-4 ${
-                      isDark ? 'text-gray-200' : 'text-slate-700'
-                    }`}>
-                      {t('rooms.availableTo')}
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <CalendarDaysIcon className="w-6 h-6 text-red-500" />
-                      </div>
-                      <input
-                        type="date"
-                        value={editFormData.availableTo}
-                        onChange={(e) => updateEditFormField('availableTo', e.target.value)}
-                        className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md ${
-                          editFormErrors.some(error => error.includes('date') || error.includes('Date') || error.includes('availability')) 
-                            ? `border-red-500 focus:ring-red-500/30 ${
-                                isDark ? 'bg-red-900/20 text-gray-200' : 'bg-red-50/80 text-slate-900'
-                              }` 
-                            : `border-slate-300 focus:ring-blue-500/30 ${
-                                isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900'
-                              }`
-                        }`}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Alternative Description */}
-                <div>
-                  <label className={`block text-base font-bold mb-4 ${
-                    isDark ? 'text-gray-200' : 'text-slate-700'
-                  }`}>
-                    {t('rooms.altDescription')}
-                  </label>
-                  <div className="relative">
-                    <div className="absolute top-4 left-0 pl-4 flex items-start pointer-events-none">
-                      <ChatBubbleLeftRightIcon className={`w-6 h-6 ${
-                        isDark ? 'text-gray-400' : 'text-slate-500'
-                      }`} />
-                    </div>
-                    <textarea
-                      value={editFormData.altDescription}
-                      onChange={(e) => updateEditFormField('altDescription', e.target.value)}
-                      rows={4}
-                      className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-600 transition-all duration-300 backdrop-blur-sm text-base font-medium shadow-sm hover:shadow-md resize-none ${
-                        isDark ? 'bg-gray-700/50 text-gray-200 border-gray-600' : 'bg-white text-slate-900 border-slate-300'
-                      }`}
-                      placeholder={t('rooms.altDescriptionPlaceholder')}
-                    />
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-wrap gap-4 pt-6">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className={`flex-1 px-8 py-4 font-black text-lg rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 focus:ring-4 focus:ring-offset-2 backdrop-blur-sm ${
-                      loading
-                        ? `cursor-not-allowed ${
-                            isDark ? 'bg-gray-600 text-gray-400' : 'bg-gray-400 text-gray-200'
-                          }`
-                        : `text-white focus:ring-blue-500/50 ${
-                            isDark 
-                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700' 
-                              : 'bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800'
-                          }`
-                    }`}
-                  >
-                    {loading ? (
-                      <div className="flex items-center justify-center space-x-3">
-                        <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        <span>{t('common.updating')}</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center space-x-3">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span>{t('rooms.updateRoom')}</span>
-                      </div>
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleCancelEdit}
-                    className={`px-8 py-4 text-white font-black text-lg rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 focus:ring-4 focus:ring-offset-2 backdrop-blur-sm ${
-                      isDark 
-                        ? 'bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 focus:ring-gray-500/50' 
-                        : 'bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 focus:ring-slate-500/50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-center space-x-3">
-                      <XMarkIcon className="w-6 h-6" />
-                      <span>{t('common.cancel')}</span>
-                    </div>
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-            </div>
+            </div> 
           
       
     </ProtectedRoute>
