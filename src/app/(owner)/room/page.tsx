@@ -2022,7 +2022,8 @@ export default function Room() {
               </div>
 
               {/* Selected Rooms Actions */}
-              {selectedRooms.length > 0 && (
+              {/*
+                  {selectedRooms.length > 0 && (
                 <div className={`flex flex-wrap gap-3 p-4 border rounded-xl mb-6 transition-colors duration-300 ${
                   isDark ? 'bg-blue-900/30 border-blue-800/50' : 'bg-blue-50/50 border-blue-200/50'
                 }`}>
@@ -2054,6 +2055,7 @@ export default function Room() {
                   </button>
                 </div>
               )}
+              */}
 
 
 
