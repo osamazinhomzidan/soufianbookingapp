@@ -98,7 +98,7 @@ const Navbar = ({ isOpen, onToggle }: NavbarProps) => {
         <div className="flex items-center justify-between h-full px-4 xl:px-6">
           {/* Logo and Brand */}
           <div className={`flex items-center ${isRTL ? 'space-x-reverse' : ''} space-x-2 xl:space-x-3`}>
-            <div className="w-8 h-8 xl:w-10 xl:h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center ">
+            <div className="w-8 h-8 xl:w-10 xl:h-10 bg-blue-900 rounded-lg flex items-center justify-center ">
               <span className="text-white font-bold text-sm xl:text-lg">H</span>
             </div>
             <span className={`text-lg xl:text-xl font-bold ${isDark ? 'text-white' : 'text-gray-800'} ${textAlignClass} tracking-wide hidden sm:block`}>HotelOS</span>
@@ -113,12 +113,12 @@ const Navbar = ({ isOpen, onToggle }: NavbarProps) => {
                 className={`
                   navbar-item flex items-center ${isRTL ? 'space-x-reverse' : ''} space-x-1 xl:space-x-2 px-2 xl:px-4 py-1.5 xl:py-2 rounded-lg transition-all duration-200 group
                   ${item.isActive 
-                    ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md transform scale-105' 
+                    ? 'bg-blue-900 text-white shadow-md transform scale-105' 
                     : `${isDark ? 'text-gray-300 hover:bg-gray-800/50 hover:text-white' : 'text-gray-700 hover:bg-gray-100/80 hover:text-gray-900'}`
                   }
                 `}
               >
-                <item.icon className={`w-4 h-4 xl:w-5 xl:h-5 transition-colors duration-200 ${item.isActive ? 'text-white' : `${isDark ? 'text-gray-400 group-hover:text-green-400' : 'text-gray-600 group-hover:text-green-600'}`}`} />
+                <item.icon className={`w-4 h-4 xl:w-5 xl:h-5 transition-colors duration-200 ${item.isActive ? 'text-white' : `${isDark ? 'text-gray-400 group-hover:text-blue-900' : 'text-gray-600 group-hover:text-blue-900'}`}`} />
                 <span className={`font-bold text-xs xl:text-sm ${textAlignClass} transition-colors duration-200`}>{item.title}</span>
               </Link>
             ))}

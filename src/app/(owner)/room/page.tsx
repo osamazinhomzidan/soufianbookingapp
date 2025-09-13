@@ -1738,10 +1738,10 @@ export default function Room() {
                       type="submit"
                       className={`flex-1 px-6 py-2.5 font-medium text-sm rounded-lg transition-all duration-200 focus:ring-2 focus:ring-offset-1 ${
                         editingRoom 
-                          ? (loading ? 'bg-gray-400 text-gray-200 cursor-not-allowed' : 'bg-green-600 text-white focus:ring-green-500/50 hover:bg-green-700')
+                          ? (loading ? 'bg-gray-800 text-gray-400 cursor-not-allowed' : 'bg-blue-900 text-white focus:ring-blue-800/50 hover:bg-black shadow-lg')
                           : (!selectedHotelForMultiple || roomForms.length === 0 || loading || isValidating
-                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                            : 'bg-blue-600 text-white focus:ring-blue-500/50 hover:bg-blue-700')
+                            ? 'bg-gray-800 text-gray-400 cursor-not-allowed'
+                            : 'bg-blue-900 text-white focus:ring-blue-800/50 hover:bg-black shadow-lg')
                       }`}
                       disabled={editingRoom ? loading : (!selectedHotelForMultiple || roomForms.length === 0 || loading || isValidating)}
                     >
@@ -1755,8 +1755,8 @@ export default function Room() {
                       onClick={editingRoom ? handleClearEdit : resetMultipleRoomForms}
                       className={`flex-1 px-6 py-2.5 font-medium text-sm rounded-lg transition-all duration-200 focus:ring-2 focus:ring-offset-1 ${
                         isDark 
-                          ? 'bg-gray-700 hover:bg-gray-600 text-gray-200 focus:ring-gray-500/50' 
-                          : 'bg-slate-100 hover:bg-slate-200 text-slate-700 focus:ring-slate-500/50'
+                          ? 'bg-gray-900 hover:bg-black text-gray-300 focus:ring-gray-700/50 shadow-lg' 
+                          : 'bg-gray-800 hover:bg-gray-900 text-gray-200 focus:ring-gray-600/50 shadow-lg'
                       }`}
                     >
                       <div className="flex items-center justify-center space-x-2">
@@ -1774,21 +1774,21 @@ export default function Room() {
                         <button
                           type="button"
                           onClick={() => handleViewRoom(selectedRoom.id)}
-                          className={`py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white focus:ring-blue-300/50`}
+                          className={`py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-gradient-to-r from-blue-900 to-blue-800 hover:from-black hover:to-gray-900 text-white focus:ring-blue-800/50`}
                         >
                           {t('rooms.view')}
                         </button>
                         <button
                           type="button"
                           onClick={() => handlePrintRoom(selectedRoom.id)}
-                          className={`py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white focus:ring-green-300/50`}
+                          className={`py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-gradient-to-r from-gray-800 to-gray-700 hover:from-black hover:to-gray-900 text-white focus:ring-gray-700/50`}
                         >
                           {t('rooms.print')}
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDeleteRoom(selectedRoom.id)}
-                          className={`py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white focus:ring-red-300/50`}
+                          className={`py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-gradient-to-r from-gray-900 to-black hover:from-black hover:to-gray-800 text-white focus:ring-gray-800/50`}
                         >
                           {t('rooms.delete')}
                         </button>

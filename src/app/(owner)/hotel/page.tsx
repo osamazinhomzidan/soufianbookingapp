@@ -1517,8 +1517,8 @@ export default function Hotel() {
                 disabled={loading}
                 className={`flex-1 py-2 px-4 rounded-lg font-semibold text-sm min-h-[2.25rem] transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] ${
                   loading
-                    ? 'bg-gray-400 cursor-not-allowed text-gray-600'
-                    : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white focus:ring-blue-300/50'
+                    ? 'bg-gray-800 cursor-not-allowed text-gray-400'
+                    : 'bg-gradient-to-r from-blue-900 to-blue-800 hover:from-black hover:to-gray-900 text-white focus:ring-blue-800/50'
                 }`}
               >
                 {loading ? (
@@ -1538,8 +1538,8 @@ export default function Hotel() {
                 type="button"
                 className={`flex-1 py-2 px-4 rounded-lg font-semibold text-sm min-h-[2.25rem] transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] ${
                   isDark
-                    ? 'bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white focus:ring-gray-500/50'
-                    : 'bg-gradient-to-r from-gray-200 to-gray-300 hover:from-gray-300 hover:to-gray-400 text-gray-800 focus:ring-gray-300/50'
+                    ? 'bg-gradient-to-r from-gray-900 to-black hover:from-black hover:to-gray-800 text-gray-300 focus:ring-gray-700/50'
+                    : 'bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-gray-200 focus:ring-gray-600/50'
                 }`}
                 onClick={editingHotel ? handleCancelEdit : () => {
                   setHotelName('');
@@ -1564,21 +1564,21 @@ export default function Hotel() {
                   <button
                     type="button"
                     onClick={() => handleViewHotel(selectedHotel.id)}
-                    className={`py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white focus:ring-blue-300/50`}
+                    className={`py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-gradient-to-r from-blue-900 to-blue-800 hover:from-black hover:to-gray-900 text-white focus:ring-blue-800/50`}
                   >
                     {t('common.view')}
                   </button>
                   <button
                     type="button"
                     onClick={handlePrintSelectedHotel}
-                    className={`py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white focus:ring-green-300/50`}
+                    className={`py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-gradient-to-r from-gray-800 to-gray-700 hover:from-black hover:to-gray-900 text-white focus:ring-gray-700/50`}
                   >
                     {t('common.print')}
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDeleteHotel(selectedHotel.id)}
-                    className={`py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white focus:ring-red-300/50`}
+                    className={`py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 focus:outline-none focus:ring-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-gradient-to-r from-gray-900 to-black hover:from-black hover:to-gray-800 text-white focus:ring-gray-800/50`}
                   >
                     {t('common.delete')}
                   </button>
