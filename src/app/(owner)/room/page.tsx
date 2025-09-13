@@ -171,6 +171,7 @@ export default function Room() {
   
   const [selectedRooms, setSelectedRooms] = useState<string[]>([]);
   const [selectedRoomDetails, setSelectedRoomDetails] = useState<Room | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   
   // Edit room state
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
@@ -661,6 +662,29 @@ export default function Room() {
   const handlePrintSelected = () => {
     console.log('Print selected rooms:', selectedRooms);
     // Implement print functionality for selected rooms
+  };
+
+  const handleRowClick = (room: Room) => {
+    setSelectedRoom(room);
+    setEditingRoom(room);
+    
+    // Populate edit form with room data
+    setEditFormData({
+      id: room.id,
+      roomType: room.roomType,
+      roomTypeDescription: room.roomTypeDescription,
+      altDescription: room.altDescription,
+      purchasePrice: room.purchasePrice.toString(),
+      basePrice: room.basePrice.toString(),
+      alternativePrice: room.alternativePrice?.toString() || '',
+      availableFrom: room.availableFrom || '',
+      availableTo: room.availableTo || '',
+      quantity: room.quantity.toString(),
+      boardType: room.boardType,
+      hasAlternativePrice: !!room.alternativePrice
+    });
+    
+    setEditFormErrors([]);
   };
 
   const handleDeleteRoom = async (id: string) => {
@@ -1585,6 +1609,50 @@ export default function Room() {
                 </div>
               )}
 
+              {/* Selected Room Action Buttons */}
+              {selectedRoom && (
+                <div className={`flex flex-wrap gap-3 p-4 border rounded-xl mb-6 transition-colors duration-300 ${
+                  isDark ? 'bg-green-900/30 border-green-800/50' : 'bg-green-50/50 border-green-200/50'
+                }`}>
+                  <div className={`flex items-center space-x-2 font-medium transition-colors duration-300 ${
+                    isDark ? 'text-green-300' : 'text-green-700'
+                  }`}>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{t('rooms.selectedRoom')}: {selectedRoom.roomType}</span>
+                  </div>
+                  <button
+                    onClick={() => handleViewRoom(selectedRoom.id)}
+                    className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transition-all duration-200 flex items-center space-x-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span>{t('rooms.view')}</span>
+                  </button>
+                  <button
+                    onClick={() => handlePrintRoom(selectedRoom.id)}
+                    className="px-4 py-2 bg-slate-500 hover:bg-slate-600 text-white text-sm rounded-lg transition-all duration-200 flex items-center space-x-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    <span>{t('rooms.print')}</span>
+                  </button>
+                  <button
+                    onClick={() => handleDeleteRoom(selectedRoom.id)}
+                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg transition-all duration-200 flex items-center space-x-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    <span>{t('rooms.delete')}</span>
+                  </button>
+                </div>
+              )}
+
               {/* Rooms Table */}
               <div className={`rounded-lg border transition-colors duration-300 ${
                 isDark ? 'border-gray-700/60 bg-gray-800/90' : 'border-slate-200/60 bg-white/90'
@@ -1720,12 +1788,7 @@ export default function Room() {
                           <CalendarDaysIcon className="w-3 h-3 opacity-70" />
                           {t('common.createdDate')}
                         </div>
-                        <div className={`text-left flex items-center gap-2 ${
-                          isDark ? 'text-gray-200' : 'text-slate-700'
-                        }`}>
-                          <Cog6ToothIcon className="w-3 h-3 opacity-70" />
-                          {t('common.actions')}
-                        </div>
+
                       </div>
                   </div>
                   {/* Scrollable Body */}
@@ -1734,7 +1797,7 @@ export default function Room() {
                       isDark ? 'divide-gray-700/40' : 'divide-slate-200/40'
                     }`}>
                     {filteredRooms.map((room, index) => (
-                      <div key={room.id} className={`grid items-center transition-all duration-200 gap-1 sm:gap-2 ${
+                      <div key={room.id} onClick={() => handleRowClick(room)} className={`grid items-center transition-all duration-200 gap-1 sm:gap-2 cursor-pointer ${
                         screenWidth < 640 
                           ? 'px-1 py-1 text-[7px]'
                           : screenWidth < 768
@@ -1754,18 +1817,18 @@ export default function Room() {
                           : `hover:bg-blue-50/40 ${index % 2 === 0 ? 'bg-white/60' : 'bg-slate-50/40'}`
                       }`} style={{
                         gridTemplateColumns: screenWidth < 640 
-                          ? 'minmax(20px, 25px) minmax(80px, 100px) minmax(40px, 50px) minmax(60px, 80px) minmax(50px, 70px) minmax(45px, 55px) minmax(45px, 55px) minmax(45px, 55px) minmax(35px, 45px) minmax(50px, 60px) minmax(50px, 60px) minmax(60px, 70px) minmax(35px, 45px)'
+                          ? 'minmax(20px, 25px) minmax(80px, 100px) minmax(40px, 50px) minmax(60px, 80px) minmax(50px, 70px) minmax(45px, 55px) minmax(45px, 55px) minmax(45px, 55px) minmax(35px, 45px) minmax(50px, 60px) minmax(50px, 60px) minmax(60px, 70px)'
                           : screenWidth < 768
-                          ? 'minmax(22px, 27px) minmax(100px, 120px) minmax(50px, 60px) minmax(70px, 90px) minmax(60px, 80px) minmax(55px, 65px) minmax(55px, 65px) minmax(55px, 65px) minmax(40px, 50px) minmax(60px, 70px) minmax(60px, 70px) minmax(70px, 80px) minmax(40px, 50px)'
+                          ? 'minmax(22px, 27px) minmax(100px, 120px) minmax(50px, 60px) minmax(70px, 90px) minmax(60px, 80px) minmax(55px, 65px) minmax(55px, 65px) minmax(55px, 65px) minmax(40px, 50px) minmax(60px, 70px) minmax(60px, 70px) minmax(70px, 80px)'
                           : screenWidth < 1024
-                          ? 'minmax(25px, 30px) minmax(120px, 140px) minmax(60px, 70px) minmax(80px, 100px) minmax(70px, 90px) minmax(65px, 75px) minmax(65px, 75px) minmax(65px, 75px) minmax(50px, 60px) minmax(70px, 80px) minmax(70px, 80px) minmax(80px, 90px) minmax(50px, 60px)'
+                          ? 'minmax(25px, 30px) minmax(120px, 140px) minmax(60px, 70px) minmax(80px, 100px) minmax(70px, 90px) minmax(65px, 75px) minmax(65px, 75px) minmax(65px, 75px) minmax(50px, 60px) minmax(70px, 80px) minmax(70px, 80px) minmax(80px, 90px)'
                           : screenWidth < 1366
-                          ? 'minmax(22px, 28px) minmax(110px, 130px) minmax(55px, 65px) minmax(75px, 90px) minmax(65px, 80px) minmax(60px, 70px) minmax(60px, 70px) minmax(60px, 70px) minmax(45px, 55px) minmax(65px, 75px) minmax(65px, 75px) minmax(75px, 85px) minmax(45px, 55px)'
+                          ? 'minmax(22px, 28px) minmax(110px, 130px) minmax(55px, 65px) minmax(75px, 90px) minmax(65px, 80px) minmax(60px, 70px) minmax(60px, 70px) minmax(60px, 70px) minmax(45px, 55px) minmax(65px, 75px) minmax(65px, 75px) minmax(75px, 85px)'
                           : screenWidth < 1920
-                          ? 'minmax(35px, 40px) minmax(160px, 180px) minmax(80px, 90px) minmax(120px, 140px) minmax(100px, 120px) minmax(90px, 100px) minmax(90px, 100px) minmax(90px, 100px) minmax(70px, 80px) minmax(100px, 110px) minmax(100px, 110px) minmax(120px, 130px) minmax(70px, 80px)'
+                          ? 'minmax(35px, 40px) minmax(160px, 180px) minmax(80px, 90px) minmax(120px, 140px) minmax(100px, 120px) minmax(90px, 100px) minmax(90px, 100px) minmax(90px, 100px) minmax(70px, 80px) minmax(100px, 110px) minmax(100px, 110px) minmax(120px, 130px)'
                           : screenWidth < 2560
-                          ? 'minmax(40px, 50px) minmax(180px, 220px) minmax(90px, 110px) minmax(140px, 170px) minmax(120px, 150px) minmax(100px, 120px) minmax(100px, 120px) minmax(100px, 120px) minmax(80px, 100px) minmax(120px, 140px) minmax(120px, 140px) minmax(140px, 160px) minmax(80px, 100px)'
-                          : 'minmax(50px, 60px) minmax(220px, 280px) minmax(110px, 140px) minmax(170px, 220px) minmax(150px, 200px) minmax(130px, 170px) minmax(130px, 170px) minmax(130px, 170px) minmax(100px, 130px) minmax(150px, 190px) minmax(150px, 190px) minmax(170px, 210px) minmax(100px, 130px)'
+                          ? 'minmax(40px, 50px) minmax(180px, 220px) minmax(90px, 110px) minmax(140px, 170px) minmax(120px, 150px) minmax(100px, 120px) minmax(100px, 120px) minmax(100px, 120px) minmax(80px, 100px) minmax(120px, 140px) minmax(120px, 140px) minmax(140px, 160px)'
+                          : 'minmax(50px, 60px) minmax(220px, 280px) minmax(110px, 140px) minmax(170px, 220px) minmax(150px, 200px) minmax(130px, 170px) minmax(130px, 170px) minmax(130px, 170px) minmax(100px, 130px) minmax(150px, 190px) minmax(150px, 190px) minmax(170px, 210px)'
                       }}>
                         <div className="flex items-center justify-center">
                             <input
@@ -1922,55 +1985,7 @@ export default function Room() {
                               <span className={`text-xs font-medium ${isDark ? 'text-gray-200' : 'text-slate-700'}`}>{new Date(room.createdAt).toLocaleDateString()}</span>
                             </div>
                         </div>
-                        <div className="flex items-center">
-                            <div className="flex flex-wrap gap-1">
-                              <button
-                                onClick={() => handleViewRoom(room.id)}
-                                className={`px-2 py-1 text-white text-xs font-medium rounded hover:opacity-80 transition-opacity duration-200 ${
-                                  isDark ? 'bg-blue-600' : 'bg-blue-500'
-                                }`}
-                                title={t('common.view')}
-                              >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                              </button>
-                              <button
-                                onClick={() => handleEditRoom && handleEditRoom(room.id)}
-                                className={`px-2 py-1 text-white text-xs font-medium rounded hover:opacity-80 transition-opacity duration-200 ${
-                                  isDark ? 'bg-amber-500' : 'bg-amber-600'
-                                }`}
-                                title={t('common.edit')}
-                              >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                              </button>
-                              <button
-                                onClick={() => handleDeleteRoom(room.id)}
-                                className={`px-2 py-1 text-white text-xs font-medium rounded hover:opacity-80 transition-opacity duration-200 ${
-                                  isDark ? 'bg-red-500' : 'bg-red-600'
-                                }`}
-                                title={t('common.delete')}
-                              >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                              </button>
-                              <button
-                                onClick={() => handlePrintRoom && handlePrintRoom(room.id)}
-                                className={`px-2 py-1 text-white text-xs font-medium rounded hover:opacity-80 transition-opacity duration-200 ${
-                                  isDark ? 'bg-slate-600' : 'bg-slate-700'
-                                }`}
-                                title={t('rooms.print')}
-                              >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                                </svg>
-                              </button>
-                            </div>
-                        </div>
+
                       </div>
                       ))}
                     </div>
