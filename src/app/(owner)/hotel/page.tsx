@@ -2014,8 +2014,8 @@ export default function Hotel() {
                          : 'p-2.5'
                      } rounded-lg transition-all duration-200 flex items-center justify-center group hover:scale-105 ${
                        isDark
-                         ? 'bg-red-600/80 hover:bg-red-600 text-white border border-red-500/50 hover:border-red-400'
-                         : 'bg-red-500/90 hover:bg-red-500 text-white border border-red-400/50 hover:border-red-300 shadow-sm hover:shadow-md'
+                         ? 'bg-gray-600  text-black border border-blue-900 '
+                         : 'bg-gray-200  text-black border border-blue-900 '
                      }`}
                      title="Clear All Filters"
                    >
