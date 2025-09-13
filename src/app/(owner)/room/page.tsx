@@ -1118,12 +1118,11 @@ export default function Room() {
               )}
 
               {/* Hotel Selection - Hotel Page Style */}
-              <div className="flex items-center gap-6">
-                <div className="flex-1">
-                 
+              <div className="flex items-center gap-4 mb-3">
+                <div className="flex-1 max-w-xs">
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <svg className={`w-6 h-6 transition-colors duration-300 ${
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg className={`w-4 h-4 transition-colors duration-300 ${
                         isDark ? 'text-indigo-400' : 'text-indigo-500'
                       }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -1137,10 +1136,10 @@ export default function Room() {
                           resetMultipleRoomForms();
                         }
                       }}
-                      className={`w-full pl-14 pr-4 py-4 border-2 rounded-xl focus:outline-none focus:shadow-lg transition-all duration-200 font-medium text-lg ${
+                      className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 font-bold text-sm ${
                         isDark 
-                          ? 'bg-gray-700/50 border-gray-600 text-gray-100 placeholder-gray-400 hover:border-gray-500 focus:border-indigo-500' 
-                          : 'bg-slate-50/50 border-slate-300 text-slate-700 placeholder-slate-400 hover:border-slate-400 focus:border-indigo-600'
+                          ? 'bg-gray-700/50 border-gray-600 text-gray-100 placeholder-gray-400 hover:border-gray-500 focus:ring-indigo-500/50 focus:border-indigo-500' 
+                          : 'bg-white border-gray-300 text-gray-700 placeholder-gray-400 hover:border-gray-400 focus:ring-indigo-500/50 focus:border-indigo-500'
                       }`}
                       required
                     >
@@ -1154,46 +1153,52 @@ export default function Room() {
                   </div>
                 </div>
                 
-                {/* Plus/Minus Controls - Minimalistic Style */}
-                {selectedHotelForMultiple && (
-                  <div className="flex items-center gap-3 mt-6">
-                    <button
-                      type="button"
-                      onClick={addRoomForm}
-                      className={`w-10 h-10 text-white rounded-lg flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200 focus:ring-2 focus:ring-offset-1 ${
-                        isDark 
-                          ? 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-400/50' 
-                          : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500/50'
-                      }`}
-                      title={t('rooms.addAnotherRoom')}
-                    >
-                      <PlusIcon className="w-5 h-5" />
-                    </button>
-                    {roomForms.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeRoomForm(roomForms[roomForms.length - 1].id)}
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200 focus:ring-2 focus:ring-offset-1 ${
-                          isDark 
-                            ? 'bg-gray-600 hover:bg-gray-700 text-gray-200 focus:ring-gray-500/50' 
-                            : 'bg-gray-200 hover:bg-gray-300 text-gray-700 focus:ring-gray-500/50'
-                        }`}
-                        title={t('rooms.removeLastRoom')}
-                      >
-                        <MinusIcon className="w-5 h-5" />
-                      </button>
-                    )}
-                    <div className={`px-4 py-2 rounded-lg border transition-colors duration-200 ${
+                {/* Plus/Minus Controls - Always Visible */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={addRoomForm}
+                    disabled={!selectedHotelForMultiple}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 focus:ring-2 focus:ring-offset-1 ${
+                      selectedHotelForMultiple
+                        ? isDark 
+                          ? 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-400/50' 
+                          : 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500/50'
+                        : isDark
+                          ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    }`}
+                    title={t('rooms.addAnotherRoom')}
+                  >
+                    <PlusIcon className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeRoomForm(roomForms[roomForms.length - 1].id)}
+                    disabled={!selectedHotelForMultiple || roomForms.length <= 1}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 focus:ring-2 focus:ring-offset-1 ${
+                      selectedHotelForMultiple && roomForms.length > 1
+                        ? isDark 
+                          ? 'bg-gray-600 hover:bg-gray-700 text-gray-200 focus:ring-gray-500/50' 
+                          : 'bg-gray-300 hover:bg-gray-400 text-gray-700 focus:ring-gray-500/50'
+                        : isDark
+                          ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    }`}
+                    title={t('rooms.removeLastRoom')}
+                  >
+                    <MinusIcon className="w-4 h-4" />
+                  </button>
+                  {selectedHotelForMultiple && (
+                    <div className={`ml-2 px-4 py-1 rounded-md text-xs font-black transition-colors duration-200  ${
                       isDark 
-                        ? 'bg-gray-700/50 border-gray-600 text-gray-200' 
-                        : 'bg-white/80 border-gray-300 text-gray-700'
+                        ? 'bg-gray-700/50 text-gray-300' 
+                        : 'bg-gray-100 text-gray-600'
                     }`}>
-                      <span className="text-sm font-medium">
-                        {roomForms.length} room{roomForms.length !== 1 ? 's' : ''}
-                      </span>
+                      {roomForms.length}
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
               {/* Multiple Room Forms */}
               {(selectedHotelForMultiple || editingRoom) && (
