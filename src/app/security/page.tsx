@@ -893,6 +893,21 @@ export default function SecurityPage() {
                     {t('security.activeUser')}
                   </label>
                 </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="editIsActive"
+                    checked={editForm.isActive || false}
+                    onChange={(e) => setEditForm({...editForm, isActive: e.target.checked})}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <label htmlFor="editIsActive" className={`ml-2 text-sm transition-colors duration-300 ${
+                    isDark ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
+                    {t('security.activeUser')}
+                  </label>
+                </div>
                 
                 <div className="flex justify-end space-x-4 pt-4">
                   <button

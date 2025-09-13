@@ -332,6 +332,12 @@ export interface Translations {
     enterPriceSAR: string;
     enterAlternativePriceSAR: string;
     roomQuantityPlaceholder: string;
+    roomTypePlaceholder: string;
+    purchasePricePlaceholder: string;
+    sellingPricePlaceholder: string;
+    altPricePlaceholder: string;
+    descriptionPlaceholder: string;
+    altDescriptionPlaceholder: string;
     updateRoom: string;
     fillAllFields: string;
     selectValidHotel: string;
@@ -939,7 +945,13 @@ const en: Translations = {
     roomQuantity: 'Room quantity',
     enterPriceSAR: 'Enter price in SAR',
     enterAlternativePriceSAR: 'Enter alternative price in SAR',
-    roomQuantityPlaceholder: 'Enter number of rooms',
+    roomQuantityPlaceholder: 'Number of rooms',
+    roomTypePlaceholder: 'Type',
+    purchasePricePlaceholder: 'Purchase',
+    sellingPricePlaceholder: 'Selling',
+    altPricePlaceholder: 'Alt price',
+    descriptionPlaceholder: 'Description',
+    altDescriptionPlaceholder: 'Alt description',
     updateRoom: 'Update Room',
     fillAllFields: 'Please fill all required fields',
     selectValidHotel: 'Please select a valid hotel',
@@ -1547,7 +1559,13 @@ const ar: Translations = {
     roomQuantity: 'كمية الغرف',
     enterPriceSAR: 'أدخل السعر بالريال السعودي',
     enterAlternativePriceSAR: 'أدخل السعر البديل بالريال السعودي',
-    roomQuantityPlaceholder: 'أدخل عدد الغرف',
+    roomQuantityPlaceholder: 'عدد الغرف',
+    roomTypePlaceholder: 'النوع',
+    purchasePricePlaceholder: 'الشراء',
+    sellingPricePlaceholder: 'البيع',
+    altPricePlaceholder: 'السعر البديل',
+    descriptionPlaceholder: 'الوصف',
+    altDescriptionPlaceholder: 'الوصف البديل',
     updateRoom: 'تحديث الغرفة',
     fillAllFields: 'يرجى ملء جميع الحقول المطلوبة',
     selectValidHotel: 'يرجى اختيار فندق صحيح',
